@@ -704,7 +704,7 @@ public class SharedConfig {
 
     // Mercurygram: UI settings
     public static boolean disableSecureFlags = false;
-    public static boolean removeAdsAndProxySponsor = false;
+    public static boolean removeAdsAndProxySponsor = true;
     public static boolean disableAutoUpdate = false;
     public static boolean acceptPreReleaseUpdates = false;
     // Last 5-dotted prerelease tag this install ran, so MgUpdateChecker can
@@ -1144,7 +1144,7 @@ public class SharedConfig {
                     preferences.getString("mg_unifiedPushEndpointUrl", ""));
         }
         disableSecureFlags = preferences.getBoolean("mg_disableSecureFlags", false);
-        removeAdsAndProxySponsor = preferences.getBoolean("mg_removeAdsAndProxySponsor", false);
+        removeAdsAndProxySponsor = preferences.getBoolean("mg_removeAdsAndProxySponsor", true);
         mg_enforceHttps = preferences.getBoolean("mg_enforceHttps", true);
         disableAutoUpdate = preferences.getBoolean("mg_disableAutoUpdate", false);
         acceptPreReleaseUpdates = preferences.getBoolean("mg_acceptPreReleaseUpdates", false);
