@@ -71,6 +71,7 @@ public class MercurygramSettingsActivity extends UniversalFragment {
     private static final int ID_DISABLE_PROXIMITY_SENSOR = 65;
     private static final int ID_REMOVE_ADS = 66;
     private static final int ID_ENFORCE_HTTPS = 67;
+    private static final int ID_BLOCK_AI_SERVERS = 68;
 
     @Override
     protected CharSequence getTitle() {
@@ -183,6 +184,11 @@ public class MercurygramSettingsActivity extends UniversalFragment {
                         LocaleController.getString(R.string.MercurygramDisableGlobalSearch))
                 .setChecked(getUserConfig().mg.disableGlobalSearch));
         items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramDisableGlobalSearchAbout)));
+
+        items.add(UItem.asCheck(ID_BLOCK_AI_SERVERS,
+                        LocaleController.getString(R.string.MercurygramBlockAiServers))
+                .setChecked(getUserConfig().mg.blockAiServers));
+        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramBlockAiServersAbout)));
 
         items.add(UItem.asCheck(ID_DISABLE_AI_EDITOR,
                         LocaleController.getString(R.string.MercurygramDisableAiEditor))
@@ -385,6 +391,11 @@ public class MercurygramSettingsActivity extends UniversalFragment {
                 break;
             case ID_DISABLE_GLOBAL_SEARCH:
                 getUserConfig().mg.disableGlobalSearch = !getUserConfig().mg.disableGlobalSearch;
+                getUserConfig().saveConfig(false);
+                refreshList();
+                break;
+            case ID_BLOCK_AI_SERVERS:
+                getUserConfig().mg.blockAiServers = !getUserConfig().mg.blockAiServers;
                 getUserConfig().saveConfig(false);
                 refreshList();
                 break;

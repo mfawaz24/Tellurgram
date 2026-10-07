@@ -27,6 +27,7 @@ public class MgAccountConfig {
     public boolean hideStories = false;
     public boolean hidePremiumPromo = false;
     public boolean disableGlobalSearch = false;
+    public boolean blockAiServers = true;
     public boolean disableAiEditor = true;
     public boolean disableAiSummary = true;
     public boolean disableInstantView = false;
@@ -85,6 +86,7 @@ public class MgAccountConfig {
         editor.putBoolean("hideStories", hideStories);
         editor.putBoolean("hidePremiumPromo", hidePremiumPromo);
         editor.putBoolean("disableGlobalSearch", disableGlobalSearch);
+        editor.putBoolean("blockAiServers", blockAiServers);
         editor.putBoolean("disableAiEditor", disableAiEditor);
         editor.putBoolean("disableAiSummary", disableAiSummary);
         editor.putBoolean("disableInstantView", disableInstantView);
@@ -113,6 +115,7 @@ public class MgAccountConfig {
         hideStories = preferences.getBoolean("hideStories", false);
         hidePremiumPromo = preferences.getBoolean("hidePremiumPromo", false);
         disableGlobalSearch = preferences.getBoolean("disableGlobalSearch", false);
+        blockAiServers = preferences.getBoolean("blockAiServers", true);
         disableAiEditor = preferences.getBoolean("disableAiEditor", true);
         disableAiSummary = preferences.getBoolean("disableAiSummary", true);
         disableInstantView = preferences.getBoolean("disableInstantView", false);
@@ -135,6 +138,16 @@ public class MgAccountConfig {
         mgReducedTrackingExhausted = preferences.getBoolean("mgReducedTrackingExhausted", false);
     }
 
+    /** AI editor buttons are hidden when the editor is disabled or AI servers are blocked. */
+    public boolean aiEditorOff() {
+        return blockAiServers || disableAiEditor;
+    }
+
+    /** AI summary buttons are hidden when summaries are disabled or AI servers are blocked. */
+    public boolean aiSummaryOff() {
+        return blockAiServers || disableAiSummary;
+    }
+
     public void reset() {
         rearRoundCamera = false;
         hideChatKeyboard = false;
@@ -147,6 +160,7 @@ public class MgAccountConfig {
         hideStories = false;
         hidePremiumPromo = false;
         disableGlobalSearch = false;
+        blockAiServers = true;
         disableAiEditor = true;
         disableAiSummary = true;
         disableInstantView = false;
