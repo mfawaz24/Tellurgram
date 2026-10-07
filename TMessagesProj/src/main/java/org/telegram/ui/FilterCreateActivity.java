@@ -107,7 +107,7 @@ import org.telegram.ui.Components.spoilers.SpoilersTextView;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import it.belloworld.mercurygram.folders.MgFolders;
+import it.belloworld.tellurgram.folders.MgFolders;
 
 public class FilterCreateActivity extends BaseFragment {
 
@@ -2422,7 +2422,7 @@ public class FilterCreateActivity extends BaseFragment {
         if (showedUpdateBulletin) {
             return;
         }
-        
+
         if (filter != null && filter.isChatlist() && filter.isMyChatlist()) {
             showedUpdateBulletin = true;
             showBulletinOnResume = () -> {

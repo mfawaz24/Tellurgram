@@ -99,22 +99,22 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
-import it.belloworld.mercurygram.compat.billing.BillingClient;
-import it.belloworld.mercurygram.compat.billing.BillingFlowParams;
-import it.belloworld.mercurygram.compat.billing.ProductDetails;
-import it.belloworld.mercurygram.compat.billing.Purchase;
-import it.belloworld.mercurygram.compat.billing.QueryProductDetailsParams;
-import it.belloworld.mercurygram.compat.gms.auth.GoogleSignIn;
-import it.belloworld.mercurygram.compat.gms.auth.GoogleSignInAccount;
-import it.belloworld.mercurygram.compat.gms.auth.GoogleSignInClient;
-import it.belloworld.mercurygram.compat.gms.auth.GoogleSignInOptions;
-import it.belloworld.mercurygram.compat.gms.common.ApiException;
-import it.belloworld.mercurygram.compat.gms.safetynet.SafetyNet;
-import it.belloworld.mercurygram.compat.gms.tasks.Task;
-import it.belloworld.mercurygram.compat.integrity.IntegrityManager;
-import it.belloworld.mercurygram.compat.integrity.IntegrityManagerFactory;
-import it.belloworld.mercurygram.compat.integrity.IntegrityTokenRequest;
-import it.belloworld.mercurygram.compat.integrity.IntegrityTokenResponse;
+import it.belloworld.tellurgram.compat.billing.BillingClient;
+import it.belloworld.tellurgram.compat.billing.BillingFlowParams;
+import it.belloworld.tellurgram.compat.billing.ProductDetails;
+import it.belloworld.tellurgram.compat.billing.Purchase;
+import it.belloworld.tellurgram.compat.billing.QueryProductDetailsParams;
+import it.belloworld.tellurgram.compat.gms.auth.GoogleSignIn;
+import it.belloworld.tellurgram.compat.gms.auth.GoogleSignInAccount;
+import it.belloworld.tellurgram.compat.gms.auth.GoogleSignInClient;
+import it.belloworld.tellurgram.compat.gms.auth.GoogleSignInOptions;
+import it.belloworld.tellurgram.compat.gms.common.ApiException;
+import it.belloworld.tellurgram.compat.gms.safetynet.SafetyNet;
+import it.belloworld.tellurgram.compat.gms.tasks.Task;
+import it.belloworld.tellurgram.compat.integrity.IntegrityManager;
+import it.belloworld.tellurgram.compat.integrity.IntegrityManagerFactory;
+import it.belloworld.tellurgram.compat.integrity.IntegrityTokenRequest;
+import it.belloworld.tellurgram.compat.integrity.IntegrityTokenResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -2497,7 +2497,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 });
             }
 
-            if (activityMode == MODE_LOGIN) bottomMargin -= it.belloworld.mercurygram.MgQrLogin.addButton(this, LoginActivity.this, currentAccount);
+            if (activityMode == MODE_LOGIN) bottomMargin -= it.belloworld.tellurgram.MgQrLogin.addButton(this, LoginActivity.this, currentAccount);
 
             if (bottomMargin > 0 && !AndroidUtilities.isSmallScreen()) {
                 Space bottomSpacer = new Space(context);
@@ -8794,7 +8794,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             showProxyButton(false, animated);
         }
     }
-    
+
     private boolean proxyButtonVisible;
     private Runnable showProxyButtonDelayed;
     private void showProxyButtonDelayed() {

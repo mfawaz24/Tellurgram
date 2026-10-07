@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.ui;
+package it.belloworld.tellurgram.ui;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -32,9 +32,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
-import it.belloworld.mercurygram.transcribe.MgWhisperLanguages;
-import it.belloworld.mercurygram.transcribe.MgWhisperModel;
-import it.belloworld.mercurygram.transcribe.MgWhisperTranscriber;
+import it.belloworld.tellurgram.transcribe.MgWhisperLanguages;
+import it.belloworld.tellurgram.transcribe.MgWhisperModel;
+import it.belloworld.tellurgram.transcribe.MgWhisperTranscriber;
 
 public class MercurygramTranscriptionSettingsActivity extends UniversalFragment {
 

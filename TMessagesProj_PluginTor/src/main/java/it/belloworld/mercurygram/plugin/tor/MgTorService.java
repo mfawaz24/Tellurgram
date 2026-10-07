@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.plugin.tor;
+package it.belloworld.tellurgram.plugin.tor;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -21,7 +21,7 @@ import androidx.core.app.NotificationCompat;
 //
 // Runs in the ":tor" process (manifest android:process). Bound by the main
 // Mercurygram app via the IMgTorService.BIND intent action, gated by the
-// signature-level "it.belloworld.mercurygram.plugin.tor.BIND" permission.
+// signature-level "org.tellurgram.plugin.tor.BIND" permission.
 //
 // Responsibilities (and only these):
 //   - Bridge IMgTorService binder calls -> MgTorController instance.

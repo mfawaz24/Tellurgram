@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.gms.tasks;
+package it.belloworld.tellurgram.compat.gms.tasks;
 
 import java.util.function.Consumer;
 

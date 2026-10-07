@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram;
+package it.belloworld.tellurgram;
 
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.UserConfig;

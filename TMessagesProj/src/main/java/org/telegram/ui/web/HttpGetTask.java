@@ -32,7 +32,7 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
         String urlString = params[0];
 
         try {
-            URL url = new URL(urlString);
+            URL url = new URL(it.belloworld.tellurgram.MgHttps.upgrade(urlString));
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             for (Map.Entry<String, String> e : headers.entrySet()) {
                 if (e.getKey() == null || e.getValue() == null) continue;

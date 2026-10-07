@@ -1,6 +1,6 @@
-package it.belloworld.mercurygram
+package it.belloworld.tellurgram
 
-import it.belloworld.mercurygram.search.MgSearchQuery
+import it.belloworld.tellurgram.search.MgSearchQuery
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

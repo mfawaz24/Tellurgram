@@ -348,7 +348,7 @@ public class StoryLinkSheet extends BottomSheetWithRecyclerListView implements N
 
     private final Runnable requestPreview = () -> {
         // Mercurygram: don't fetch a preview for a URL in the story-link sheet (#26)
-        if (it.belloworld.mercurygram.MgLinkPreview.suppressed(currentAccount)) {
+        if (it.belloworld.tellurgram.MgLinkPreview.suppressed(currentAccount)) {
             webpage = null;
             webpageId = 0;
             loading = false;

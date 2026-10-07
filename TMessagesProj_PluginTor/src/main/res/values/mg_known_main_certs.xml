@@ -27,7 +27,7 @@
     <string-array name="mg_known_main_certs" translatable="false">
         <!-- Developer keystore (GitHub releases + reproducible-built F-Droid APKs). -->
         <item>1e73de100e2646be671afad2cb4bb471538e062a745ae5adbe6c7d1666fd1ee9</item>
-        <!-- F-Droid per-app key for it.belloworld.mercurygram. -->
+        <!-- F-Droid per-app key for it.belloworld.tellurgram. -->
         <item>feb802f2f14cee16efd9fec5d809fa3bef7a2b349b989f816d42aad9c39ef77a</item>
     </string-array>
 </resources>

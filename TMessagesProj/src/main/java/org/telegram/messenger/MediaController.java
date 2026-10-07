@@ -787,12 +787,12 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             // viewer displayed, not the file's EXIF. The two disagree on any photo whose
             // MediaStore orientation is stale or whose EXIF mirrors, and then the bake cuts
             // out a different region than the user picked.
-            final int[] orientation = it.belloworld.mercurygram.MgPhotoCrop.sourceOrientation(this);
+            final int[] orientation = it.belloworld.tellurgram.MgPhotoCrop.sourceOrientation(this);
             final Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
             // Mercurygram: cut the crop out of the source at full resolution. Downscaling first
             // and cropping after shrinks the result by the crop ratio, and nothing downstream can
             // get those pixels back.
-            Bitmap b = fullPaintPath != null ? null : it.belloworld.mercurygram.MgPhotoCrop.renderHighQualityCrop(this, AndroidUtilities.getPhotoSize(highQuality));
+            Bitmap b = fullPaintPath != null ? null : it.belloworld.tellurgram.MgPhotoCrop.renderHighQualityCrop(this, AndroidUtilities.getPhotoSize(highQuality));
             final Bitmap bitmap = b != null ? null : StoryEntry.getScaledBitmap(opts -> BitmapFactory.decodeFile(filterPath != null ? filterPath : path, opts), AndroidUtilities.getPhotoSize(highQuality), AndroidUtilities.getPhotoSize(highQuality), false, true);
             if (imagePath != null) {
                 new File(imagePath).delete(); imagePath = null;
@@ -3040,7 +3040,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         playMusicAgain = true;
         playMessage(currentPlayList.get(currentPlaylistNum));
     }
-    
+
     private boolean traversePlaylist(ArrayList<MessageObject> playlist, int direction) {
         boolean last = false;
         final int wasCurrentPlaylistNum = currentPlaylistNum;
@@ -4211,7 +4211,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     private boolean canStartMusicPlayerService() {
         return playingMessageObject != null && (playingMessageObject.isMusic() || playingMessageObject.isVoice() || playingMessageObject.isRoundVideo()) && !playingMessageObject.isVoiceOnce() && !playingMessageObject.isRoundOnce();
     }
-    
+
     public void updateSilent(boolean value) {
         isSilent = value;
         if (videoPlayer != null) {

@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.push;
+package it.belloworld.tellurgram.push;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -14,7 +14,7 @@ import org.unifiedpush.android.connector.UnifiedPush;
 import org.unifiedpush.android.embedded_fcm_distributor.EmbeddedDistributorReceiver;
 import org.unifiedpush.android.embedded_fcm_distributor.Gateway;
 
-import it.belloworld.mercurygram.MgInstallSource;
+import it.belloworld.tellurgram.MgInstallSource;
 
 /**
  * UnifiedPush distributor that delivers through Firebase Cloud Messaging without any

@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.billing;
+package it.belloworld.tellurgram.compat.billing;
 
 import java.util.List;
 

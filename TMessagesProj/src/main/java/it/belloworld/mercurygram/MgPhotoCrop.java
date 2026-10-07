@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram;
+package it.belloworld.tellurgram;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.transcribe;
+package it.belloworld.tellurgram.transcribe;
 
 import android.content.Context;
 import android.net.Uri;
@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Sayboard pattern (free model + manual alternative) so no new F-Droid
  * antifeature is incurred beyond the NonFreeNet the app already carries for
  * talking to Telegram's servers. Download style mirrors
- * {@link it.belloworld.mercurygram.MgUpdateChecker#downloadUpdate}.
+ * {@link it.belloworld.tellurgram.MgUpdateChecker#downloadUpdate}.
  */
 public final class MgWhisperModel {
 

@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram;
+package it.belloworld.tellurgram;
 
 import android.content.SharedPreferences;
 import android.text.TextUtils;

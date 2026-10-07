@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.gms.wallet;
+package it.belloworld.tellurgram.compat.gms.wallet;
 
 import android.content.Intent;
 

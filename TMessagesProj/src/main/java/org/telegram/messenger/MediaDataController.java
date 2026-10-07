@@ -46,7 +46,7 @@ import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.core.graphics.drawable.IconCompat;
 
-import it.belloworld.mercurygram.compat.billing.ProductDetails;
+import it.belloworld.tellurgram.compat.billing.ProductDetails;
 
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLiteDatabase;
@@ -207,7 +207,7 @@ public class MediaDataController extends BaseController {
         loadRepliesOfDraftReplies(replyMessageOwners);
 
         loadStickersByEmojiOrName(AndroidUtilities.STICKERS_PLACEHOLDER_PACK_NAME, false, true);
-        loadStickersByEmojiOrName(it.belloworld.mercurygram.emoji.MgLegacyEmojiAnimations.PACK, false, true);
+        loadStickersByEmojiOrName(it.belloworld.tellurgram.emoji.MgLegacyEmojiAnimations.PACK, false, true);
         loadEmojiThemes();
         loadRecentAndTopReactions(false);
         loadAvatarConstructor(false);
@@ -1745,7 +1745,7 @@ public class MediaDataController extends BaseController {
             }
         }
         // Mercurygram: fall back to our own pack for the big emoji the server dropped.
-        return it.belloworld.mercurygram.emoji.MgLegacyEmojiAnimations.legacyDocument(currentAccount, emoji);
+        return it.belloworld.tellurgram.emoji.MgLegacyEmojiAnimations.legacyDocument(currentAccount, emoji);
     }
 
     public boolean canAddStickerToFavorites() {
@@ -3684,7 +3684,7 @@ public class MediaDataController extends BaseController {
     private SparseArray<MessageObject>[] searchServerResultMessagesMap = new SparseArray[]{new SparseArray<>(), new SparseArray<>()};
     private ArrayList<MessageObject> deletedFromResultMessages = new ArrayList<>();
     private String lastSearchQuery;
-    private it.belloworld.mercurygram.search.MgSearchQuery mgChatSearchQuery = it.belloworld.mercurygram.search.MgSearchQuery.EMPTY;
+    private it.belloworld.tellurgram.search.MgSearchQuery mgChatSearchQuery = it.belloworld.tellurgram.search.MgSearchQuery.EMPTY;
     private int lastReturnedNum;
     private boolean loadingMoreSearchMessages;
     private boolean loadingSearchLocal;
@@ -3857,7 +3857,7 @@ public class MediaDataController extends BaseController {
         long queryWithDialog = dialogId;
         boolean firstQuery = !internal;
         if (query != null && !internal) {
-            query = (mgChatSearchQuery = it.belloworld.mercurygram.search.MgSearchQuery.parse(query, getMessagesController())).q;
+            query = (mgChatSearchQuery = it.belloworld.tellurgram.search.MgSearchQuery.parse(query, getMessagesController())).q;
         }
         if (reqId != 0) {
             loadingMoreSearchMessages = false;

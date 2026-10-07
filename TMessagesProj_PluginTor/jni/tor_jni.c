@@ -38,7 +38,7 @@
 #include "tor_api.h"
 
 JNIEXPORT jint JNICALL
-Java_it_belloworld_mercurygram_plugin_tor_MgTorNative_run(JNIEnv *env, jclass clazz,
+Java_it_belloworld_tellurgram_plugin_tor_MgTorNative_run(JNIEnv *env, jclass clazz,
                                                    jobjectArray jargv) {
     (void) clazz;
 
@@ -137,7 +137,7 @@ Java_it_belloworld_mercurygram_plugin_tor_MgTorNative_run(JNIEnv *env, jclass cl
 }
 
 JNIEXPORT void JNICALL
-Java_it_belloworld_mercurygram_plugin_tor_MgTorNative_shutdown(JNIEnv *env, jclass clazz) {
+Java_it_belloworld_tellurgram_plugin_tor_MgTorNative_shutdown(JNIEnv *env, jclass clazz) {
     (void) env;
     (void) clazz;
     // No-op: shutdown is driven from Java via control-port SIGNAL SHUTDOWN.

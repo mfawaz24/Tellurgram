@@ -29,7 +29,7 @@ const MAX_FCM_PAYLOAD = 4096;
 
 const FCM_AUDIENCE = "https://fcm.googleapis.com";
 // RFC 8292 requires a contact; FCM does not act on it, but it must be present.
-const VAPID_SUBJECT = "https://mercurygram.org/";
+const VAPID_SUBJECT = "https://tellurgram.org/";
 // FCM rejects a JWT valid for more than 24h. 12h leaves room for clock skew.
 const JWT_LIFETIME_SECS = 12 * 60 * 60;
 // Re-sign this long before expiry so an in-flight push never carries a stale JWT.

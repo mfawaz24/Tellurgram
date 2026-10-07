@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.emoji;
+package it.belloworld.tellurgram.emoji;
 
 import android.text.TextUtils;
 

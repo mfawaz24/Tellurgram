@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.integrity;
+package it.belloworld.tellurgram.compat.integrity;
 
 import android.content.Context;
 

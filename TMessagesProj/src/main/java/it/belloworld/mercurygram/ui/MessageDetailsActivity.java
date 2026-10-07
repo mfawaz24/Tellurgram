@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.ui;
+package it.belloworld.tellurgram.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -34,7 +34,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-import it.belloworld.mercurygram.MgLocalMedia;
+import it.belloworld.tellurgram.MgLocalMedia;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;

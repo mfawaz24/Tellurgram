@@ -54,6 +54,8 @@ import android.view.inputmethod.EditorInfo;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.RenderProcessGoneDetail;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -73,15 +75,15 @@ import androidx.dynamicanimation.animation.FloatValueHolder;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
 
-import it.belloworld.mercurygram.compat.gms.common.Status;
-import it.belloworld.mercurygram.compat.gms.tasks.Task;
-import it.belloworld.mercurygram.compat.gms.wallet.AutoResolveHelper;
-import it.belloworld.mercurygram.compat.gms.wallet.IsReadyToPayRequest;
-import it.belloworld.mercurygram.compat.gms.wallet.PaymentData;
-import it.belloworld.mercurygram.compat.gms.wallet.PaymentDataRequest;
-import it.belloworld.mercurygram.compat.gms.wallet.PaymentsClient;
-import it.belloworld.mercurygram.compat.gms.wallet.Wallet;
-import it.belloworld.mercurygram.compat.gms.wallet.WalletConstants;
+import it.belloworld.tellurgram.compat.gms.common.Status;
+import it.belloworld.tellurgram.compat.gms.tasks.Task;
+import it.belloworld.tellurgram.compat.gms.wallet.AutoResolveHelper;
+import it.belloworld.tellurgram.compat.gms.wallet.IsReadyToPayRequest;
+import it.belloworld.tellurgram.compat.gms.wallet.PaymentData;
+import it.belloworld.tellurgram.compat.gms.wallet.PaymentDataRequest;
+import it.belloworld.tellurgram.compat.gms.wallet.PaymentsClient;
+import it.belloworld.tellurgram.compat.gms.wallet.Wallet;
+import it.belloworld.tellurgram.compat.gms.wallet.WalletConstants;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
 import com.stripe.android.exception.APIConnectionException;
@@ -499,7 +501,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
     private void setDelegate(PaymentFormActivityDelegate paymentFormActivityDelegate) {
         delegate = paymentFormActivityDelegate;
     }
-    
+
     public void setResourcesProvider(Theme.ResourcesProvider provider) {
         resourcesProvider = provider;
     }
@@ -1228,6 +1230,12 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                     webView.addJavascriptInterface(new TelegramWebviewProxy(), "TelegramWebviewProxy");
                 }
                 webView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                        WebResourceResponse https = it.belloworld.tellurgram.MgHttps.intercept(request);
+                        return https != null ? https : super.shouldInterceptRequest(view, request);
+                    }
+
                     @Override
                     public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
                         try {
@@ -2508,6 +2516,12 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                     }
 
                     webView.setWebViewClient(new WebViewClient() {
+                        @Override
+                        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                            WebResourceResponse https = it.belloworld.tellurgram.MgHttps.intercept(request);
+                            return https != null ? https : super.shouldInterceptRequest(view, request);
+                        }
+
                         @Override
                         public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
                             try {

@@ -26,6 +26,8 @@ import android.view.View;
 import android.view.ViewParent;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -235,6 +237,12 @@ public class WebviewActivity extends BaseFragment {
         }
 
         webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                WebResourceResponse https = it.belloworld.tellurgram.MgHttps.intercept(request);
+                return https != null ? https : super.shouldInterceptRequest(view, request);
+            }
+
 
             private boolean isInternalUrl(String url) {
                 if (TextUtils.isEmpty(url)) {

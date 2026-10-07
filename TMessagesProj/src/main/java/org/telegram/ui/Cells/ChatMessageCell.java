@@ -99,7 +99,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.math.MathUtils;
 
-import it.belloworld.mercurygram.map.MgMapSnapshot;
+import it.belloworld.tellurgram.map.MgMapSnapshot;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
@@ -963,7 +963,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         public int selectorDrawableColor;
         public Drawable selectorDrawable;
         public PollButtonDrawable pollButtonDrawable;
-        
+
         private AvatarDrawable avatarDrawable;
         private ImageReceiver avatarImageReceiver;
 
@@ -3550,7 +3550,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
         }
 
-        
+
         if (action == MotionEvent.ACTION_DOWN) {
             pollMediaPressedIndex = PollAttachedMediaPack.INDEX_NONE;
             if (pollContentDrawable != null && pollContentDrawable.isHasMedia() && pollContentDrawable.getBounds().contains(x, y)) {
@@ -12682,7 +12682,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             (
                 UserConfig.getInstance(currentAccount).isPremium()
                 ||
-                it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.isUsable()
+                it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.isUsable()
                 ||
                 TranscribeButton.isFreeTranscribeInChat(currentMessageObject)
                 ||
@@ -18191,12 +18191,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (!currentMessageObject.isDice()) {
             return false;
         }
-        
+
         Drawable drawable = photoImage.getDrawable();
         if (!(drawable instanceof RLottieDiceDrawable)) {
             return false;
         }
-        
+
         RLottieDiceDrawable lottieDrawable = (RLottieDiceDrawable) drawable;
         String emoji = currentMessageObject.getDiceEmoji();
         TLRPC.TL_messages_stickerSet stickerSet = MediaDataController.getInstance(currentAccount).getStickerSetByEmojiOrName(emoji);
@@ -18204,7 +18204,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             MediaDataController.getInstance(currentAccount).loadStickersByEmojiOrName(emoji, true, true);
             return false;
         }
-        
+
         int value = currentMessageObject.getDiceValue();
         if ("\uD83C\uDFB0".equals(currentMessageObject.getDiceEmoji())) {
             if (value >= 0 && value <= 64) {
@@ -26700,7 +26700,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     public float getEventX(MotionEvent event) {
         return event.getX();
     }
-    
+
     public float getEventY(MotionEvent event) {
         return event.getY() - starsPriceTopPadding - topicSeparatorTopPadding - suggestionOfferTopPadding;
     }
@@ -28863,7 +28863,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     changed = true;
                 }
             }
-            
+
             if (mediaOffsetY != lastMediaOffsetY) {
                 animateFromMediaOffsetY = lastMediaOffsetY;
                 animateMediaOffsetY = true;
@@ -29519,8 +29519,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     private TL_stars.StarGift instantViewTypeIsGiftAuction;
 
-    
-    
+
+
     private static boolean isSmallImageLinkPreviewType(String type) {
         return "app".equals(type) || "profile".equals(type) ||
                 "article".equals(type) || "telegram_bot".equals(type) ||
@@ -29529,7 +29529,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 "telegram_livestream".equals(type) || "telegram_channel_boost".equals(type) || "telegram_group_boost".equals(type) ||
                 "telegram_aicomposetone".equals(type);
     }
-    
+
     private static void normalizePollPercents(boolean hasDifferent, int restPercent, ArrayList<PollButton> sortedPollButtons) {
         if (!hasDifferent || restPercent == 0 || sortedPollButtons == null || sortedPollButtons.isEmpty()) {
             return;

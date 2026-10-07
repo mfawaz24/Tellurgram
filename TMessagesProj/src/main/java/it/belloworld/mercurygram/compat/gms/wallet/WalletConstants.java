@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.gms.wallet;
+package it.belloworld.tellurgram.compat.gms.wallet;
 
 /** Stub — Google Wallet removed in FOSS builds. */
 public class WalletConstants {

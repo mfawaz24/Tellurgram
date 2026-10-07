@@ -78,7 +78,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
+import it.belloworld.tellurgram.HiddenAccountHelper;
 
 public class NotificationsSettingsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -957,7 +957,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
 
         if (!alternatives.isEmpty()) {
             String alt = alternatives.get(0);
-            it.belloworld.mercurygram.push.UnifiedPushListenerServiceProvider.switchDistributor(alt);
+            it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.switchDistributor(alt);
             builder.setMessage(baseMessage + "\n\n" + LocaleController.formatString(R.string.NtfyDefaultServerSwitched, alt));
             builder.setPositiveButton(getString(R.string.OK), null);
         } else {
@@ -967,7 +967,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                 if (!SharedConfig.disableUnifiedPush) {
                     SharedConfig.toggleDisableUnifiedPush();
                 }
-                it.belloworld.mercurygram.push.UnifiedPushListenerServiceProvider.applyDisabled();
+                it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.applyDisabled();
                 SharedConfig.setUnifiedPushEndpointUrl("");
             });
         }

@@ -1,6 +1,6 @@
-package it.belloworld.mercurygram
+package it.belloworld.tellurgram
 
-import it.belloworld.mercurygram.emoji.MgLegacyEmojiAnimations
+import it.belloworld.tellurgram.emoji.MgLegacyEmojiAnimations
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Test

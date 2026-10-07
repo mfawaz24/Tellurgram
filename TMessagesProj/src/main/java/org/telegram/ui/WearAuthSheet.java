@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import it.belloworld.mercurygram.compat.gms.wearable.Wearable;
+import it.belloworld.tellurgram.compat.gms.wearable.Wearable;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;

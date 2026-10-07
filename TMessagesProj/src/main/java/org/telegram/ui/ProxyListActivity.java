@@ -508,7 +508,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
                 }
                 ConnectionsManager.setProxySettings(useProxySettings, SharedConfig.currentProxy.settings);
             } else if (position == torRow) {
-                presentFragment(new it.belloworld.mercurygram.ui.MgTorSettingsActivity());
+                presentFragment(new it.belloworld.tellurgram.ui.MgTorSettingsActivity());
             } else if (position == proxyAddRow) {
                 presentFragment(new ProxySettingsActivity());
             } else if (position == deleteAllRow) {
@@ -683,7 +683,7 @@ public class ProxyListActivity extends BaseFragment implements NotificationCente
         }
         // MG: pre-S F-Droid can't bind the Tor plugin at all, so the row is
         // hidden there exactly like the one in Mercurygram settings.
-        torRow = it.belloworld.mercurygram.tor.MgTorClient.isFdroidPreS() ? -1 : rowCount++;
+        torRow = it.belloworld.tellurgram.tor.MgTorClient.isFdroidPreS() ? -1 : rowCount++;
         // MG: torRow sits after the rotation block, so when the rotation-timeout
         // info row closed the section the Tor row would otherwise be stranded
         // between that shadow and the "Connections" header with nothing under it.

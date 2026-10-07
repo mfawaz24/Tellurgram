@@ -183,7 +183,7 @@ public class ConnectionsManager extends BaseController {
     private static HashMap<String, ResolvedDomain> dnsCache = new HashMap<>();
 
     private static int lastClassGuid = 1;
-    
+
     private static final ConnectionsManager[] Instance = new ConnectionsManager[UserConfig.MAX_ACCOUNT_COUNT];
     public static ConnectionsManager getInstance(int num) {
         ConnectionsManager localInstance = Instance[num];
@@ -387,7 +387,7 @@ public class ConnectionsManager extends BaseController {
     }
 
     private void sendRequestInternal(TLObject object, RequestDelegate onComplete, RequestDelegateTimestamp onCompleteTimestamp, QuickAckDelegate onQuickAck, WriteToSocketDelegate onWriteToSocket, int flags, int datacenterId, int connectionType, boolean immediate, int requestToken) {
-        if (it.belloworld.mercurygram.folders.MgFolders.dropIfMercurygram(object, onComplete)) return; // Mercurygram: folders with a negative id never reach the server
+        if (it.belloworld.tellurgram.folders.MgFolders.dropIfMercurygram(object, onComplete)) return; // Mercurygram: folders with a negative id never reach the server
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("send request " + object + " with token = " + requestToken);
         }
@@ -775,7 +775,7 @@ public class ConnectionsManager extends BaseController {
         // MG: drive embedded tor daemon lifecycle off app foreground/background.
         // Guarded by mg_useTor so the call is zero-cost when tor is off.
         if (!byScreenState && SharedConfig.mg_useTor) {
-            it.belloworld.mercurygram.tor.MgTorClient.getInstance().onAppPausedChanged(currentAccount, appResumeCount);
+            it.belloworld.tellurgram.tor.MgTorClient.getInstance().onAppPausedChanged(currentAccount, appResumeCount);
         }
         if (appResumeCount == 0) {
             if (lastPauseTime == 0) {
@@ -1017,7 +1017,7 @@ public class ConnectionsManager extends BaseController {
         }
 
         // MG: Tor owns the single native proxy slot while mg_useTor is on.
-        if (it.belloworld.mercurygram.tor.MgTorClient.blocksProxyWrite(enabled, address, port)) return;
+        if (it.belloworld.tellurgram.tor.MgTorClient.blocksProxyWrite(enabled, address, port)) return;
 
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             if (enabled && settings != null && settings.isValid()) {

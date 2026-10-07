@@ -94,7 +94,7 @@ build_source_facts() {
         }
         function theme_of(s,    t) {
             t = ""
-            if (s ~ /([Tt]or|MgTor|mg_useTor|mg_torIdle|MercurygramTor|mercurygram\/tor\/)/) t = t ",tor"
+            if (s ~ /([Tt]or|MgTor|mg_useTor|mg_torIdle|MercurygramTor|tellurgram\/tor\/)/) t = t ",tor"
             if (s ~ /(ReduceTracking|reduceTracking|mgReducedTracking|mg_reduceTracking|mg_lastExhaustedClearedBuild|MercurygramReduceTracking|temp[_-]?key|tempKey|auth_key_id|rotateTempAuthKeys)/) t = t ",reduce-tracking"
             if (s ~ /(MgNetworkChangeWatcher|NetworkChange|rotateAllAccounts)/) t = t ",network-change"
             if (s ~ /([Pp]re[Rr]elease|isPreRelease)/) t = t ",pre-release"
@@ -373,7 +373,7 @@ call_model() {
           response_format: {
             type: "json_schema",
             json_schema: {
-              name: "mercurygram_changelog",
+              name: "tellurgram_changelog",
               strict: true,
               schema: {
                 type: "object",

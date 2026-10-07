@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.integrity;
+package it.belloworld.tellurgram.compat.integrity;
 
 /** Stub — Play Integrity removed in FOSS builds. */
 public class IntegrityTokenRequest {

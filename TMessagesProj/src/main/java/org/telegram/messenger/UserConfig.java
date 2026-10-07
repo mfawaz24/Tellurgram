@@ -21,7 +21,7 @@ import org.telegram.tgnet.tl.TL_account;
 
 import java.util.Arrays;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
+import it.belloworld.tellurgram.HiddenAccountHelper;
 
 public class UserConfig extends BaseController {
 
@@ -64,7 +64,7 @@ public class UserConfig extends BaseController {
     public boolean syncContacts = true;
     public boolean suggestContacts = true;
     public boolean showCallsTab;
-    public final it.belloworld.mercurygram.MgAccountConfig mg = new it.belloworld.mercurygram.MgAccountConfig();
+    public final it.belloworld.tellurgram.MgAccountConfig mg = new it.belloworld.tellurgram.MgAccountConfig();
     public boolean hasSecureData;
     public int loginTime;
     public TLRPC.TL_help_termsOfService unacceptedTermsOfService;

@@ -99,7 +99,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
+import it.belloworld.tellurgram.HiddenAccountHelper;
 
 public class NotificationsController extends BaseController implements NotificationCenter.NotificationCenterDelegate {
 

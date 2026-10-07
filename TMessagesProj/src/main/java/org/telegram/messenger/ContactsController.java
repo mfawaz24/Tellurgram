@@ -51,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
+import it.belloworld.tellurgram.HiddenAccountHelper;
 
 public class ContactsController extends BaseController {
 
@@ -248,7 +248,7 @@ public class ContactsController extends BaseController {
     public HashMap<String, TLRPC.TL_contact> contactsByShortPhone = new HashMap<>();
 
     private int completedRequestsCount;
-    
+
     private static volatile ContactsController[] Instance = new ContactsController[UserConfig.MAX_ACCOUNT_COUNT];
     public static ContactsController getInstance(int num) {
         ContactsController localInstance = Instance[num];

@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.gms.auth;
+package it.belloworld.tellurgram.compat.gms.auth;
 
 /** Stub — Google Sign-In removed in FOSS builds. */
 public class GoogleSignInAccount {

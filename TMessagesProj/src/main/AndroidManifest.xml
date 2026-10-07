@@ -91,7 +91,7 @@
     <!-- Plugin Tor companion (TMessagesProj_PluginTor). Signature-level
          permission gates bindService against the IMgTorService.BIND action;
          both APKs share the signing key by invariant. -->
-    <uses-permission android:name="it.belloworld.mercurygram.plugin.tor.BIND" />
+    <uses-permission android:name="org.tellurgram.plugin.tor.BIND" />
 
     <queries>
         <intent>
@@ -109,7 +109,7 @@
              covers every applicationId variant (.beta / .web debug suffixes)
              without enumerating them. -->
         <intent>
-            <action android:name="it.belloworld.mercurygram.plugin.tor.BIND" />
+            <action android:name="org.tellurgram.plugin.tor.BIND" />
         </intent>
         <!-- Belt-and-braces: explicit <package> entries so
              PackageManager.getPackageInfo(name, 0) succeeds even on Android
@@ -118,7 +118,7 @@
              queryIntentServices; a stricter future API revision could
              require explicit declaration for plain getPackageInfo lookups
              that MgTorClient.isPluginInstalled relies on). -->
-        <package android:name="it.belloworld.mercurygram.plugin.tor" />
+        <package android:name="org.tellurgram.plugin.tor" />
         <!-- Mercurygram: AIDL translation client (dev.davidv.translator). -->
         <package android:name="dev.davidv.translator"/>
         <intent>
@@ -592,7 +592,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name="it.belloworld.mercurygram.push.MgEmbeddedFcmDistributor"
+        <receiver android:name="it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor"
             android:enabled="true" android:exported="false">
             <intent-filter>
                 <action android:name="org.unifiedpush.android.distributor.feature.BYTES_MESSAGE"/>
@@ -606,7 +606,7 @@
                 <action android:name="org.telegram.start" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="it.belloworld.mercurygram.PUSH_WATCHDOG" />
+                <action android:name="it.belloworld.tellurgram.PUSH_WATCHDOG" />
             </intent-filter>
         </receiver>
 

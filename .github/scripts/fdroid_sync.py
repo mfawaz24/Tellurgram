@@ -10,8 +10,8 @@ Steps per release tag:
   3. Bump CurrentVersion / CurrentVersionCode.
 
 Two F-Droid recipes are kept in sync:
-  * main         -> it.belloworld.mercurygram          (TMessagesProj_App)
-  * plugin.tor   -> it.belloworld.mercurygram.plugin.tor (TMessagesProj_PluginTor)
+  * main         -> it.belloworld.tellurgram          (TMessagesProj_App)
+  * plugin.tor   -> it.belloworld.tellurgram.plugin.tor (TMessagesProj_PluginTor)
 
 Both APKs come from the same git tag / signing key but get separate recipes.
 APK files from both AppIDs may co-exist under apks_dir; we filter by package
@@ -20,7 +20,7 @@ the recipe currently being edited.
 
 Usage:
   fdroid_sync.py [--app=main|plugin.tor|both] <tag> <apks_dir> \
-                 <fdroiddata_root> <mercurygram_repo>
+                 <fdroiddata_root> <tellurgram_repo>
 """
 
 import argparse
@@ -36,10 +36,10 @@ from ruamel.yaml import YAML
 
 APPS = {
     'main': {
-        'appid': 'it.belloworld.mercurygram',
+        'appid': 'it.belloworld.tellurgram',
     },
     'plugin.tor': {
-        'appid': 'it.belloworld.mercurygram.plugin.tor',
+        'appid': 'it.belloworld.tellurgram.plugin.tor',
     },
 }
 # Shared across both AppIDs — main and plugin use the same afatFd* flavor
@@ -218,12 +218,12 @@ if __name__ == '__main__':
     parser.add_argument('tag')
     parser.add_argument('apks_dir')
     parser.add_argument('fdroiddata_root')
-    parser.add_argument('mercurygram_repo')
+    parser.add_argument('tellurgram_repo')
     args = parser.parse_args()
     main(
         app=args.app,
         tag=args.tag,
         apks_dir=args.apks_dir,
         fdroiddata_root=args.fdroiddata_root,
-        mg_repo=args.mercurygram_repo,
+        mg_repo=args.tellurgram_repo,
     )

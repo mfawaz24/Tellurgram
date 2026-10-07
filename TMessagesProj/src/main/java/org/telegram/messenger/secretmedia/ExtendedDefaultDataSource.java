@@ -198,6 +198,7 @@ public final class ExtendedDefaultDataSource implements DataSource {
         } else if (SCHEME_RAW.equals(scheme)) {
             dataSource = getRawResourceDataSource();
         } else {
+            dataSpec.uri = it.belloworld.tellurgram.MgHttps.upgrade(uri);
             dataSource = baseDataSource;
         }
         // Open the source and return.

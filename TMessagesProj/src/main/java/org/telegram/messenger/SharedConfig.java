@@ -174,6 +174,19 @@ public class SharedConfig {
                 .edit()
                 .putBoolean("mg_removeAdsAndProxySponsor", removeAdsAndProxySponsor)
                 .commit();
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            if (UserConfig.getInstance(a).isClientActivated()) {
+                MessagesController.getInstance(a).applyRemoveAdsAndProxySponsor();
+            }
+        }
+    }
+
+    public static void toggleEnforceHttps() {
+        mg_enforceHttps = !mg_enforceHttps;
+        ApplicationLoader.applicationContext.getSharedPreferences("userconfing", Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("mg_enforceHttps", mg_enforceHttps)
+                .commit();
     }
 
     public static void toggleDisableAutoUpdate() {
@@ -319,7 +332,7 @@ public class SharedConfig {
                 .edit()
                 .putString("mg_translateAltEngine", engine)
                 .apply();
-        it.belloworld.mercurygram.translate.MgMozhiClient.clearInstanceBans();
+        it.belloworld.tellurgram.translate.MgMozhiClient.clearInstanceBans();
     }
 
     public static void setMgTranslateAltInstanceMode(String mode) {
@@ -329,7 +342,7 @@ public class SharedConfig {
                 .edit()
                 .putString("mg_translateAltInstanceMode", mode)
                 .apply();
-        it.belloworld.mercurygram.translate.MgMozhiClient.clearInstanceBans();
+        it.belloworld.tellurgram.translate.MgMozhiClient.clearInstanceBans();
     }
 
     public static void setMgTranslateAltPinnedInstance(String url) {
@@ -338,7 +351,7 @@ public class SharedConfig {
                 .edit()
                 .putString("mg_translateAltPinnedInstance", mg_translateAltPinnedInstance)
                 .apply();
-        it.belloworld.mercurygram.translate.MgMozhiClient.clearInstanceBans();
+        it.belloworld.tellurgram.translate.MgMozhiClient.clearInstanceBans();
     }
 
     public static void setMgTranslateAltCustomInstance(String url) {
@@ -347,7 +360,7 @@ public class SharedConfig {
                 .edit()
                 .putString("mg_translateAltCustomInstance", mg_translateAltCustomInstance)
                 .apply();
-        it.belloworld.mercurygram.translate.MgMozhiClient.clearInstanceBans();
+        it.belloworld.tellurgram.translate.MgMozhiClient.clearInstanceBans();
     }
 
     private static String sanitizeMgTranslateAltEngine(String engine) {
@@ -404,14 +417,14 @@ public class SharedConfig {
             // reach the controller until the next bind cycle (e.g. plugin
             // crash + recover), so 5→60 keeps killing tor at 5 minutes
             // and 60→5 leaves it running for the longer window.
-            it.belloworld.mercurygram.tor.MgTorClient.getInstance().pushIdleStopMinutesIfBound();
+            it.belloworld.tellurgram.tor.MgTorClient.getInstance().pushIdleStopMinutesIfBound();
             // 0 → non-zero: idleCheck previously cancelled the ticker, so
             // the new finite idle never fires without an explicit re-arm.
             // pushAggregatedClientPaused has the side-effect of arming
             // the ticker if any client is paused; no-ops when tor isn't
             // running.
             if (previous <= 0 && minutes > 0) {
-                it.belloworld.mercurygram.tor.MgTorClient.getInstance().resumeIdleTickerIfNeeded();
+                it.belloworld.tellurgram.tor.MgTorClient.getInstance().resumeIdleTickerIfNeeded();
             }
         } catch (Throwable t) {
             FileLog.e(t);
@@ -438,7 +451,7 @@ public class SharedConfig {
             // The plugin reads the transport only when it assembles its start()
             // argv, so a live change requires a daemon relaunch. No-op when Tor
             // is off or unbound (the next start picks up the new value).
-            it.belloworld.mercurygram.tor.MgTorClient.getInstance().applyTransportChange();
+            it.belloworld.tellurgram.tor.MgTorClient.getInstance().applyTransportChange();
         } catch (Throwable t) {
             FileLog.e(t);
         }
@@ -462,7 +475,7 @@ public class SharedConfig {
                 .apply();
         if (mg_torTransportMode != MG_TOR_TRANSPORT_OBFS4) return;
         try {
-            it.belloworld.mercurygram.tor.MgTorClient.getInstance().applyTransportChange();
+            it.belloworld.tellurgram.tor.MgTorClient.getInstance().applyTransportChange();
         } catch (Throwable t) {
             FileLog.e(t);
         }
@@ -678,7 +691,7 @@ public class SharedConfig {
     public static boolean disableUnifiedPush = false;
     public static String unifiedPushGateway = "https://p2p.belloworld.it/";
     // VAPID public key of the gateway above, used by the built-in FCM distributor only.
-    public static String mgFcmVapidKey = it.belloworld.mercurygram.push.MgEmbeddedFcmDistributor.DEFAULT_VAPID_PUBLIC_KEY;
+    public static String mgFcmVapidKey = it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor.DEFAULT_VAPID_PUBLIC_KEY;
     // The user explicitly picked the built-in FCM distributor. The connector's own saved
     // distributor cannot answer this: it drops it on every UNREGISTERED and REGISTRATION_FAILED,
     // and our package is never auto-picked, so without remembering the choice ourselves a lost
@@ -700,7 +713,7 @@ public class SharedConfig {
     public static String mgLastPreReleaseTag = "";
     public static boolean useSystemFont = false;
     // Mercurygram: when on, Emoji rendering loads user-supplied glyphs from a
-    // side-loaded pack (it.belloworld.mercurygram.emoji.MgEmojiPack) instead of
+    // side-loaded pack (it.belloworld.tellurgram.emoji.MgEmojiPack) instead of
     // the bundled Noto set, falling back per-glyph to the bundle for any glyph
     // the pack is missing. Global because the emoji bitmap cache (Emoji.emojiBmp)
     // is a process-wide static, same as useSystemFont/useSystemEmoji.
@@ -708,6 +721,10 @@ public class SharedConfig {
     // Mercurygram: never register the proximity sensor (calls, voice playback,
     // raise-to-listen). Global: device hardware, not an account property.
     public static boolean mg_disableProximitySensor = false;
+    // Mercurygram: upgrade http:// to https:// for links, web views and
+    // direct downloads (see it.belloworld.tellurgram.MgHttps). Global: the
+    // in-app browser and the image cache are shared by all accounts.
+    public static boolean mg_enforceHttps = true;
 
     // Mercurygram: Privacy
     public static boolean reduceTrackingFingerprint = false;
@@ -777,7 +794,7 @@ public class SharedConfig {
     public static String mg_translateAltCustomInstance = "";
 
     // Mercurygram: On-device voice-message transcription via whisper.cpp
-    // (it.belloworld.mercurygram.transcribe.MgWhisperTranscriber). When enabled
+    // (it.belloworld.tellurgram.transcribe.MgWhisperTranscriber). When enabled
     // and a model is installed, voice/round-video transcription runs locally
     // instead of via the premium-gated Telegram messages.transcribeAudio RPC —
     // private (audio never leaves the device) and available to non-premium
@@ -1051,6 +1068,7 @@ public class SharedConfig {
         // would freeze it on the first saveConfig of the first session.
         editor.putBoolean("mg_disableSecureFlags", disableSecureFlags);
         editor.putBoolean("mg_removeAdsAndProxySponsor", removeAdsAndProxySponsor);
+        editor.putBoolean("mg_enforceHttps", mg_enforceHttps);
         editor.putBoolean("mg_disableAutoUpdate", disableAutoUpdate);
         editor.putBoolean("mg_acceptPreReleaseUpdates", acceptPreReleaseUpdates);
         editor.putString("mg_lastPreReleaseTag", mgLastPreReleaseTag);
@@ -1119,14 +1137,15 @@ public class SharedConfig {
         // PackageManager round trips on a startup path.
         if (preferences.contains("mg_embeddedFcmChosen")) {
             mgEmbeddedFcmChosen = preferences.getBoolean("mg_embeddedFcmChosen", false);
-        } else if (it.belloworld.mercurygram.MgInstallSource.isPlayStore()) {
-            mgEmbeddedFcmChosen = it.belloworld.mercurygram.push.MgEmbeddedFcmDistributor.isPlayDefault(ApplicationLoader.applicationContext);
+        } else if (it.belloworld.tellurgram.MgInstallSource.isPlayStore()) {
+            mgEmbeddedFcmChosen = it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor.isPlayDefault(ApplicationLoader.applicationContext);
         } else {
-            mgEmbeddedFcmChosen = it.belloworld.mercurygram.push.MgEmbeddedFcmDistributor.looksLikeFcmEndpoint(
+            mgEmbeddedFcmChosen = it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor.looksLikeFcmEndpoint(
                     preferences.getString("mg_unifiedPushEndpointUrl", ""));
         }
         disableSecureFlags = preferences.getBoolean("mg_disableSecureFlags", false);
         removeAdsAndProxySponsor = preferences.getBoolean("mg_removeAdsAndProxySponsor", false);
+        mg_enforceHttps = preferences.getBoolean("mg_enforceHttps", true);
         disableAutoUpdate = preferences.getBoolean("mg_disableAutoUpdate", false);
         acceptPreReleaseUpdates = preferences.getBoolean("mg_acceptPreReleaseUpdates", false);
         mgLastPreReleaseTag = preferences.getString("mg_lastPreReleaseTag", "");
@@ -1168,9 +1187,9 @@ public class SharedConfig {
         mgDismissedPluginPromptTag = preferences.getString("mg_dismissedPluginPromptTag", null);
         if (mgPendingUpdate != null) {
             try {
-                it.belloworld.mercurygram.MgUpdateInfo info = it.belloworld.mercurygram.MgUpdateInfo.fromJson(mgPendingUpdate);
+                it.belloworld.tellurgram.MgUpdateInfo info = it.belloworld.tellurgram.MgUpdateInfo.fromJson(mgPendingUpdate);
                 if (info != null) {
-                    String currentVersion = it.belloworld.mercurygram.MgUpdateChecker.currentInstallVersion();
+                    String currentVersion = it.belloworld.tellurgram.MgUpdateChecker.currentInstallVersion();
                     if (currentVersion != null && versionBiggerOrEqual(currentVersion, info.versionName)) {
                         clearMgPendingUpdate();
                     }
@@ -1681,14 +1700,14 @@ public class SharedConfig {
     }
 
     public static boolean isMgUpdateAvailable() {
-        return mgPendingUpdate != null && it.belloworld.mercurygram.MgUpdateChecker.canSelfInstall();
+        return mgPendingUpdate != null && it.belloworld.tellurgram.MgUpdateChecker.canSelfInstall();
     }
 
-    public static it.belloworld.mercurygram.MgUpdateInfo getMgPendingUpdate() {
-        return it.belloworld.mercurygram.MgUpdateInfo.fromJson(mgPendingUpdate);
+    public static it.belloworld.tellurgram.MgUpdateInfo getMgPendingUpdate() {
+        return it.belloworld.tellurgram.MgUpdateInfo.fromJson(mgPendingUpdate);
     }
 
-    public static void setMgPendingUpdate(it.belloworld.mercurygram.MgUpdateInfo info) {
+    public static void setMgPendingUpdate(it.belloworld.tellurgram.MgUpdateInfo info) {
         if (info == null) {
             clearMgPendingUpdate();
             return;
@@ -1696,7 +1715,7 @@ public class SharedConfig {
         // Tag change → the previously downloaded APK is stale; drop it so
         // the next download replaces it cleanly instead of the side-menu
         // "Install" shortcut firing the old cached APK from disk.
-        it.belloworld.mercurygram.MgUpdateInfo prev = getMgPendingUpdate();
+        it.belloworld.tellurgram.MgUpdateInfo prev = getMgPendingUpdate();
         if (prev != null && !info.tagName.equals(prev.tagName)) {
             deleteCachedUpdateApk();
         }

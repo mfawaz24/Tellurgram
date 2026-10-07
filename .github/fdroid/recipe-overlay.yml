@@ -7,7 +7,7 @@
 # anyway, since the reproducibility check reads fdroiddata master.
 # Keys not listed (sudo, subdir, scandelete, submodules, ndk) still ride along
 # from the previous entry, so edits made during upstream review survive.
-it.belloworld.mercurygram:
+it.belloworld.tellurgram:
   rm:
     - TMessagesProj_AppHockeyApp
     - TMessagesProj_AppHuawei
@@ -34,7 +34,7 @@ it.belloworld.mercurygram:
     - printf '' > ../TMessagesProj_Modules/media/publish.gradle
     - printf '\nMG_BUILD_TAG=$$VERSION$$\n' >> ../gradle.properties
 
-it.belloworld.mercurygram.plugin.tor:
+it.belloworld.tellurgram.plugin.tor:
   # The plugin builds from the same tree, so the scanner walks the media3
   # submodule here too, even though nothing in the plugin touches it.
   # Same removals as the main app, plus the two projects the plugin does not

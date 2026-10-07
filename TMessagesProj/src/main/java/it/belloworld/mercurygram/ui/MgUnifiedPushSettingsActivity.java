@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.ui;
+package it.belloworld.tellurgram.ui;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,8 +30,8 @@ import org.unifiedpush.android.connector.UnifiedPush;
 
 import java.util.ArrayList;
 
-import it.belloworld.mercurygram.push.MgEmbeddedFcmDistributor;
-import it.belloworld.mercurygram.push.UnifiedPushListenerServiceProvider;
+import it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor;
+import it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider;
 
 /**
  * UnifiedPush settings, split out of {@link MercurygramSettingsActivity}: the distributor

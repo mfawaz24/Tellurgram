@@ -289,7 +289,7 @@ public class ChatActivityEnterView extends FrameLayout implements
     public interface ChatActivityEnterViewDelegate {
 
         default void onEditTextScroll() {}
-        
+
         default void onContextMenuOpen() {}
 
         default void onContextMenuClose() {}
@@ -6046,7 +6046,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                 // the condition above instead of reading captionLimitView's visibility: that view
                 // stays VISIBLE for the whole 100ms fade-out, so a read here would keep the
                 // counter hidden until the next keystroke.
-                it.belloworld.mercurygram.ui.MgCharCounter.update(ChatActivityEnterView.this, resourcesProvider, currentAccount, codePointCount, currentLimit > 0 && currentLimit - codePointCount <= (isLiveComment ? 5 : 100));
+                it.belloworld.tellurgram.ui.MgCharCounter.update(ChatActivityEnterView.this, resourcesProvider, currentAccount, codePointCount, currentLimit > 0 && currentLimit - codePointCount <= (isLiveComment ? 5 : 100));
 
                 if (doneButtonEnabled != doneButtonEnabledLocal && (doneButton != null)) {
                     doneButtonEnabled = doneButtonEnabledLocal;
@@ -6982,7 +6982,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         // account.getWebPagePreview RPC itself is suppressed at the
         // searchLinks() chokepoint in ChatActivity. Hard-off for now;
         // per-chat/per-link override deferred (#26).
-        if (it.belloworld.mercurygram.MgLinkPreview.suppressed(currentAccount)) {
+        if (it.belloworld.tellurgram.MgLinkPreview.suppressed(currentAccount)) {
             return false;
         }
         return messageWebPageSearch;
@@ -15606,7 +15606,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         text.text = message[0].toString();
         return text;
     }
-    
+
     private WindowInsetsInAppController windowInsetsInAppController;
 
     public void setInAppInsetsController(WindowInsetsInAppController inAppInsetsController) {

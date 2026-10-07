@@ -1,9 +1,9 @@
-package it.belloworld.mercurygram.compat.gms.wallet;
+package it.belloworld.tellurgram.compat.gms.wallet;
 
 import android.app.Activity;
 import android.content.Intent;
-import it.belloworld.mercurygram.compat.gms.common.Status;
-import it.belloworld.mercurygram.compat.gms.tasks.Task;
+import it.belloworld.tellurgram.compat.gms.common.Status;
+import it.belloworld.tellurgram.compat.gms.tasks.Task;
 
 /** Stub — Google Wallet removed in FOSS builds. */
 public class AutoResolveHelper {

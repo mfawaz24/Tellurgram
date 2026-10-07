@@ -26,7 +26,7 @@ import android.util.SparseIntArray;
 import androidx.collection.LongSparseArray;
 import androidx.core.content.ContextCompat;
 
-import it.belloworld.mercurygram.location.MgBackgroundLocationGate;
+import it.belloworld.tellurgram.location.MgBackgroundLocationGate;
 
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLitePreparedStatement;

@@ -8,7 +8,7 @@
 #      buildserver"); the Android SDK + build env live in this image.
 #   * fdroidserver itself is NOT taken from the image — fdroiddata CI overlays a
 #     fdroidserver checkout on PATH/PYTHONPATH. We overlay the same way, pinned
-#     to !1825 (drizzt/fdroidserver @ mercurygram-v2-only-graft) because
+#     to !1825 (drizzt/fdroidserver @ tellurgram-v2-only-graft) because
 #     Mercurygram is signed v2/v3-only and stock fdroidserver cannot graft its
 #     developer signature for `fdroid verify` until that MR merges. Once merged:
 #       FDROIDSERVER_REPO=https://gitlab.com/fdroid/fdroidserver.git \
@@ -113,11 +113,11 @@ unset _filtered_args _arg
 
 case "$MG_APP" in
     main)
-        APPID=it.belloworld.mercurygram
+        APPID=it.belloworld.tellurgram
         GRADLE_MODULE=':TMessagesProj_App'
         ;;
     plugin.tor)
-        APPID=it.belloworld.mercurygram.plugin.tor
+        APPID=it.belloworld.tellurgram.plugin.tor
         GRADLE_MODULE=':TMessagesProj_PluginTor'
         ;;
     *)
@@ -136,7 +136,7 @@ BUILDSERVER_IMAGE="${BUILDSERVER_IMAGE:-registry.gitlab.com/fdroid/fdroidserver:
 FDROIDDATA_RAW="${FDROIDDATA_RAW:-https://gitlab.com/fdroid/fdroiddata/-/raw/master}"
 # fdroidserver overlay, pinned to MR !1825 until it lands upstream.
 FDROIDSERVER_REPO="${FDROIDSERVER_REPO:-https://gitlab.com/drizzt/fdroidserver.git}"
-FDROIDSERVER_REF="${FDROIDSERVER_REF:-mercurygram-v2-only-graft}"
+FDROIDSERVER_REF="${FDROIDSERVER_REF:-tellurgram-v2-only-graft}"
 IMG=mg-repro-buildserver:local        # buildserver + fdroidserver overlay
 DIFF_IMG=mg-repro-diffoscope:local    # separate, build-independent
 

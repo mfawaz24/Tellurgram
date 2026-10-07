@@ -34,7 +34,7 @@ public class WebPageLoader {
 
     public void get(String url, Utilities.Callback2<TLRPC.WebPage, TLObject> callback) {
         // Mercurygram: don't fetch a preview for a URL in the poll editor (#26)
-        if (it.belloworld.mercurygram.MgLinkPreview.suppressed(currentAccount)) {
+        if (it.belloworld.tellurgram.MgLinkPreview.suppressed(currentAccount)) {
             callback.run(null, null);
             return;
         }

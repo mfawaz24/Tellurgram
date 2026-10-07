@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.ui;
+package it.belloworld.tellurgram.ui;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import it.belloworld.mercurygram.translate.MgAidlTranslate;
-import it.belloworld.mercurygram.translate.MgMozhiClient;
+import it.belloworld.tellurgram.translate.MgAidlTranslate;
+import it.belloworld.tellurgram.translate.MgMozhiClient;
 
 public class MercurygramTranslationSettingsActivity extends UniversalFragment {
 

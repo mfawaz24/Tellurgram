@@ -71,7 +71,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Objects;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
+import it.belloworld.tellurgram.HiddenAccountHelper;
 
 public class UserInfoActivity extends UniversalFragment implements NotificationCenter.NotificationCenterDelegate {
 

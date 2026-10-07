@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.tor
+package it.belloworld.tellurgram.tor
 
 import android.content.Context
 import android.content.SharedPreferences

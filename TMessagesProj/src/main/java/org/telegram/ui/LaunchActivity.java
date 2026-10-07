@@ -254,9 +254,9 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
-import it.belloworld.mercurygram.MgNetworkChangeWatcher;
-import it.belloworld.mercurygram.location.MgBackgroundLocationGate;
+import it.belloworld.tellurgram.HiddenAccountHelper;
+import it.belloworld.tellurgram.MgNetworkChangeWatcher;
+import it.belloworld.tellurgram.location.MgBackgroundLocationGate;
 import tw.nekomimi.nekogram.helpers.MonetHelper;
 
 public class LaunchActivity extends BasePermissionsActivity implements INavigationLayout.INavigationLayoutDelegate, NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, IPipActivity {
@@ -1713,7 +1713,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         } else if (!TextUtils.isEmpty(subject)) {
                             sendingText = subject;
                         }
-                        sendingText = it.belloworld.mercurygram.MgUrlCleaner.cleanText(sendingText);
+                        sendingText = it.belloworld.tellurgram.MgUrlCleaner.cleanText(sendingText);
 
                         Parcelable parcelable = intent.getParcelableExtra(Intent.EXTRA_STREAM);
                         if (parcelable != null) {
@@ -5987,7 +5987,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     private boolean firstAppUpdateCheck = true;
     public void checkAppUpdate(boolean force, Browser.Progress progress) {
-        it.belloworld.mercurygram.MgUpdateChecker.checkForUpdates(force);
+        it.belloworld.tellurgram.MgUpdateChecker.checkForUpdates(force);
         // After a same-MG_VERSION_CODE main bump (e.g. 12.7.3.2.7 → .2.8)
         // the companion Tor plugin sits at the old versionName but is
         // never re-prompted because handleConnected's AIDL gate only
@@ -5996,7 +5996,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         // forward to match main; force=true callers (debug menu,
         // Settings "Check now") only refresh the main check.
         if (!force) {
-            it.belloworld.mercurygram.tor.MgTorClient.maybePromptPluginUpdate(this);
+            it.belloworld.tellurgram.tor.MgTorClient.maybePromptPluginUpdate(this);
         }
 
         if (!ApplicationLoader.isStandaloneBuild() && !ApplicationLoader.isBetaBuild()) {

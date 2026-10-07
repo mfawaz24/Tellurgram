@@ -9,7 +9,7 @@
 # Java packages that contain ONLY MG/TF code. Diff scripts skip these
 # entirely so upstream-derived patches don't try to delete or modify them.
 MG_OWNED_PATHS=(
-    'TMessagesProj/src/main/java/it/belloworld/mercurygram/'
+    'TMessagesProj/src/main/java/it/belloworld/tellurgram/'
     'TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/'
 )
 

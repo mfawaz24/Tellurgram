@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram;
+package it.belloworld.tellurgram;
 
 import org.json.JSONException;
 import org.json.JSONObject;

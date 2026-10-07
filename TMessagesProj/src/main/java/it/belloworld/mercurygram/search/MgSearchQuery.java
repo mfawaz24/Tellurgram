@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.search;
+package it.belloworld.tellurgram.search;
 
 import org.telegram.messenger.MessagesController;
 import org.telegram.tgnet.TLRPC;

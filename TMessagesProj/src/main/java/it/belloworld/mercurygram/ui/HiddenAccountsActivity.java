@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.ui;
+package it.belloworld.tellurgram.ui;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,7 +34,7 @@ import org.telegram.ui.LaunchActivity;
 
 import java.util.ArrayList;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
+import it.belloworld.tellurgram.HiddenAccountHelper;
 
 public class HiddenAccountsActivity extends UniversalFragment {
 

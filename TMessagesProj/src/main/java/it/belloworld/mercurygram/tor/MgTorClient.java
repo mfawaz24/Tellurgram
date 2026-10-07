@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.tor;
+package it.belloworld.tellurgram.tor;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -37,7 +37,7 @@ import org.telegram.messenger.voip.VoIPService;
 import org.telegram.utils.proxy.ProxySettings;
 import org.telegram.tgnet.ConnectionsManager;
 
-import it.belloworld.mercurygram.MgUpdateChecker;
+import it.belloworld.tellurgram.MgUpdateChecker;
 
 import org.telegram.ui.ActionBar.AlertDialog;
 
@@ -48,8 +48,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import it.belloworld.mercurygram.plugin.tor.IMgTorCallback;
-import it.belloworld.mercurygram.plugin.tor.IMgTorService;
+import it.belloworld.tellurgram.plugin.tor.IMgTorCallback;
+import it.belloworld.tellurgram.plugin.tor.IMgTorService;
 
 /**
  * Main-app client for the Tor companion plugin (`:TMessagesProj_PluginTor`).
@@ -89,8 +89,8 @@ public final class MgTorClient {
     // permission and the self-pin both match; no suffixed plugin variant is
     // ever built, published, or downloaded. (A per-flavor suffix here once
     // pointed at a .beta package nothing installs — hence the reinstall loop.)
-    private static final String PLUGIN_PACKAGE_BASE = "it.belloworld.mercurygram.plugin.tor";
-    private static final String BIND_ACTION         = "it.belloworld.mercurygram.plugin.tor.BIND";
+    private static final String PLUGIN_PACKAGE_BASE = "org.tellurgram.plugin.tor";
+    private static final String BIND_ACTION         = "org.tellurgram.plugin.tor.BIND";
 
     private static String pluginPackage() {
         return PLUGIN_PACKAGE_BASE;
@@ -109,7 +109,7 @@ public final class MgTorClient {
     private static final String[] ALLOWED_CERT_SHA256_HEX = {
             // Developer keystore (GitHub + reproducible F-Droid APKs).
             "1e73de100e2646be671afad2cb4bb471538e062a745ae5adbe6c7d1666fd1ee9",
-            // F-Droid per-app key for it.belloworld.mercurygram.
+            // F-Droid per-app key for it.belloworld.tellurgram.
             "feb802f2f14cee16efd9fec5d809fa3bef7a2b349b989f816d42aad9c39ef77a",
     };
     private static volatile byte[][] allowedCertSha256Cache;

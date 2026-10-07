@@ -100,7 +100,7 @@ static void mgOnNewSegment(struct whisper_context *ctx, struct whisper_state * /
 extern "C" {
 
 JNIEXPORT jlong JNICALL
-Java_it_belloworld_mercurygram_transcribe_MgWhisperNative_nativeInit(
+Java_it_belloworld_tellurgram_transcribe_MgWhisperNative_nativeInit(
         JNIEnv *env, jclass clazz, jstring modelPath) {
     const char *path = env->GetStringUTFChars(modelPath, nullptr);
     if (path == nullptr) {
@@ -119,7 +119,7 @@ Java_it_belloworld_mercurygram_transcribe_MgWhisperNative_nativeInit(
 }
 
 JNIEXPORT jstring JNICALL
-Java_it_belloworld_mercurygram_transcribe_MgWhisperNative_nativeTranscribe(
+Java_it_belloworld_tellurgram_transcribe_MgWhisperNative_nativeTranscribe(
         JNIEnv *env, jclass clazz, jlong ctxPtr, jfloatArray pcm,
         jstring language, jboolean translate, jstring vadModelPath, jobject segmentCallback) {
     auto *ctx = reinterpret_cast<whisper_context *>(ctxPtr);
@@ -268,7 +268,7 @@ Java_it_belloworld_mercurygram_transcribe_MgWhisperNative_nativeTranscribe(
 }
 
 JNIEXPORT void JNICALL
-Java_it_belloworld_mercurygram_transcribe_MgWhisperNative_nativeFree(
+Java_it_belloworld_tellurgram_transcribe_MgWhisperNative_nativeFree(
         JNIEnv *env, jclass clazz, jlong ctxPtr) {
     auto *ctx = reinterpret_cast<whisper_context *>(ctxPtr);
     if (ctx != nullptr) {

@@ -24,11 +24,11 @@ One document message in Saved Messages (`peer = inputPeerSelf`):
 
 | Field | Value |
 |---|---|
-| `document.file_name` | `mercurygram-folders.json` |
+| `document.file_name` | `tellurgram-folders.json` |
 | `document.mime_type` | `application/json` |
-| caption | first line `#mercurygram_folders`, then optional human-readable lines `📁 <title> (<n> chats)`; at most 1024 characters, truncated at a line boundary |
+| caption | first line `#tellurgram_folders`, then optional human-readable lines `📁 <title> (<n> chats)`; at most 1024 characters, truncated at a line boundary |
 
-**Discovery**: `messages.search(peer=inputPeerSelf, q="#mercurygram_folders",
+**Discovery**: `messages.search(peer=inputPeerSelf, q="#tellurgram_folders",
 filter=inputMessagesFilterDocument, limit=5)`, then keep the messages whose
 document `file_name` matches and take the one with the highest id.
 
@@ -49,7 +49,7 @@ with that name into Saved Messages.
 
 ```json
 {
-  "format": "mercurygram-folders",
+  "format": "tellurgram-folders",
   "version": 1,
   "updated": 1757181000,
   "folders": [
@@ -77,7 +77,7 @@ with that name into Saved Messages.
 
 | Key | Meaning |
 |---|---|
-| `format` | Always `mercurygram-folders`. |
+| `format` | Always `tellurgram-folders`. |
 | `version` | Format version; a bump means an incompatible change. Readers ignore documents with a version they do not know. Unknown keys are ignored, which is why an optional key added later leaves the version alone: a client that does not know it keeps reading the document, and only drops that key when it writes one of its own. |
 | `updated` | Unix seconds of the last write. Readers apply the document only when it is newer than the last `updated` they applied (last writer wins, whole document, no merge). Writers set it to `max(now, previous.updated + 1)`. |
 | `folders` | Folder list; array order is the order of the Mercurygram folders relative to each other. Their position among server folders is per device. |
@@ -93,9 +93,9 @@ with that name into Saved Messages.
 ## Reading it from a bot (Telethon)
 
 ```python
-msgs = await client.get_messages("me", search="#mercurygram_folders",
+msgs = await client.get_messages("me", search="#tellurgram_folders",
                                  filter=types.InputMessagesFilterDocument, limit=5)
-msgs = [m for m in msgs if m.file and m.file.name == "mercurygram-folders.json"]
+msgs = [m for m in msgs if m.file and m.file.name == "tellurgram-folders.json"]
 if msgs:
     raw = await client.download_media(max(msgs, key=lambda m: m.id), bytes)
     doc = json.loads(raw)

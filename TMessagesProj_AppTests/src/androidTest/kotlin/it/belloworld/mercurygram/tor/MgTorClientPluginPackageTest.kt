@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.tor
+package it.belloworld.tellurgram.tor
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -23,7 +23,7 @@ class MgTorClientPluginPackageTest {
             .getDeclaredMethod("pluginPackage")
             .apply { isAccessible = true }
         assertEquals(
-            "it.belloworld.mercurygram.plugin.tor",
+            "org.tellurgram.plugin.tor",
             method.invoke(null) as String,
         )
     }

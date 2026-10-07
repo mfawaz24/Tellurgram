@@ -136,7 +136,7 @@ public class BotShareSheet extends BottomSheetWithRecyclerListView {
 
     public static Runnable loadWebPagePreview(int currentAccount, String url, Utilities.Callback<TLRPC.WebPage> whenLoaded) {
         // Mercurygram: don't fetch a preview for a URL shared via a bot (#26)
-        if (it.belloworld.mercurygram.MgLinkPreview.suppressed(currentAccount)) {
+        if (it.belloworld.tellurgram.MgLinkPreview.suppressed(currentAccount)) {
             whenLoaded.run(null);
             return () -> {};
         }

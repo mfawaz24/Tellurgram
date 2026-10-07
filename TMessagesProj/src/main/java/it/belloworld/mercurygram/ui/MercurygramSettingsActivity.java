@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.ui;
+package it.belloworld.tellurgram.ui;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -28,11 +28,11 @@ import org.unifiedpush.android.connector.UnifiedPush;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
-import it.belloworld.mercurygram.MgMessageHistory;
-import it.belloworld.mercurygram.MgUpdateChecker;
-import it.belloworld.mercurygram.push.MgEmbeddedFcmDistributor;
-import it.belloworld.mercurygram.transcribe.MgWhisperModel;
+import it.belloworld.tellurgram.HiddenAccountHelper;
+import it.belloworld.tellurgram.MgMessageHistory;
+import it.belloworld.tellurgram.MgUpdateChecker;
+import it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor;
+import it.belloworld.tellurgram.transcribe.MgWhisperModel;
 
 public class MercurygramSettingsActivity extends UniversalFragment {
 
@@ -69,6 +69,8 @@ public class MercurygramSettingsActivity extends UniversalFragment {
     private static final int ID_CONFIRM_INTERNAL_LINKS = 63;
     private static final int ID_SHOW_CHAR_COUNTER = 64;
     private static final int ID_DISABLE_PROXIMITY_SENSOR = 65;
+    private static final int ID_REMOVE_ADS = 66;
+    private static final int ID_ENFORCE_HTTPS = 67;
 
     @Override
     protected CharSequence getTitle() {
@@ -109,6 +111,9 @@ public class MercurygramSettingsActivity extends UniversalFragment {
         items.add(UItem.asCheck(ID_HIDE_PREMIUM_PROMO, LocaleController.getString(R.string.MercurygramHidePremiumPromo))
                 .setChecked(getUserConfig().mg.hidePremiumPromo));
         items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramHidePremiumPromoAbout)));
+        items.add(MgSettingsScope.globalCheck(ID_REMOVE_ADS, LocaleController.getString(R.string.MercurygramRemoveAds))
+                .setChecked(SharedConfig.removeAdsAndProxySponsor));
+        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramRemoveAdsAbout)));
         items.add(MgSettingsScope.globalCheck(ID_USE_SYSTEM_FONT, LocaleController.getString(R.string.MercurygramUseSystemFont))
                 .setChecked(SharedConfig.useSystemFont));
         items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramUseSystemFontAbout)));
@@ -165,7 +170,7 @@ public class MercurygramSettingsActivity extends UniversalFragment {
 
         // Tor lives on its own screen so the proxy list can reach it too
         // (that screen is available before login, where Settings is not).
-        if (!it.belloworld.mercurygram.tor.MgTorClient.isFdroidPreS()) {
+        if (!it.belloworld.tellurgram.tor.MgTorClient.isFdroidPreS()) {
             items.add(UItem.asButton(ID_TOR_SETTINGS,
                     LocaleController.getString(R.string.MercurygramTor),
                     LocaleController.getString(SharedConfig.mg_useTor
@@ -203,6 +208,10 @@ public class MercurygramSettingsActivity extends UniversalFragment {
                         LocaleController.getString(R.string.MercurygramStripTrackingParams))
                 .setChecked(getUserConfig().mg.stripTrackingParams));
         items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramStripTrackingParamsAbout)));
+
+        items.add(MgSettingsScope.globalCheck(ID_ENFORCE_HTTPS, LocaleController.getString(R.string.MercurygramEnforceHttps))
+                .setChecked(SharedConfig.mg_enforceHttps));
+        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramEnforceHttpsAbout)));
 
         items.add(UItem.asCheck(ID_DISABLE_CLOUD_DRAFTS,
                         LocaleController.getString(R.string.MercurygramDisableCloudDrafts))
@@ -315,6 +324,14 @@ public class MercurygramSettingsActivity extends UniversalFragment {
             case ID_HIDE_PREMIUM_PROMO:
                 getUserConfig().mg.hidePremiumPromo = !getUserConfig().mg.hidePremiumPromo;
                 getUserConfig().saveConfig(false);
+                refreshList();
+                break;
+            case ID_REMOVE_ADS:
+                SharedConfig.toggleRemoveAdsAndProxySponsor();
+                refreshList();
+                break;
+            case ID_ENFORCE_HTTPS:
+                SharedConfig.toggleEnforceHttps();
                 refreshList();
                 break;
             case ID_DELETE_FOR_ALL_DEFAULT:
@@ -431,7 +448,7 @@ public class MercurygramSettingsActivity extends UniversalFragment {
         if (!SharedConfig.mg_useCustomEmojiPack) {
             return LocaleController.getString(R.string.MercurygramEmojiRowDisabled);
         }
-        int installed = it.belloworld.mercurygram.emoji.MgEmojiPack.installedCount();
+        int installed = it.belloworld.tellurgram.emoji.MgEmojiPack.installedCount();
         return installed > 0
                 ? LocaleController.formatString("MercurygramEmojiInstalled",
                         R.string.MercurygramEmojiInstalled, installed)

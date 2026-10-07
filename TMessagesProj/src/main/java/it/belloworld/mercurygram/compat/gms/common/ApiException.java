@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.gms.common;
+package it.belloworld.tellurgram.compat.gms.common;
 
 /** Stub — GMS removed in FOSS builds. */
 public class ApiException extends Exception {

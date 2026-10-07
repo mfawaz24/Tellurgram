@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.location;
+package it.belloworld.tellurgram.location;
 
 import android.Manifest;
 import android.app.PendingIntent;

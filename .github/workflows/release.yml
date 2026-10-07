@@ -487,11 +487,11 @@ jobs:
       matrix:
         include:
           - app: main
-            appid: it.belloworld.mercurygram
-            branch_prefix: mercurygram
+            appid: it.belloworld.tellurgram
+            branch_prefix: tellurgram
           - app: plugin.tor
-            appid: it.belloworld.mercurygram.plugin.tor
-            branch_prefix: mercurygram-plugin-tor
+            appid: it.belloworld.tellurgram.plugin.tor
+            branch_prefix: tellurgram-plugin-tor
     env:
       BRANCH: ${{ matrix.branch_prefix }}-${{ github.ref_name }}
     concurrency:
@@ -509,7 +509,7 @@ jobs:
       - name: Checkout Mercurygram at tag
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          path: mercurygram
+          path: tellurgram
           ref: ${{ github.ref }}
           fetch-depth: 0
 
@@ -566,9 +566,9 @@ jobs:
         working-directory: fdroiddata
         run: |
           "$HOME/fdroid-venv/bin/python3" \
-            ../mercurygram/.github/scripts/fdroid_sync.py \
+            ../tellurgram/.github/scripts/fdroid_sync.py \
             --app=${{ matrix.app }} \
-            "$GITHUB_REF_NAME" ../apks . ../mercurygram
+            "$GITHUB_REF_NAME" ../apks . ../tellurgram
 
       - name: Commit and push branch
         if: steps.recipe.outputs.present == 'true'
@@ -612,7 +612,7 @@ jobs:
             "https://gitlab.com/api/v4/projects/${SRC_PID}/merge_requests" \
             | python3 -c 'import json,sys; d=json.load(sys.stdin); print("MR:", d.get("web_url") or d)'
 
-  # Tell the website (mercurygram.org) to show the just-released
+  # Tell the website (tellurgram.org) to show the just-released
   # version. The site's bump-version workflow updates config.toml and
   # redeploys. Tag pushes only; the full 4-part X.Y.Z.M is sent. The first
   # three components are the upstream Telegram version; the 4th is the
@@ -637,4 +637,4 @@ jobs:
           version=$(printf '%s' "${GITHUB_REF_NAME}" | cut -d. -f1-4)
           jq -n --arg v "$version" \
             '{event_type:"android-release",client_payload:{version:$v}}' \
-            | gh api repos/Mercurygram/mercurygram.org/dispatches --input -
+            | gh api repos/Mercurygram/tellurgram.org/dispatches --input -

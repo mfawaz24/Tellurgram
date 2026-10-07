@@ -22,10 +22,10 @@
              second line of defense if Android ever loosens knownSigner.
     -->
     <permission
-        android:name="it.belloworld.mercurygram.plugin.tor.BIND"
+        android:name="org.tellurgram.plugin.tor.BIND"
         android:protectionLevel="signature|knownSigner"
         android:knownCerts="@array/mg_known_main_certs" />
-    <uses-permission android:name="it.belloworld.mercurygram.plugin.tor.BIND" />
+    <uses-permission android:name="org.tellurgram.plugin.tor.BIND" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -64,14 +64,14 @@
         <service
             android:name=".MgTorService"
             android:exported="true"
-            android:permission="it.belloworld.mercurygram.plugin.tor.BIND"
+            android:permission="org.tellurgram.plugin.tor.BIND"
             android:foregroundServiceType="specialUse"
             android:process=":tor">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="tor_anonymity_network_client" />
             <intent-filter>
-                <action android:name="it.belloworld.mercurygram.plugin.tor.BIND" />
+                <action android:name="org.tellurgram.plugin.tor.BIND" />
             </intent-filter>
         </service>
     </application>

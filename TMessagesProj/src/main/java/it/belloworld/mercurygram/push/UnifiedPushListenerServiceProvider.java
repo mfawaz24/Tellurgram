@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.push;
+package it.belloworld.tellurgram.push;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -151,7 +151,7 @@ public final class UnifiedPushListenerServiceProvider implements PushListenerCon
                 UnifiedPush.register(
                         ApplicationLoader.applicationContext,
                         "default",
-                        "Mercurygram WebPush",
+                        "Tellurgram WebPush",
                         null
                 );
                 Utilities.globalQueue.postRunnable(
@@ -297,7 +297,7 @@ public final class UnifiedPushListenerServiceProvider implements PushListenerCon
         UnifiedPush.register(
                 ApplicationLoader.applicationContext,
                 "default",
-                "Mercurygram WebPush",
+                "Tellurgram WebPush",
                 null
         );
         notifyStateChanged();

@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.gms.wearable;
+package it.belloworld.tellurgram.compat.gms.wearable;
 
 /** Stub MessageEvent — GMS Wearable removed in FOSS builds. */
 public interface MessageEvent {

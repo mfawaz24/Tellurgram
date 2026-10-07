@@ -292,7 +292,8 @@ public class Browser {
         if (context == null || uri == null) {
             return;
         }
-        uri = it.belloworld.mercurygram.MgUrlCleaner.clean(uri);
+        uri = it.belloworld.tellurgram.MgUrlCleaner.clean(uri);
+        uri = it.belloworld.tellurgram.MgHttps.upgrade(uri);
         final int currentAccount = UserConfig.selectedAccount;
         boolean[] forceBrowser = new boolean[]{false};
         boolean internalUri = isInternalUri(uri, forceBrowser);
@@ -510,7 +511,7 @@ public class Browser {
     public static boolean openInExternalBrowser(Context context, String url, boolean allowIntent, String browser) {
         if (url == null) return false;
         try {
-            Uri uri = Uri.parse(url);
+            Uri uri = it.belloworld.tellurgram.MgHttps.upgrade(Uri.parse(url));
             final boolean isIntentScheme = uri.getScheme() != null && uri.getScheme().equalsIgnoreCase("intent");
             if (isIntentScheme && !allowIntent) return false;
             final Intent intent = isIntentScheme ?

@@ -1,6 +1,6 @@
-package it.belloworld.mercurygram.compat.gms.safetynet;
+package it.belloworld.tellurgram.compat.gms.safetynet;
 
-import it.belloworld.mercurygram.compat.gms.tasks.Task;
+import it.belloworld.tellurgram.compat.gms.tasks.Task;
 
 /** Stub — SafetyNet removed in FOSS builds. */
 public class SafetyNetClient {

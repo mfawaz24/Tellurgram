@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.translate
+package it.belloworld.tellurgram.translate
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry

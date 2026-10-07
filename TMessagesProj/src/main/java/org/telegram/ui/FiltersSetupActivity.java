@@ -71,7 +71,7 @@ import org.telegram.ui.Components.UndoView;
 
 import java.util.ArrayList;
 
-import it.belloworld.mercurygram.folders.MgFolders;
+import it.belloworld.tellurgram.folders.MgFolders;
 
 public class FiltersSetupActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 

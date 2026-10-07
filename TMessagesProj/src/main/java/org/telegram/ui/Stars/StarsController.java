@@ -19,10 +19,10 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import it.belloworld.mercurygram.compat.billing.BillingClient;
-import it.belloworld.mercurygram.compat.billing.BillingFlowParams;
-import it.belloworld.mercurygram.compat.billing.ProductDetails;
-import it.belloworld.mercurygram.compat.billing.QueryProductDetailsParams;
+import it.belloworld.tellurgram.compat.billing.BillingClient;
+import it.belloworld.tellurgram.compat.billing.BillingFlowParams;
+import it.belloworld.tellurgram.compat.billing.ProductDetails;
+import it.belloworld.tellurgram.compat.billing.QueryProductDetailsParams;
 
 import org.json.JSONObject;
 import org.telegram.SQLite.SQLiteCursor;

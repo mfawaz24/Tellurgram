@@ -82,7 +82,7 @@ TMessagesProj_App/fastlane/metadata/android/<locale>/
 ```
 
 They live under the app module rather than the repo root so that F-Droid
-scopes them to `it.belloworld.mercurygram` alone; the Tor plugin has its own
+scopes them to `it.belloworld.tellurgram` alone; the Tor plugin has its own
 listing in `TMessagesProj_PluginTor/src/main/play/listings/`.
 
 Source of truth: `TMessagesProj_App/fastlane/metadata/android/en-US/`.
@@ -96,7 +96,7 @@ For non-translation code changes, follow the conventions in
 [`AGENTS.md`](AGENTS.md):
 
 - Tag commits `[MG]` (Mercurygram features) or `[TF]` (Telegram-FOSS / de-googling).
-- Prefer adding new files in `it.belloworld.mercurygram.*` over modifying
+- Prefer adding new files in `it.belloworld.tellurgram.*` over modifying
   upstream files.
 - New `SharedConfig` flags use the `mg_` SharedPreferences prefix.
 - Bug fixes against an existing `[MG]` feature should be folded into the
@@ -104,4 +104,3 @@ For non-translation code changes, follow the conventions in
   not added as new follow-up commits.
 - Keep `AGENTS.md` / `README.md` in sync with any change to build, config,
   or workflow.
-

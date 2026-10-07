@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.compat.gms.wearable;
+package it.belloworld.tellurgram.compat.gms.wearable;
 
 import android.app.Service;
 import android.content.Intent;

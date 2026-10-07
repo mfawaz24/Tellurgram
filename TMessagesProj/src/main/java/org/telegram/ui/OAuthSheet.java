@@ -64,7 +64,7 @@ import org.telegram.ui.web.BotWebViewContainer;
 
 import java.util.ArrayList;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
+import it.belloworld.tellurgram.HiddenAccountHelper;
 
 public class OAuthSheet {
 

@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
-import it.belloworld.mercurygram.WebPushDecryptor;
+import it.belloworld.tellurgram.WebPushDecryptor;
 
 public class UnifiedPushReceiver extends PushService {
 
@@ -55,7 +55,7 @@ public class UnifiedPushReceiver extends PushService {
 
     private static synchronized void acquireWakeLock(PowerManager pm) {
         if (sWakeLock == null) {
-            sWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "mercurygram:wp");
+            sWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "tellurgram:wp");
             sWakeLock.setReferenceCounted(true);
         }
         sWakeLock.acquire(30_000);
@@ -149,7 +149,7 @@ public class UnifiedPushReceiver extends PushService {
         }
         log("endpoint: " + android.net.Uri.parse(endpoint.getUrl()).getHost());
         setLastRegistrationFailure(null);
-        it.belloworld.mercurygram.push.UnifiedPushListenerServiceProvider.resetRegistrationBackoff();
+        it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.resetRegistrationBackoff();
         Utilities.globalQueue.postRunnable(() -> {
             SharedConfig.pushStringGetTimeEnd = SystemClock.elapsedRealtime();
 
@@ -161,13 +161,13 @@ public class UnifiedPushReceiver extends PushService {
 
             // All distributors route through the /aesgcm gateway which serializes
             // WebPush headers into the body (common-proxies compatible format)
-            String gateway = it.belloworld.mercurygram.push.MgEmbeddedFcmDistributor.gatewayBase();
+            String gateway = it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor.gatewayBase();
 
             try {
                 // The embedded FCM distributor already points at the gateway's /fcm route,
                 // which folds the headers itself and signs the push for FCM. Wrapping it in
                 // /aesgcm would fold twice and strip the VAPID signing.
-                boolean fcm = it.belloworld.mercurygram.push.MgEmbeddedFcmDistributor.isFcmEndpoint(endpoint.getUrl());
+                boolean fcm = it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor.isFcmEndpoint(endpoint.getUrl());
                 if (fcm && !SharedConfig.mgEmbeddedFcmChosen) {
                     // Migration for installs that picked the built-in distributor before the
                     // choice was remembered: a working FCM endpoint is proof they did.
@@ -198,7 +198,7 @@ public class UnifiedPushReceiver extends PushService {
                 String simplePushUrl = fcm
                         ? endpoint.getUrl()
                         : gateway + URLEncoder.encode(endpoint.getUrl(), StandardCharsets.UTF_8.name());
-                it.belloworld.mercurygram.push.UnifiedPushListenerServiceProvider.sendSimplePushRegistration(simplePushUrl);
+                it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.sendSimplePushRegistration(simplePushUrl);
             } catch (Exception e) {
                 FileLog.e(e);
             }
@@ -211,7 +211,7 @@ public class UnifiedPushReceiver extends PushService {
                     }
                 }
             });
-            it.belloworld.mercurygram.push.UnifiedPushListenerServiceProvider.notifyStateChanged();
+            it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.notifyStateChanged();
         });
     }
 
@@ -294,7 +294,7 @@ public class UnifiedPushReceiver extends PushService {
         final boolean torStartingForFallback = SharedConfig.mg_useTor;
         if (torStartingForFallback) {
             acquireWakeLock(pm);
-            it.belloworld.mercurygram.tor.MgTorClient.getInstance().requestStartForPushFallback();
+            it.belloworld.tellurgram.tor.MgTorClient.getInstance().requestStartForPushFallback();
         }
         AndroidUtilities.runOnUIThread(() -> {
             boolean stageQueueScheduled = false;
@@ -366,11 +366,11 @@ public class UnifiedPushReceiver extends PushService {
         setLastRegistrationFailure(reason);
         // Without this the settings screen keeps claiming it is waiting for an endpoint that
         // will never arrive.
-        it.belloworld.mercurygram.push.UnifiedPushListenerServiceProvider.notifyStateChanged();
+        it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.notifyStateChanged();
         Utilities.globalQueue.postRunnable(() -> {
             SharedConfig.pushStringGetTimeEnd = SystemClock.elapsedRealtime();
             PushListenerController.sendRegistrationToServer(PushListenerController.PUSH_TYPE_WEB, null);
-            it.belloworld.mercurygram.push.UnifiedPushListenerServiceProvider.revokeServerTokens();
+            it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.revokeServerTokens();
         });
     }
 }

@@ -148,8 +148,8 @@ import java.util.Set;
 import me.vkryl.android.animator.BoolAnimator;
 import me.vkryl.android.animator.FactorAnimator;
 
-import it.belloworld.mercurygram.HiddenAccountHelper;
-import it.belloworld.mercurygram.MgUpdateChecker;
+import it.belloworld.tellurgram.HiddenAccountHelper;
+import it.belloworld.tellurgram.MgUpdateChecker;
 
 public class SettingsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, ImageUpdater.ImageUpdaterDelegate, MainTabsActivity.TabFragmentDelegate, FactorAnimator.Target {
 
@@ -848,7 +848,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 presentSettingFragment(new LanguageSelectActivity());
                 break;
             case 100:
-                presentFragment(new it.belloworld.mercurygram.ui.MercurygramSettingsActivity());
+                presentFragment(new it.belloworld.tellurgram.ui.MercurygramSettingsActivity());
                 break;
 
             case 11:

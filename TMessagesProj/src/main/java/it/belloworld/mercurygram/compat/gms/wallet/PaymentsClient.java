@@ -1,6 +1,6 @@
-package it.belloworld.mercurygram.compat.gms.wallet;
+package it.belloworld.tellurgram.compat.gms.wallet;
 
-import it.belloworld.mercurygram.compat.gms.tasks.Task;
+import it.belloworld.tellurgram.compat.gms.tasks.Task;
 
 /** Stub — Google Wallet removed in FOSS builds. */
 public class PaymentsClient {

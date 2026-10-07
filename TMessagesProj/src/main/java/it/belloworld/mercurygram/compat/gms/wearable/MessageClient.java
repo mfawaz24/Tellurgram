@@ -1,6 +1,6 @@
-package it.belloworld.mercurygram.compat.gms.wearable;
+package it.belloworld.tellurgram.compat.gms.wearable;
 
-import it.belloworld.mercurygram.compat.gms.tasks.Task;
+import it.belloworld.tellurgram.compat.gms.tasks.Task;
 
 /** Stub MessageClient — GMS Wearable removed in FOSS builds. */
 public class MessageClient {

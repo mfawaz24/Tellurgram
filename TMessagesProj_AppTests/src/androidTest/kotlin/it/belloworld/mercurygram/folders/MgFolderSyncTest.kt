@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.folders
+package it.belloworld.tellurgram.folders
 
 import org.json.JSONObject
 import org.junit.Assert.assertEquals

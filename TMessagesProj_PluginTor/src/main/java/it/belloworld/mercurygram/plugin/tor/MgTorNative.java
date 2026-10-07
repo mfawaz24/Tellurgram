@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.plugin.tor;
+package it.belloworld.tellurgram.plugin.tor;
 
 import android.util.Log;
 

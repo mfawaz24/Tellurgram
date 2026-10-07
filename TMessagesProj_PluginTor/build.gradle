@@ -63,10 +63,10 @@ android {
     buildToolsVersion '35.0.0'
     ndkVersion "27.2.12479018"
 
-    namespace 'it.belloworld.mercurygram.plugin.tor'
+    namespace 'it.belloworld.tellurgram.plugin.tor'
 
     defaultConfig {
-        applicationId 'it.belloworld.mercurygram.plugin.tor'
+        applicationId 'org.tellurgram.plugin.tor'
         minSdkVersion 24
         targetSdkVersion 35
         versionName rootProject.ext.MG_VERSION_NAME

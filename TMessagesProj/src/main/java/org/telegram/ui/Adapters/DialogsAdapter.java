@@ -86,7 +86,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 
-import it.belloworld.mercurygram.MgPins;
+import it.belloworld.tellurgram.MgPins;
 
 public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements DialogCell.DialogCellDelegate {
     public final static int VIEW_TYPE_DIALOG = 0,

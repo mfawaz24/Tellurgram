@@ -90,7 +90,7 @@ mg_upstream_patches() {
     local files
     files=$(git diff --name-only "$prev" "$curr" 2>/dev/null \
         | { grep -E '^TMessagesProj/.*\.(java|kt)$' || true; } \
-        | { grep -vE "^TMessagesProj/src/main/java/(it/belloworld/mercurygram|tw/nekomimi/nekogram/helpers)/" || true; } \
+        | { grep -vE "^TMessagesProj/src/main/java/(it/belloworld/tellurgram|tw/nekomimi/nekogram/helpers)/" || true; } \
         | { grep -vxF "$SHARED_CONFIG" || true; } \
         | { grep -vxF "$STRINGS_XML" || true; })
     [[ -z "$files" ]] && return

@@ -76,7 +76,7 @@ import java.util.function.Consumer;
 
 import me.vkryl.core.BitwiseUtils;
 
-import it.belloworld.mercurygram.folders.MgFolders;
+import it.belloworld.tellurgram.folders.MgFolders;
 
 public class MessagesStorage extends BaseController {
 
@@ -2248,7 +2248,7 @@ public class MessagesStorage extends BaseController {
             getNotificationCenter().postNotificationName(NotificationCenter.didClearDatabase);
             getMediaDataController().loadAttachMenuBots(false, true);
             getNotificationCenter().postNotificationName(NotificationCenter.onDatabaseReset);
-            
+
             getMessagesController().getStoriesController().cleanup();
         });
     }

@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.folders;
+package it.belloworld.tellurgram.folders;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,8 +47,8 @@ import java.util.List;
  */
 public class MgFolderSync implements NotificationCenter.NotificationCenterDelegate {
 
-    public static final String FILE_NAME = "mercurygram-folders.json";
-    public static final String CAPTION_TAG = "#mercurygram_folders";
+    public static final String FILE_NAME = "tellurgram-folders.json";
+    public static final String CAPTION_TAG = "#tellurgram_folders";
     private static final int FORMAT_VERSION = 1;
     private static final int PUSH_DELAY_MS = 3000;
     /** Anything this big is not a folder blob; do not download or read it. */
@@ -564,7 +564,7 @@ public class MgFolderSync implements NotificationCenter.NotificationCenterDelega
     private static JSONObject root(JSONArray folders, int updated) {
         try {
             final JSONObject root = new JSONObject();
-            root.put("format", "mercurygram-folders");
+            root.put("format", "tellurgram-folders");
             root.put("version", FORMAT_VERSION);
             root.put("updated", updated);
             root.put("folders", folders);

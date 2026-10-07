@@ -15,9 +15,9 @@
 // All AIDL calls are non-oneway except where noted; treat as blocking but
 // short. The plugin must not perform Tor I/O on the binder thread.
 
-package it.belloworld.mercurygram.plugin.tor;
+package it.belloworld.tellurgram.plugin.tor;
 
-import it.belloworld.mercurygram.plugin.tor.IMgTorCallback;
+import it.belloworld.tellurgram.plugin.tor.IMgTorCallback;
 
 interface IMgTorService {
     // Plugin versionCode (BuildConfig.VERSION_CODE on the plugin side).

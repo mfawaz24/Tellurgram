@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.ui;
+package it.belloworld.tellurgram.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -26,8 +26,8 @@ import org.telegram.ui.Components.LayoutHelper;
 
 import java.io.File;
 
-import it.belloworld.mercurygram.MgUpdateChecker;
-import it.belloworld.mercurygram.MgUpdateInfo;
+import it.belloworld.tellurgram.MgUpdateChecker;
+import it.belloworld.tellurgram.MgUpdateInfo;
 
 public class MgUpdateAlertDialog extends BottomSheet {
 
@@ -183,7 +183,7 @@ public class MgUpdateAlertDialog extends BottomSheet {
         titleView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
         titleView.setSingleLine(true);
         titleView.setEllipsize(TextUtils.TruncateAt.END);
-        titleView.setText("Mercurygram Update");
+        titleView.setText("Tellurgram Update");
         linearLayout.addView(titleView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 23, 24, 23, 0));
 
         if (info.isPreRelease()) {

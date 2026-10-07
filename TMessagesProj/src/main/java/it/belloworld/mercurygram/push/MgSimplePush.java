@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram.push;
+package it.belloworld.tellurgram.push;
 
 import android.text.TextUtils;
 

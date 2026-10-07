@@ -280,7 +280,7 @@ public class ImageLoader {
 
             URLConnection httpConnection = null;
             try {
-                URL downloadUrl = new URL(url);
+                URL downloadUrl = new URL(it.belloworld.tellurgram.MgHttps.upgrade(url));
                 httpConnection = downloadUrl.openConnection();
                 httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
                 httpConnection.setConnectTimeout(5000);
@@ -292,7 +292,7 @@ public class ImageLoader {
                     if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM || status == HttpURLConnection.HTTP_SEE_OTHER) {
                         String newUrl = httpURLConnection.getHeaderField("Location");
                         String cookies = httpURLConnection.getHeaderField("Set-Cookie");
-                        downloadUrl = new URL(newUrl);
+                        downloadUrl = new URL(it.belloworld.tellurgram.MgHttps.upgrade(newUrl));
                         httpConnection = downloadUrl.openConnection();
                         httpConnection.setRequestProperty("Cookie", cookies);
                         httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
@@ -595,7 +595,7 @@ public class ImageLoader {
                         }
                     }
 
-                    URL downloadUrl = new URL(overrideUrl != null ? overrideUrl : location);
+                    URL downloadUrl = new URL(it.belloworld.tellurgram.MgHttps.upgrade(overrideUrl != null ? overrideUrl : location));
                     httpConnection = (HttpURLConnection) downloadUrl.openConnection();
                     httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
                     httpConnection.setConnectTimeout(5000);

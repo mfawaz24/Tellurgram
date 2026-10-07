@@ -28,7 +28,7 @@ concurrency:
 
 jobs:
   # Both APKs always run in parallel. plugin.tor is soft-fail
-  # (continue-on-error) until metadata/it.belloworld.mercurygram.plugin.tor.yml
+  # (continue-on-error) until metadata/it.belloworld.tellurgram.plugin.tor.yml
   # is merged into fdroiddata. Once the recipe lands, drop the
   # continue-on-error expression.
   reproducible:

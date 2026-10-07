@@ -118,7 +118,7 @@ public class TranscribeButton {
         this.shouldBeOpen = false;
         // [MG] Treat on-device transcription as premium-equivalent so the button
         // unlocks for non-premium accounts; actual routing happens in transcribePressed().
-        premium = parent.getMessageObject() != null && (UserConfig.getInstance(parent.getMessageObject().currentAccount).isPremium() || it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.isUsable());
+        premium = parent.getMessageObject() != null && (UserConfig.getInstance(parent.getMessageObject().currentAccount).isPremium() || it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.isUsable());
 
         loadingFloat = new AnimatedFloat(parent, 250, CubicBezierInterpolator.EASE_OUT_QUINT);
         animatedDrawLock = new AnimatedFloat(parent, 250, CubicBezierInterpolator.EASE_OUT_QUINT);
@@ -216,7 +216,7 @@ public class TranscribeButton {
         // presence). Refresh it here so a mid-session enable/disable or model
         // download is honored on the next tap instead of misrouting to a premium
         // bulletin against a stale snapshot.
-        premium = parent.getMessageObject() != null && (UserConfig.getInstance(parent.getMessageObject().currentAccount).isPremium() || it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.isUsable());
+        premium = parent.getMessageObject() != null && (UserConfig.getInstance(parent.getMessageObject().currentAccount).isPremium() || it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.isUsable());
         clickedToOpen = false;
         boolean processClick, toOpen = !shouldBeOpen;
         if (!shouldBeOpen) {
@@ -317,7 +317,7 @@ public class TranscribeButton {
         this.radius = Math.min(Math.min(w, h) / 2, r);
         this.diameter = this.radius * 2;
     }
-    
+
     public int width() {
         return this.bounds.width();
     }
@@ -691,7 +691,7 @@ public class TranscribeButton {
             // [MG] isStale(): the stored text was transcribed on-device with a model
             // or language the user has since changed, so re-run instead of re-opening.
             if (messageObject.messageOwner.voiceTranscription != null && messageObject.messageOwner.voiceTranscriptionFinal
-                    && !it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.isStale(messageObject)) {
+                    && !it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.isStale(messageObject)) {
                 TranscribeButton.openVideoTranscription(messageObject);
                 messageObject.messageOwner.voiceTranscriptionOpen = true;
                 MessagesStorage.getInstance(account).updateMessageVoiceTranscriptionOpen(dialogId, messageId, messageObject.messageOwner);
@@ -701,7 +701,7 @@ public class TranscribeButton {
             } else {
                 // [MG] Route through on-device whisper.cpp when enabled + model installed.
                 // Keeps audio on-device (privacy) and works for non-premium accounts.
-                if (it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.isUsable()) {
+                if (it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.isUsable()) {
                     mgTranscribeOffline(messageObject, dialogId, messageId, start, minDuration, delegate);
                     return;
                 }
@@ -803,7 +803,7 @@ public class TranscribeButton {
         }
         transcribeOperationsByDialogPosition.put((Integer) reqInfoHash(messageObject), messageObject);
         final int account = messageObject.currentAccount;
-        it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.transcribe(messageObject, new it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.Result() {
+        it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.transcribe(messageObject, new it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.Result() {
             @Override
             public void onPartial(String partial) {
                 // [MG] Live: show whisper's growing transcript while the op is
@@ -829,7 +829,7 @@ public class TranscribeButton {
             }
 
             @Override
-            public void done(String text, boolean success, it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.Failure failure) {
+            public void done(String text, boolean success, it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.Failure failure) {
                 if (success && text != null) {
                     final long duration = SystemClock.elapsedRealtime() - start;
                     TranscribeButton.openVideoTranscription(messageObject);
@@ -839,7 +839,7 @@ public class TranscribeButton {
                     // can't be mistaken for a server transcription id) — the next tap
                     // re-transcribes when the settings no longer match.
                     messageObject.messageOwner.voiceTranscriptionId =
-                            it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.currentStamp(account);
+                            it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.currentStamp(account);
                     MessagesStorage.getInstance(account).updateMessageVoiceTranscription(dialogId, messageId, text, messageObject.messageOwner);
                     AndroidUtilities.runOnUIThread(() -> finishTranscription(messageObject, 0, text), Math.max(0, minDuration - duration));
                 } else {
@@ -854,7 +854,7 @@ public class TranscribeButton {
         });
     }
 
-    private static String mgTranscribeFailureText(it.belloworld.mercurygram.transcribe.MgWhisperTranscriber.Failure failure) {
+    private static String mgTranscribeFailureText(it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.Failure failure) {
         int res = R.string.MercurygramTranscribeOfflineFailed;
         if (failure != null && failure.reason != null) {
             switch (failure.reason) {

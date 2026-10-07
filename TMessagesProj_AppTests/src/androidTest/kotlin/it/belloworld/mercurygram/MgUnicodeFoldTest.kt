@@ -1,4 +1,4 @@
-package it.belloworld.mercurygram
+package it.belloworld.tellurgram
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame

@@ -84,7 +84,7 @@ test("the VAPID header verifies against the advertised public key", async () => 
   assert.deepEqual(JSON.parse(Buffer.from(claimsB64, "base64url").toString()), {
     aud: "https://fcm.googleapis.com",
     exp,
-    sub: "https://mercurygram.org/",
+    sub: "https://tellurgram.org/",
   });
   assert.ok(
     await crypto.subtle.verify(
