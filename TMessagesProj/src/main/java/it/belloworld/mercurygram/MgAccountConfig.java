@@ -25,8 +25,8 @@ public class MgAccountConfig {
     public boolean hideStories = false;
     public boolean hidePremiumPromo = false;
     public boolean disableGlobalSearch = false;
-    public boolean disableAiEditor = false;
-    public boolean disableAiSummary = false;
+    public boolean disableAiEditor = true;
+    public boolean disableAiSummary = true;
     public boolean disableInstantView = false;
     public boolean disableLinkPreviews = false;
     public boolean preferSecretChats = false;
@@ -105,8 +105,8 @@ public class MgAccountConfig {
         hideStories = preferences.getBoolean("hideStories", false);
         hidePremiumPromo = preferences.getBoolean("hidePremiumPromo", false);
         disableGlobalSearch = preferences.getBoolean("disableGlobalSearch", false);
-        disableAiEditor = preferences.getBoolean("disableAiEditor", false);
-        disableAiSummary = preferences.getBoolean("disableAiSummary", false);
+        disableAiEditor = preferences.getBoolean("disableAiEditor", true);
+        disableAiSummary = preferences.getBoolean("disableAiSummary", true);
         disableInstantView = preferences.getBoolean("disableInstantView", false);
         disableLinkPreviews = preferences.getBoolean("disableLinkPreviews", false);
         preferSecretChats = preferences.getBoolean("preferSecretChats", false);
@@ -131,8 +131,8 @@ public class MgAccountConfig {
         hideStories = false;
         hidePremiumPromo = false;
         disableGlobalSearch = false;
-        disableAiEditor = false;
-        disableAiSummary = false;
+        disableAiEditor = true;
+        disableAiSummary = true;
         disableInstantView = false;
         disableLinkPreviews = false;
         preferSecretChats = false;
