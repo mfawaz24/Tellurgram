@@ -34,7 +34,7 @@ public class MgAccountConfig {
     public boolean disableLinkPreviews = false;
     public boolean preferSecretChats = false;
     public boolean deleteForAllByDefault = false;
-    public boolean stripTrackingParams = false;
+    public boolean stripTrackingParams = true;
     public boolean disableCloudDrafts = false;
     public boolean confirmInternalLinks = false;
     public boolean showCharCounter = false;
@@ -122,7 +122,7 @@ public class MgAccountConfig {
         disableLinkPreviews = preferences.getBoolean("disableLinkPreviews", false);
         preferSecretChats = preferences.getBoolean("preferSecretChats", false);
         deleteForAllByDefault = preferences.getBoolean("deleteForAllByDefault", false);
-        stripTrackingParams = preferences.getBoolean("stripTrackingParams", false);
+        stripTrackingParams = preferences.getBoolean("stripTrackingParams", true);
         disableCloudDrafts = preferences.getBoolean("disableCloudDrafts", false);
         confirmInternalLinks = preferences.getBoolean("confirmInternalLinks", false);
         showCharCounter = preferences.getBoolean("showCharCounter", false);
@@ -167,7 +167,7 @@ public class MgAccountConfig {
         disableLinkPreviews = false;
         preferSecretChats = false;
         deleteForAllByDefault = false;
-        stripTrackingParams = false;
+        stripTrackingParams = true;
         disableCloudDrafts = false;
         confirmInternalLinks = false;
         showCharCounter = false;
