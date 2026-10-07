@@ -30,7 +30,9 @@ public class MgAccountConfig {
     public boolean disableAiSummary = true;
     public boolean disableInstantView = false;
     public boolean disableLinkPreviews = false;
-    public boolean preferSecretChats = false;
+    public boolean preferSecretChats = true;
+    /** The one-time "new chats start as secret" hint was shown on the new-chat screen. */
+    public boolean preferSecretChatsHintShown = false;
     public boolean deleteForAllByDefault = false;
     public boolean stripTrackingParams = true;
     public boolean disableCloudDrafts = false;
@@ -86,6 +88,7 @@ public class MgAccountConfig {
         editor.putBoolean("disableInstantView", disableInstantView);
         editor.putBoolean("disableLinkPreviews", disableLinkPreviews);
         editor.putBoolean("preferSecretChats", preferSecretChats);
+        editor.putBoolean("preferSecretChatsHintShown", preferSecretChatsHintShown);
         editor.putBoolean("deleteForAllByDefault", deleteForAllByDefault);
         editor.putBoolean("stripTrackingParams", stripTrackingParams);
         editor.putBoolean("disableCloudDrafts", disableCloudDrafts);
@@ -112,7 +115,8 @@ public class MgAccountConfig {
         disableAiSummary = preferences.getBoolean("disableAiSummary", true);
         disableInstantView = preferences.getBoolean("disableInstantView", false);
         disableLinkPreviews = preferences.getBoolean("disableLinkPreviews", false);
-        preferSecretChats = preferences.getBoolean("preferSecretChats", false);
+        preferSecretChats = preferences.getBoolean("preferSecretChats", true);
+        preferSecretChatsHintShown = preferences.getBoolean("preferSecretChatsHintShown", false);
         deleteForAllByDefault = preferences.getBoolean("deleteForAllByDefault", false);
         stripTrackingParams = preferences.getBoolean("stripTrackingParams", true);
         disableCloudDrafts = preferences.getBoolean("disableCloudDrafts", false);
@@ -149,7 +153,8 @@ public class MgAccountConfig {
         disableAiSummary = true;
         disableInstantView = false;
         disableLinkPreviews = false;
-        preferSecretChats = false;
+        preferSecretChats = true;
+        preferSecretChatsHintShown = false;
         deleteForAllByDefault = false;
         stripTrackingParams = true;
         disableCloudDrafts = false;

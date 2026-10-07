@@ -13577,6 +13577,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         // Mercurygram: start new conversations as secret chats when opted in (#42)
         if (getUserConfig().mg.preferSecretChats) {
             args.putBoolean("createSecretChat", true);
+            args.putBoolean("mgSecretByDefault", true);
         }
         presentFragment(new ContactsActivity(args));
     }

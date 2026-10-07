@@ -156,6 +156,7 @@ public class ContactsActivity extends BaseFragment implements FactorAnimator.Tar
     private boolean destroyAfterSelect;
     private boolean returnAsResult;
     private boolean createSecretChat;
+    private boolean mgSecretByDefault;
     private boolean creatingChat;
     private boolean allowSelf = true;
     private boolean allowBots = true;
@@ -229,6 +230,7 @@ public class ContactsActivity extends BaseFragment implements FactorAnimator.Tar
             destroyAfterSelect = arguments.getBoolean("destroyAfterSelect", false);
             returnAsResult = arguments.getBoolean("returnAsResult", false);
             createSecretChat = arguments.getBoolean("createSecretChat", false);
+            mgSecretByDefault = arguments.getBoolean("mgSecretByDefault", false);
             selectAlertString = arguments.getString("selectAlertString");
             allowUsernameSearch = arguments.getBoolean("allowUsernameSearch", true);
             needForwardCount = arguments.getBoolean("needForwardCount", true);
@@ -1244,6 +1246,16 @@ public class ContactsActivity extends BaseFragment implements FactorAnimator.Tar
     @Override
     public void onBecomeFullyVisible() {
         super.onBecomeFullyVisible();
+        // Tellurgram: the first time compose opens a secret chat because of the
+        // default, say so once and point at the switch that turns it off.
+        final UserConfig userConfig = getUserConfig();
+        if (mgSecretByDefault && !userConfig.mg.preferSecretChatsHintShown) {
+            userConfig.mg.preferSecretChatsHintShown = true;
+            userConfig.saveConfig(false);
+            BulletinFactory.of(this).createSimpleBulletin(R.raw.passcode_lock_close,
+                    getString(R.string.MercurygramPreferSecretChatsHint), getString(R.string.Settings), Bulletin.DURATION_PROLONG,
+                    () -> presentFragment(new it.belloworld.tellurgram.ui.MercurygramSettingsActivity())).show();
+        }
         if (checkPermission && Build.VERSION.SDK_INT >= 23) {
             Activity activity = getParentActivity();
             if (activity != null) {
