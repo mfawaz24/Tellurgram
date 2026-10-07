@@ -25,7 +25,7 @@ public class MgAccountConfig {
     public boolean savedMessagesHistory = false;
     public String transcribeLang = SharedConfig.MG_TRANSCRIBE_LANG_DEVICE;
     public boolean hideStories = false;
-    public boolean hidePremiumPromo = false;
+    public boolean hidePremiumPromo = true;
     public boolean disableGlobalSearch = false;
     public boolean blockAiServers = true;
     public boolean disableAiEditor = true;
@@ -113,7 +113,7 @@ public class MgAccountConfig {
         savedMessagesHistory = preferences.getBoolean("savedMessagesHistory", false);
         transcribeLang = preferences.getString("transcribeLang", SharedConfig.MG_TRANSCRIBE_LANG_DEVICE);
         hideStories = preferences.getBoolean("hideStories", false);
-        hidePremiumPromo = preferences.getBoolean("hidePremiumPromo", false);
+        hidePremiumPromo = preferences.getBoolean("hidePremiumPromo", true);
         disableGlobalSearch = preferences.getBoolean("disableGlobalSearch", false);
         blockAiServers = preferences.getBoolean("blockAiServers", true);
         disableAiEditor = preferences.getBoolean("disableAiEditor", true);
@@ -158,7 +158,7 @@ public class MgAccountConfig {
         savedMessagesHistory = false;
         transcribeLang = SharedConfig.MG_TRANSCRIBE_LANG_DEVICE;
         hideStories = false;
-        hidePremiumPromo = false;
+        hidePremiumPromo = true;
         disableGlobalSearch = false;
         blockAiServers = true;
         disableAiEditor = true;
