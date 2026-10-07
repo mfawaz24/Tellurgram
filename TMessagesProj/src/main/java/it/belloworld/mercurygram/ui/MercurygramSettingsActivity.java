@@ -98,6 +98,35 @@ public class MercurygramSettingsActivity extends UniversalFragment {
             items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramScopeDefaultFooter)));
         }
 
+        // Tellurgram: the protections people look for first sit at the top.
+        // While AI servers are blocked the per-feature AI rows are greyed out
+        // and show as disabled, since blocking already covers them.
+        final boolean aiBlocked = getUserConfig().mg.blockAiServers;
+        items.add(MgSettingsScope.globalCheck(ID_REMOVE_ADS, LocaleController.getString(R.string.MercurygramRemoveAds))
+                .setChecked(SharedConfig.removeAdsAndProxySponsor));
+        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramRemoveAdsAbout)));
+
+        items.add(MgSettingsScope.globalCheck(ID_ENFORCE_HTTPS, LocaleController.getString(R.string.MercurygramEnforceHttps))
+                .setChecked(SharedConfig.mg_enforceHttps));
+        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramEnforceHttpsAbout)));
+
+        items.add(UItem.asCheck(ID_BLOCK_AI_SERVERS,
+                        LocaleController.getString(R.string.MercurygramBlockAiServers))
+                .setChecked(aiBlocked));
+        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramBlockAiServersAbout)));
+
+        items.add(UItem.asCheck(ID_DISABLE_AI_EDITOR,
+                        LocaleController.getString(R.string.MercurygramDisableAiEditor))
+                .setChecked(getUserConfig().mg.aiEditorOff())
+                .setEnabled(!aiBlocked));
+        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramDisableAiEditorAbout)));
+
+        items.add(UItem.asCheck(ID_DISABLE_AI_SUMMARY,
+                        LocaleController.getString(R.string.MercurygramDisableAiSummary))
+                .setChecked(getUserConfig().mg.aiSummaryOff())
+                .setEnabled(!aiBlocked));
+        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramDisableAiSummaryAbout)));
+
         items.add(UItem.asHeader(LocaleController.getString(R.string.MercurygramSettingsGeneral)));
         items.add(UItem.asCheck(ID_MESSAGE_DETAILS_MENU, LocaleController.getString(R.string.MercurygramMessageDetailsMenu))
                 .setChecked(getUserConfig().mg.messageDetailsMenu));
@@ -112,9 +141,6 @@ public class MercurygramSettingsActivity extends UniversalFragment {
         items.add(UItem.asCheck(ID_HIDE_PREMIUM_PROMO, LocaleController.getString(R.string.MercurygramHidePremiumPromo))
                 .setChecked(getUserConfig().mg.hidePremiumPromo));
         items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramHidePremiumPromoAbout)));
-        items.add(MgSettingsScope.globalCheck(ID_REMOVE_ADS, LocaleController.getString(R.string.MercurygramRemoveAds))
-                .setChecked(SharedConfig.removeAdsAndProxySponsor));
-        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramRemoveAdsAbout)));
         items.add(MgSettingsScope.globalCheck(ID_USE_SYSTEM_FONT, LocaleController.getString(R.string.MercurygramUseSystemFont))
                 .setChecked(SharedConfig.useSystemFont));
         items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramUseSystemFontAbout)));
@@ -185,21 +211,6 @@ public class MercurygramSettingsActivity extends UniversalFragment {
                 .setChecked(getUserConfig().mg.disableGlobalSearch));
         items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramDisableGlobalSearchAbout)));
 
-        items.add(UItem.asCheck(ID_BLOCK_AI_SERVERS,
-                        LocaleController.getString(R.string.MercurygramBlockAiServers))
-                .setChecked(getUserConfig().mg.blockAiServers));
-        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramBlockAiServersAbout)));
-
-        items.add(UItem.asCheck(ID_DISABLE_AI_EDITOR,
-                        LocaleController.getString(R.string.MercurygramDisableAiEditor))
-                .setChecked(getUserConfig().mg.disableAiEditor));
-        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramDisableAiEditorAbout)));
-
-        items.add(UItem.asCheck(ID_DISABLE_AI_SUMMARY,
-                        LocaleController.getString(R.string.MercurygramDisableAiSummary))
-                .setChecked(getUserConfig().mg.disableAiSummary));
-        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramDisableAiSummaryAbout)));
-
         items.add(UItem.asCheck(ID_DISABLE_INSTANT_VIEW,
                         LocaleController.getString(R.string.MercurygramDisableInstantView))
                 .setChecked(getUserConfig().mg.disableInstantView));
@@ -214,10 +225,6 @@ public class MercurygramSettingsActivity extends UniversalFragment {
                         LocaleController.getString(R.string.MercurygramStripTrackingParams))
                 .setChecked(getUserConfig().mg.stripTrackingParams));
         items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramStripTrackingParamsAbout)));
-
-        items.add(MgSettingsScope.globalCheck(ID_ENFORCE_HTTPS, LocaleController.getString(R.string.MercurygramEnforceHttps))
-                .setChecked(SharedConfig.mg_enforceHttps));
-        items.add(UItem.asShadow(LocaleController.getString(R.string.MercurygramEnforceHttpsAbout)));
 
         items.add(UItem.asCheck(ID_DISABLE_CLOUD_DRAFTS,
                         LocaleController.getString(R.string.MercurygramDisableCloudDrafts))
@@ -400,11 +407,13 @@ public class MercurygramSettingsActivity extends UniversalFragment {
                 refreshList();
                 break;
             case ID_DISABLE_AI_EDITOR:
+                if (getUserConfig().mg.blockAiServers) break;
                 getUserConfig().mg.disableAiEditor = !getUserConfig().mg.disableAiEditor;
                 getUserConfig().saveConfig(false);
                 refreshList();
                 break;
             case ID_DISABLE_AI_SUMMARY:
+                if (getUserConfig().mg.blockAiServers) break;
                 getUserConfig().mg.disableAiSummary = !getUserConfig().mg.disableAiSummary;
                 getUserConfig().saveConfig(false);
                 refreshList();
