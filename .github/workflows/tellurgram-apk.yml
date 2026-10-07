@@ -1,0 +1,113 @@
+name: Tellurgram APK
+
+# Builds a single arm64 release APK and uploads it as a workflow artifact.
+# Signed with the public test keystore in TMessagesProj/config (fine for
+# personal installs, not for distribution). Needs repo secrets APP_ID and
+# APP_HASH (Telegram API credentials from https://my.telegram.org).
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-tag:
+        description: 'MG_BUILD_TAG baked into versionName/versionCode (X.Y.Z.M or X.Y.Z.M.K)'
+        required: true
+        default: '12.10.1.1'
+  push:
+    branches:
+      - adblock
+      - main
+
+concurrency:
+  group: tellurgram-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    env:
+      BUILD_TAG: ${{ inputs.build-tag || '12.10.1.1' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Install host build tools
+        run: sudo apt-get install -y --no-install-recommends gperf meson libuv1-dev nasm cmake
+
+      - name: Parse NDK and build-tools versions from gradle
+        run: |
+          gradle_file=TMessagesProj/build.gradle
+          ndk=$(grep -oE 'ndkVersion[[:space:]]+"[0-9.]+"' "$gradle_file" | grep -oE '[0-9.]+')
+          bt=$(grep -oE "buildToolsVersion[[:space:]]+'[0-9.]+'" "$gradle_file" | grep -oE '[0-9.]+')
+          [ -n "$ndk" ] && [ -n "$bt" ] || { echo "could not parse versions from $gradle_file" >&2; exit 1; }
+          echo "NDK_VERSION=$ndk"        >> "$GITHUB_ENV"
+          echo "BUILD_TOOLS_VERSION=$bt" >> "$GITHUB_ENV"
+
+      - name: Ensure NDK and build-tools installed
+        run: |
+          set -euo pipefail
+          ndk_dir="$ANDROID_SDK_ROOT/ndk/${NDK_VERSION}"
+          bt_dir="$ANDROID_SDK_ROOT/build-tools/${BUILD_TOOLS_VERSION}"
+          if [ -f "$ndk_dir/source.properties" ] && [ -d "$bt_dir" ]; then
+            exit 0
+          fi
+          for i in 1 2 3; do
+            "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+              "ndk;${NDK_VERSION}" "build-tools;${BUILD_TOOLS_VERSION}" && exit 0
+            rm -rf "$ndk_dir" "$bt_dir"
+            sleep $((i * 10))
+          done
+          echo "sdkmanager exhausted retries" >&2
+          exit 1
+
+      - name: Cache native build outputs
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            TMessagesProj/jni/boringssl/build/arm64-v8a
+            TMessagesProj/jni/ffmpeg/arm64-v8a
+            TMessagesProj/jni/ffmpeg/include
+            TMessagesProj/jni/ffmpeg/.ndk-${{ env.NDK_VERSION }}-arm64-v8a
+            TMessagesProj/jni/td/build/arm64-v8a
+            TMessagesProj/jni/td/td/generate/auto
+            TMessagesProj/jni/td/tdutils/generate/auto
+          key: tellurgram-jni-arm64-v8a-ndk${{ env.NDK_VERSION }}-${{ hashFiles('.gitmodules', 'TMessagesProj/jni/*.sh', 'TMessagesProj/jni/ffmpeg/*.sh') }}-${{ github.sha }}
+          restore-keys: |
+            tellurgram-jni-arm64-v8a-ndk${{ env.NDK_VERSION }}-${{ hashFiles('.gitmodules', 'TMessagesProj/jni/*.sh', 'TMessagesProj/jni/ffmpeg/*.sh') }}-
+
+      - name: Create API_KEYS
+        env:
+          APP_ID: ${{ secrets.APP_ID }}
+          APP_HASH: ${{ secrets.APP_HASH }}
+        run: |
+          [ -n "$APP_ID" ] && [ -n "$APP_HASH" ] || { echo "Set the APP_ID and APP_HASH repository secrets" >&2; exit 1; }
+          printf 'APP_ID = %s\nAPP_HASH = %s\n' "$APP_ID" "$APP_HASH" > API_KEYS
+
+      - name: Build APK
+        run: ./gradlew :TMessagesProj_App:assembleAfatFdArm64Release -PMG_BUILD_TAG="$BUILD_TAG" --no-daemon
+
+      - name: Rename APK
+        id: rename
+        run: |
+          set -euo pipefail
+          APK_DIR=TMessagesProj_App/build/outputs/apk/afatFdArm64/release
+          DEST="$APK_DIR/Tellurgram-${BUILD_TAG}-arm64-v8a.apk"
+          cp "$APK_DIR/afatFdArm64.apk" "$DEST"
+          echo "SHA256: $(sha256sum "$DEST" | cut -d' ' -f1)"
+          echo "apk_path=${DEST}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: Tellurgram-${{ env.BUILD_TAG }}-arm64-v8a
+          path: ${{ steps.rename.outputs.apk_path }}

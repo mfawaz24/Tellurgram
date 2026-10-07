@@ -1,0 +1,304 @@
+cmake_minimum_required(VERSION 3.16)
+
+set(CMAKE_CXX_FLAGS "-std=c++17 -DANDROID -Wno-register")
+set(CMAKE_C_FLAGS "-w -std=c11 -DANDROID -D_LARGEFILE_SOURCE=1")
+set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections")
+# Reproducible builds: override __FILE__ with __FILE_NAME__ (filename only, no path)
+# so absolute build paths are not embedded in .rodata. Works with clang 9+ (NDK r21e).
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-builtin-macro-redefined -D__FILE__=__FILE_NAME__")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-builtin-macro-redefined -D__FILE__=__FILE_NAME__")
+# Upstream hides non-JNI symbols with jni/exports.map (--version-script), so no
+# --exclude-libs list is needed here. --build-id=none and --hash-style=gnu keep
+# the link output independent of the build host; --icf=safe and -flto=full are
+# dropped because both reorder sections in a way that is not byte-stable across
+# builds of identical sources.
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--build-id=none -Wl,--hash-style=gnu -Wl,-Bsymbolic -Wl,--gc-sections")
+
+if (${ANDROID_ABI} STREQUAL "armeabi-v7a" OR ${ANDROID_ABI} STREQUAL "arm64-v8a")
+    enable_language(ASM)
+else()
+    enable_language(ASM_NASM)
+endif()
+
+set(CAN_COMPILE_SME FALSE CACHE INTERNAL "Disable libyuv SME" FORCE)
+add_subdirectory(
+        third_party/libyuv
+        ${CMAKE_CURRENT_BINARY_DIR}/libyuv
+        EXCLUDE_FROM_ALL)
+
+add_library(avutil STATIC IMPORTED)
+set_target_properties(avutil PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/ffmpeg/${ANDROID_ABI}/libavutil.a)
+
+add_library(avformat STATIC IMPORTED)
+set_target_properties(avformat PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/ffmpeg/${ANDROID_ABI}/libavformat.a)
+
+add_library(avcodec STATIC IMPORTED)
+set_target_properties(avcodec PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/ffmpeg/${ANDROID_ABI}/libavcodec.a)
+
+add_library(swresample STATIC IMPORTED)
+set_target_properties(swresample PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/ffmpeg/${ANDROID_ABI}/libswresample.a)
+
+add_library(swscale STATIC IMPORTED)
+set_target_properties(swscale PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/ffmpeg/${ANDROID_ABI}/libswscale.a)
+
+add_library(crypto STATIC IMPORTED)
+set_target_properties(crypto PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/boringssl/build/${ANDROID_ABI}/crypto/libcrypto.a)
+
+add_library(ssl STATIC IMPORTED)
+set_target_properties(ssl PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/boringssl/build/${ANDROID_ABI}/ssl/libssl.a)
+
+add_library(libvpx STATIC IMPORTED)
+set_target_properties(libvpx PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/ffmpeg/${ANDROID_ABI}/libvpx.a)
+
+add_library(libdav1d STATIC IMPORTED)
+set_target_properties(libdav1d PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/ffmpeg/${ANDROID_ABI}/libdav1d.a)
+
+add_library(libopus STATIC IMPORTED)
+set_target_properties(libopus PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/ffmpeg/${ANDROID_ABI}/libopus.a)
+
+add_library(tde2e STATIC IMPORTED)
+set_target_properties(tde2e PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/td/build/${ANDROID_ABI}/tde2e/libtde2e.a)
+
+add_library(tdutils STATIC IMPORTED)
+set_target_properties(tdutils PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/td/build/${ANDROID_ABI}/tdutils/libtdutils.a)
+
+#tgnet
+add_library(tgnet STATIC
+        tgnet/ApiScheme.cpp
+        tgnet/BuffersStorage.cpp
+        tgnet/ByteArray.cpp
+        tgnet/ByteStream.cpp
+        tgnet/Connection.cpp
+        tgnet/ConnectionSession.cpp
+        tgnet/ConnectionsManager.cpp
+        tgnet/ConnectionSocket.cpp
+        tgnet/Datacenter.cpp
+        tgnet/EventObject.cpp
+        tgnet/FileLog.cpp
+        tgnet/MTProtoScheme.cpp
+        tgnet/NativeByteBuffer.cpp
+        tgnet/Request.cpp
+        tgnet/Timer.cpp
+        tgnet/TLObject.cpp
+        tgnet/ProxyCheckInfo.cpp
+        tgnet/Handshake.cpp
+        tgnet/Config.cpp)
+target_compile_options(tgnet PUBLIC
+        -Wall -frtti -finline-functions -ffast-math -Oz)
+set_target_properties(tgnet PROPERTIES
+        ANDROID_ARM_MODE arm)
+target_compile_definitions(tgnet PUBLIC
+        HAVE_PTHREAD)
+target_include_directories(tgnet PUBLIC
+        boringssl/include/)
+target_link_libraries(tgnet
+        crypto)
+
+# tlottie (prebuilt Rust static library)
+add_library(tlottie STATIC IMPORTED)
+set_target_properties(tlottie PROPERTIES
+        IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/prebuild/${ANDROID_ABI}/libtlottie.a)
+
+#sqlite
+add_library(sqlite STATIC
+        sqlite/sqlite3.c)
+target_compile_options(sqlite PUBLIC
+        -fno-strict-aliasing -Oz)
+set_target_properties(sqlite PROPERTIES
+        ANDROID_ARM_MODE arm)
+target_compile_definitions(sqlite PUBLIC
+        NULL=0 SOCKLEN_T=socklen_t LOCALE_NOT_USED ANDROID_NDK DISABLE_IMPORTGL AVOID_TABLES ANDROID_TILE_BASED_DECODE HAVE_STRCHRNUL=0 ANDROID_ARMV6_IDCT)
+
+#breakpad
+add_library(breakpad STATIC
+        third_party/breakpad/src/client/linux/crash_generation/crash_generation_client.cc
+        third_party/breakpad/src/client/linux/handler/exception_handler.cc
+        third_party/breakpad/src/client/linux/handler/minidump_descriptor.cc
+        third_party/breakpad/src/client/linux/log/log.cc
+        third_party/breakpad/src/client/linux/dump_writer_common/thread_info.cc
+        third_party/breakpad/src/client/linux/dump_writer_common/seccomp_unwinder.cc
+        third_party/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc
+        third_party/breakpad/src/client/linux/microdump_writer/microdump_writer.cc
+        third_party/breakpad/src/client/linux/minidump_writer/linux_dumper.cc
+        third_party/breakpad/src/client/linux/minidump_writer/linux_ptrace_dumper.cc
+        third_party/breakpad/src/client/linux/minidump_writer/minidump_writer.cc
+        third_party/breakpad/src/client/minidump_file_writer.cc
+        third_party/breakpad/src/common/android/breakpad_getcontext.S
+        third_party/breakpad/src/common/convert_UTF.c
+        third_party/breakpad/src/common/md5.cc
+        third_party/breakpad/src/common/string_conversion.cc
+        third_party/breakpad/src/common/linux/elfutils.cc
+        third_party/breakpad/src/common/linux/file_id.cc
+        third_party/breakpad/src/common/linux/guid_creator.cc
+        third_party/breakpad/src/common/linux/linux_libc_support.cc
+        third_party/breakpad/src/common/linux/memory_mapped_file.cc
+        third_party/breakpad/src/common/linux/safe_readlink.cc)
+set_target_properties(breakpad PROPERTIES ANDROID_ARM_MODE arm)
+set_property(SOURCE third_party/breakpad/src/common/android/breakpad_getcontext.S PROPERTY LANGUAGE C)
+target_include_directories(breakpad PUBLIC
+        third_party/breakpad/src/common/android/include
+        third_party/breakpad/src)
+
+
+#voip
+set(_cxx_flags_before_voip "${CMAKE_CXX_FLAGS}")
+include(${CMAKE_HOME_DIRECTORY}/voip/CMakeLists.txt)
+set(CMAKE_CXX_FLAGS "${_cxx_flags_before_voip}")
+unset(_cxx_flags_before_voip)
+
+option(QUIET_BUILD "Suppress compiler warnings for CI log reduction" OFF)
+
+# [MG] whisper.cpp — on-device voice transcription engine.
+# Vendored as the jni/whisper submodule and built as a static lib that links
+# into libtmessages. add_subdirectory() makes it inherit this file's
+# reproducible-build flags (-D__FILE__=__FILE_NAME__, --build-id=none, ...).
+# Disable everything we don't ship; CPU-only inference.
+# Reproducibility: ggml/CMakeLists.txt runs `git rev-parse --short HEAD` in the
+# submodule and compiles the result into libggml as GGML_COMMIT (read back by
+# ggml.c:519). Git auto-scales the abbreviation with the clone's object count,
+# so a shallow submodule checkout yields 7 chars and a full one 8, and a dirty
+# tree appends "-dirty". Either changes one string, which reorders the merged
+# SHF_STRINGS pool and makes libtmessages.49.so differ between builds of
+# byte-identical sources. ggml offers no override for the value, so point its
+# git probe at a non-git binary: the command fails under ERROR_QUIET and ggml
+# falls back to its own "unknown" constant. find_program skips the search
+# because the cache entry is already set to a non-NOTFOUND path.
+set(GIT_EXE "${CMAKE_COMMAND}" CACHE FILEPATH "" FORCE)
+set(WHISPER_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+set(WHISPER_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(WHISPER_BUILD_SERVER   OFF CACHE BOOL "" FORCE)
+set(WHISPER_SDL2           OFF CACHE BOOL "" FORCE)
+set(GGML_OPENMP            OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS      OFF CACHE BOOL "" FORCE)
+# On Android we cross-compile, so ggml sets GGML_NATIVE=OFF and emits no
+# -march flag → the NDK baseline (armv8-a) is used, which lacks the int8
+# dot-product instruction. whisper's q8_0 GEMM then falls back to a slow
+# widening-NEON path (~5-10x slower than `sdot`). Pin an arch that enables
+# dotprod + fp16 on arm64. This compiles ARMv8.2 instructions that SIGILL on
+# older cores (pre-Cortex-A55/A75), so MgWhisperTranscriber.isUsable() gates
+# the feature on a runtime /proc/cpuinfo "asimddp" check — devices without it
+# never reach this code and fall back to Telegram's server transcription.
+# Deterministic fixed string → no reproducibility impact.
+if (${ANDROID_ABI} STREQUAL "arm64-v8a")
+    set(GGML_CPU_ARM_ARCH "armv8.2-a+dotprod+fp16" CACHE STRING "" FORCE)
+endif()
+add_subdirectory(whisper)
+
+set(NATIVE_LIB "tmessages.49")
+
+#tmessages
+add_library(${NATIVE_LIB} SHARED
+        jni.c
+        audio.c
+        webm_encoder.c
+        image.cpp
+        intro/IntroRenderer.c
+        SqliteWrapper.cpp
+        utilities.cpp
+        gifvideo.cpp
+        lottie.cpp
+        TgNetWrapper.cpp
+        exoplayer/ffmpeg_jni.cc
+        fast-edge.cpp
+        genann.c
+        secureid_ocr.cpp
+        tde2e/bridge.cpp
+        whisper_jni.cpp
+)
+
+target_compile_options(${NATIVE_LIB} PUBLIC
+        -ffast-math -Oz -funroll-loops -ffast-math -fno-strict-aliasing -fno-math-errno)
+
+target_compile_definitions(${NATIVE_LIB} PUBLIC
+        BSD=1 NULL=0 SOCKLEN_T=socklen_t ANDROID_NDK DISABLE_IMPORTGL AVOID_TABLES ANDROID_TILE_BASED_DECODE __STDC_CONSTANT_MACROS ANDROID_ARMV6_IDCT OPUS_BUILD FIXED_POINT USE_ALLOCA restrict= __EMX__ LOCALE_NOT_USED HAVE_LRINT HAVE_LRINTF)
+
+target_sources(${NATIVE_LIB} PRIVATE
+
+        third_party/xiph/opusfile/src/info.c
+        third_party/xiph/opusfile/src/internal.c
+        third_party/xiph/opusfile/src/opusfile.c
+        third_party/xiph/opusfile/src/stream.c
+        third_party/xiph/ogg/src/bitwise.c
+        third_party/xiph/ogg/src/framing.c)
+
+target_include_directories(${NATIVE_LIB} PUBLIC
+        third_party/xiph/opus/include
+        third_party/xiph/opus/silk
+        third_party/xiph/opus/silk/fixed
+        third_party/xiph/opus/celt
+        third_party/xiph/opus
+        third_party/xiph/opusfile/include
+        third_party/xiph/ogg/include
+        third_party/libyuv/include
+        boringssl/include
+        ffmpeg/include
+        emoji
+        exoplayer/include
+        intro
+        tlottie/include
+        tgcalls/
+        webrtc/
+        tde2e/include
+        whisper/include
+        whisper/ggml/include
+)
+
+target_link_options(${NATIVE_LIB} PRIVATE "-Wl,-z,max-page-size=16384")
+target_link_options(${NATIVE_LIB} PRIVATE "-Wl,-z,common-page-size=16384")
+target_link_options(${NATIVE_LIB} PRIVATE "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/exports.map")
+target_link_libraries(${NATIVE_LIB}
+        -Wl,--whole-archive rnnoise openh264 voipandroid -Wl,--no-whole-archive
+        tgvoip
+        tgcalls
+        tgcalls_tp
+        tgnet
+        tlottie
+        sqlite
+        swscale
+        avformat
+        avcodec
+        swresample
+        libvpx
+        libdav1d
+        libopus
+        tde2e
+        tdutils
+        yuv
+        whisper
+        avutil
+        ssl
+        crypto
+        jnigraphics
+        log
+        z
+        GLESv2
+        EGL
+        android
+        OpenSLES
+        cpufeatures
+        breakpad)
+
+#if (${ANDROID_ABI} STREQUAL "x86" OR ${ANDROID_ABI} STREQUAL "x86_64")
+#    target_link_libraries(${NATIVE_LIB}
+#            -Wl,--whole-archive vpxasm -Wl,--no-whole-archive
+#            c)
+#endif()
+
+if(QUIET_BUILD)
+    foreach(_tgt tgnet tgvoip openh264 rnnoise tgcalls voipandroid ${NATIVE_LIB})
+        if(TARGET ${_tgt})
+            # Upstream turns libraries into prebuilt IMPORTED targets from time to
+            # time (openh264 in 12.10.1). CMake rejects PRIVATE options on those,
+            # and there is nothing to silence anyway since they are not compiled.
+            get_target_property(_tgt_imported ${_tgt} IMPORTED)
+            if(NOT _tgt_imported)
+                target_compile_options(${_tgt} PRIVATE -w)
+            endif()
+        endif()
+    endforeach()
+endif()
+
+include(AndroidNdkModules)
+android_ndk_import_module_cpufeatures()
