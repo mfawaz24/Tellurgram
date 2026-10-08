@@ -10,7 +10,7 @@ Tellurgram keeps all of Mercurygram's privacy and security improvements and adds
 
 ## Download
 
-Get the [latest APK](https://github.com/mfawaz24/Tellurgram/releases/latest/download/Tellurgram-arm64-v8a.apk).
+Get the [latest APK](https://github.com/mfawaz24/Tellurgram/releases/latest).
 
 ## License
 
