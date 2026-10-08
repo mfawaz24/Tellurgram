@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Warm the JNI native-build cache once per release so the 4 build-matrix
+  # Warm the JNI native-build cache once per release so the build-matrix
   # jobs below restore prebuilt natives instead of each rebuilding from
   # source.
   prewarm-native:
@@ -41,18 +41,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - flavor: afatFdArm32
-            task: assembleAfatFdArm32Release
-            abi: armeabi-v7a
           - flavor: afatFdArm64
             task: assembleAfatFdArm64Release
             abi: arm64-v8a
-          - flavor: afatFdX86
-            task: assembleAfatFdX86Release
-            abi: x86
-          - flavor: afatFdX86_64
-            task: assembleAfatFdX86_64Release
-            abi: x86_64
           # Google Play bundle. Attached to the GitHub release, uploaded to
           # Play Console by hand. Artifact name is not apk-* on purpose:
           # fdroiddata-sync globs *.apk and the release job lists it
@@ -92,7 +83,7 @@ jobs:
           name: ${{ matrix.abi == 'aab' && 'bundle-play' || format('apk-{0}', matrix.abi) }}
           path: ${{ steps.build.outputs.apk_path }}
 
-  # Tor plugin companion APK — per-ABI Release build of
+  # Tor plugin companion APK — arm64 Release build of
   # :TMessagesProj_PluginTor. Same MG_BUILD_TAG (github.ref_name) and same
   # signing key as main; per-ABI versionCode offsets match the main app via
   # gradle/mg-version.gradle. Inline (not build-mg) because build-mg hardcodes
@@ -108,14 +99,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - flavor: afatFdArm32
-            abi: armeabi-v7a
           - flavor: afatFdArm64
             abi: arm64-v8a
-          - flavor: afatFdX86
-            abi: x86
-          - flavor: afatFdX86_64
-            abi: x86_64
 
     steps:
       - name: Checkout
