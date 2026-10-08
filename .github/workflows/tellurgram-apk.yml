@@ -15,7 +15,7 @@ on:
   push:
     branches:
       - new
-      - main
+      - prod
 
 concurrency:
   group: tellurgram-apk-${{ github.ref }}
