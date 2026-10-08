@@ -1,6 +1,6 @@
 name: Prewarm JNI native build cache
 
-# Reusable workflow called by beta.yml and release.yml. Builds each ABI's
+# Reusable workflow called by beta.yml and release.yml. Builds the arm64
 # native libs (boringssl, ffmpeg, dav1d, libvpx, tde2e) once per push and
 # saves them under a deterministic cache key. The shared build-mg composite
 # then restores those artifacts so the per-APK assemble jobs short-circuit
@@ -38,12 +38,6 @@ jobs:
         include:
           - abi: arm64-v8a
             task: buildNativeLibsArm64
-          - abi: armeabi-v7a
-            task: buildNativeLibsArm32
-          - abi: x86_64
-            task: buildNativeLibsX86_64
-          - abi: x86
-            task: buildNativeLibsX86
 
     steps:
       - name: Checkout

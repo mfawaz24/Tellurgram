@@ -89,7 +89,7 @@ jobs:
             echo "- Computed: **\`${NAME}\`**"
           } >> "$GITHUB_STEP_SUMMARY"
 
-  # Warm the JNI native-build cache once per push so the 8 build-matrix jobs
+  # Warm the JNI native-build cache once per push so the build-matrix jobs
   # below restore prebuilt boringssl/ffmpeg/dav1d/libvpx/tde2e archives
   # instead of each rebuilding from source.
   prewarm-native:
@@ -116,47 +116,17 @@ jobs:
         include:
           # Release builds — reproducible, shares versionCode with the
           # latest stable. Filename has no infix.
-          - flavor: afatFdArm32
-            task: assembleAfatFdArm32Release
-            abi: armeabi-v7a
-            build-type: release
-            name-infix: ''
           - flavor: afatFdArm64
             task: assembleAfatFdArm64Release
             abi: arm64-v8a
             build-type: release
             name-infix: ''
-          - flavor: afatFdX86
-            task: assembleAfatFdX86Release
-            abi: x86
-            build-type: release
-            name-infix: ''
-          - flavor: afatFdX86_64
-            task: assembleAfatFdX86_64Release
-            abi: x86_64
-            build-type: release
-            name-infix: ''
           # Debug builds — `.beta` applicationIdSuffix, side-by-side install
           # with stable. Filename gets a "-debug" infix to distinguish from
           # the Release APK.
-          - flavor: afatFdArm32
-            task: assembleAfatFdArm32Debug
-            abi: armeabi-v7a
-            build-type: debug
-            name-infix: '-debug'
           - flavor: afatFdArm64
             task: assembleAfatFdArm64Debug
             abi: arm64-v8a
-            build-type: debug
-            name-infix: '-debug'
-          - flavor: afatFdX86
-            task: assembleAfatFdX86Debug
-            abi: x86
-            build-type: debug
-            name-infix: '-debug'
-          - flavor: afatFdX86_64
-            task: assembleAfatFdX86_64Debug
-            abi: x86_64
             build-type: debug
             name-infix: '-debug'
 
@@ -199,7 +169,7 @@ jobs:
           name: apk-${{ matrix.abi }}-${{ matrix.build-type }}
           path: ${{ steps.build.outputs.apk_path }}
 
-  # Tor plugin companion APK — per-ABI Release build of
+  # Tor plugin companion APK — arm64 Release build of
   # :TMessagesProj_PluginTor. Same MG_BUILD_TAG, same signing key, same per-ABI
   # versionCode offsets as main. No Debug variant: the plugin has no .beta
   # applicationId and ships only as a Release artifact attached to the same
@@ -216,14 +186,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - flavor: afatFdArm32
-            abi: armeabi-v7a
           - flavor: afatFdArm64
             abi: arm64-v8a
-          - flavor: afatFdX86
-            abi: x86
-          - flavor: afatFdX86_64
-            abi: x86_64
 
     steps:
       - name: Checkout
