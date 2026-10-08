@@ -1,6 +1,6 @@
-package it.belloworld.tellurgram.compat.gms.wearable;
+package org.tellurgram.compat.gms.wearable;
 
-import it.belloworld.tellurgram.compat.gms.tasks.Task;
+import org.tellurgram.compat.gms.tasks.Task;
 
 /** Stub MessageClient — GMS Wearable removed in FOSS builds. */
 public class MessageClient {

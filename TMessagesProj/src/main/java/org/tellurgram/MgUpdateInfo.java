@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram;
+package org.tellurgram;
 
 import org.json.JSONException;
 import org.json.JSONObject;

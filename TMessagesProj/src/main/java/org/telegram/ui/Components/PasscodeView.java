@@ -79,7 +79,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import it.belloworld.tellurgram.HiddenAccountHelper;
+import org.tellurgram.HiddenAccountHelper;
 
 public class PasscodeView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
     private final static float BACKGROUND_SPRING_STIFFNESS = 300f;

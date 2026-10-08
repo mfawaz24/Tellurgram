@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.emoji;
+package org.tellurgram.emoji;
 
 import android.text.TextUtils;
 

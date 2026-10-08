@@ -10,8 +10,8 @@
 # jni/<abi>/ (the module's jniLibs.srcDirs root, build.gradle:92), NOT through
 # CMake: it is a standalone binary, not a linked shared library.
 #
-# REPRODUCIBILITY (F-Droid ships bit-for-bit reproducible builds, so every
-# native artifact must be byte-identical across hosts). Go embeds build paths,
+# REPRODUCIBILITY (every native artifact must be byte-identical across
+# hosts). Go embeds build paths,
 # a build id, and module
 # metadata by default, all host-dependent. Neutralised here with:
 #   -trimpath            strip absolute module/GOPATH/GOROOT paths from the binary
@@ -27,7 +27,7 @@
 #                        build host ships. Go >=1.21 honours this directive and
 #                        transparently fetches the exact pinned toolchain (Go
 #                        verifies it against the content hash baked into the go
-#                        command), so the F-Droid buildserver, CI, a developer,
+#                        command), so CI, a developer,
 #                        and an independent verifier all compile with the same
 #                        compiler regardless of their distro's Go package. The
 #                        buildserver only needs SOME Go >=1.21 to bootstrap this
@@ -38,7 +38,7 @@
 #                        the snowflake submodule's go.mod floor moves.
 #
 # Verify a built .so is byte-identical across two runs (and ideally two hosts)
-# with `scripts/check-reproducibility.sh` before committing.
+# before committing.
 #
 # Requires: NDK env var (same as build_tor.sh) and a Go >=1.21 on PATH (only as
 # the GOTOOLCHAIN bootstrap; the actual compile uses the pinned version below).

@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.ui;
+package org.tellurgram.ui;
 
 import android.view.Gravity;
 import android.view.View;

@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.compat.gms.wallet;
+package org.tellurgram.compat.gms.wallet;
 
 import android.content.Context;
 

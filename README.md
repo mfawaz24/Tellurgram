@@ -11,7 +11,6 @@ This is an unofficial fork of [Telegram App for Android](https://github.com/DrKL
 [![Releases](https://img.shields.io/github/release/Mercurygram/Mercurygram.svg)](https://github.com/Mercurygram/Mercurygram/releases/latest)
 [![Discussions](https://img.shields.io/badge/Official-Group-blue.svg?logo=telegram)](https://t.me/Mercurygram)
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/en/packages/it.belloworld.tellurgram/)
 
 </div>
 
@@ -21,9 +20,9 @@ Mercurygram publishes two kinds of build. The tag shape tells you which:
 
 | Channel | Tag shape | Example | Packages | When it ships |
 |---|---|---|---|---|
-| **Stable** | 4-part `X.Y.Z.M` (M ≥ 1) | `12.7.3.1` | stable only (`it.belloworld.tellurgram`) | Tagged release. Also goes to F-Droid / IzzyOnDroid. |
-| **Snapshot** | 5-part `X.Y.Z.M.K` (M ≥ 1) | `12.7.3.1.42` | **both** stable and beta (`it.belloworld.tellurgram.beta`) | Every push to the `Mercurygram` branch (`beta.yml`). Snapshot of the next stable. |
-| **Pre-stable** | 5-part `X.Y.Z.0.K` | `12.7.3.0.5` | **both** stable and beta (`it.belloworld.tellurgram.beta`) | After an upstream rebase, before the first `X.Y.Z.M` (M ≥ 1) stable for that upstream ships (`beta.yml`). |
+| **Stable** | 4-part `X.Y.Z.M` (M ≥ 1) | `12.7.3.1` | stable only (`org.tellurgram`) | Tagged release. |
+| **Snapshot** | 5-part `X.Y.Z.M.K` (M ≥ 1) | `12.7.3.1.42` | **both** stable and beta (`org.tellurgram.beta`) | Every push to the `Mercurygram` branch (`beta.yml`). Snapshot of the next stable. |
+| **Pre-stable** | 5-part `X.Y.Z.0.K` | `12.7.3.0.5` | **both** stable and beta (`org.tellurgram.beta`) | After an upstream rebase, before the first `X.Y.Z.M` (M ≥ 1) stable for that upstream ships (`beta.yml`). |
 
 Snapshots and pre-stable builds both publish two APKs per release: a Release-flavor APK that updates the stable package side and a Debug-flavor APK (filename infixed with `-debug`) that updates the `.beta` package side. Filenames: `Mercurygram-<tag>-<abi>.apk` (Release) and `Mercurygram-debug-<tag>-<abi>.apk` (Debug). Stable installs pull the Release APK via the in-app updater opt-in toggle; `.beta` installs pull the Debug APK.
 
@@ -37,29 +36,29 @@ Open the link on your Android device and the app source pre-fills with the right
 
 Same package ID across these entries; pick **one**. Stable + Pre-release mirrors the in-app **Accept pre-release updates** toggle and tracks both 4-dotted stable and 5-dotted pre-release tags.
 
-**Stable** — package `it.belloworld.tellurgram`. Tagged stable releases only.
+**Stable** — package `org.tellurgram`. Tagged stable releases only.
 
-[![Add Mercurygram to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22it.belloworld.tellurgram%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-%5C%5C%5C%5Cd%5C%22%7D%22%7D)
+[![Add Mercurygram to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22org.tellurgram%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-%5C%5C%5C%5Cd%5C%22%7D%22%7D)
 
-**Stable + Pre-release** — package `it.belloworld.tellurgram`. Tagged stable releases plus 5-dotted pre-releases (Release-flavor APK).
+**Stable + Pre-release** — package `org.tellurgram`. Tagged stable releases plus 5-dotted pre-releases (Release-flavor APK).
 
-[![Add Mercurygram (Stable + Pre-release) to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22it.belloworld.tellurgram%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%20%28Stable%20%2B%20Pre-release%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3A%20true%2C%20%5C%22filterReleaseTitlesByRegEx%5C%22%3A%20%5C%22%5E%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%28%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%29%3F%24%5C%22%2C%20%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-%5C%5C%5C%5Cd%5C%22%7D%22%7D)
+[![Add Mercurygram (Stable + Pre-release) to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22org.tellurgram%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%20%28Stable%20%2B%20Pre-release%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3A%20true%2C%20%5C%22filterReleaseTitlesByRegEx%5C%22%3A%20%5C%22%5E%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%28%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%29%3F%24%5C%22%2C%20%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-%5C%5C%5C%5Cd%5C%22%7D%22%7D)
 
-**Beta** — package `it.belloworld.tellurgram.beta`. Per-push snapshots (`X.Y.Z.M.K`, M ≥ 1) and pre-stable test builds (`X.Y.Z.0.K`). Debug-flavor APK.
+**Beta** — package `org.tellurgram.beta`. Per-push snapshots (`X.Y.Z.M.K`, M ≥ 1) and pre-stable test builds (`X.Y.Z.0.K`). Debug-flavor APK.
 
-[![Add Mercurygram Beta to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22it.belloworld.tellurgram.beta%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%20Beta%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3A%20true%2C%20%5C%22filterReleaseTitlesByRegEx%5C%22%3A%20%5C%22%5E%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%24%5C%22%2C%20%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-debug-%5C%22%7D%22%7D)
+[![Add Mercurygram Beta to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22org.tellurgram.beta%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%20Beta%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3A%20true%2C%20%5C%22filterReleaseTitlesByRegEx%5C%22%3A%20%5C%22%5E%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%24%5C%22%2C%20%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-debug-%5C%22%7D%22%7D)
 
 #### Tor plugin (optional companion APK)
 
 Same package ID across these entries; pick **one**. The plugin only ships a Release-flavor APK (no separate `.beta` package).
 
-**Stable** — package `it.belloworld.tellurgram.plugin.tor`. Tagged stable releases only.
+**Stable** — package `org.tellurgram.plugin.tor`. Tagged stable releases only.
 
-[![Add Mercurygram Tor Plugin to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22it.belloworld.tellurgram.plugin.tor%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%20Tor%20Plugin%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-tor-plugin-%5C%22%7D%22%7D)
+[![Add Mercurygram Tor Plugin to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22org.tellurgram.plugin.tor%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%20Tor%20Plugin%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-tor-plugin-%5C%22%7D%22%7D)
 
-**Stable + Pre-release** — package `it.belloworld.tellurgram.plugin.tor`. Tagged stable releases plus 5-dotted pre-releases. Pair this with **Main Beta** or **Main Stable + Pre-release** so the plugin tracks the same release cadence.
+**Stable + Pre-release** — package `org.tellurgram.plugin.tor`. Tagged stable releases plus 5-dotted pre-releases. Pair this with **Main Beta** or **Main Stable + Pre-release** so the plugin tracks the same release cadence.
 
-[![Add Mercurygram Tor Plugin (Stable + Pre-release) to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22it.belloworld.tellurgram.plugin.tor%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%20Tor%20Plugin%20%28Stable%20%2B%20Pre-release%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3A%20true%2C%20%5C%22filterReleaseTitlesByRegEx%5C%22%3A%20%5C%22%5E%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%28%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%29%3F%24%5C%22%2C%20%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-tor-plugin-%5C%22%7D%22%7D)
+[![Add Mercurygram Tor Plugin (Stable + Pre-release) to Obtainium](https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22org.tellurgram.plugin.tor%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FMercurygram%2FMercurygram%22%2C%22author%22%3A%22Mercurygram%22%2C%22name%22%3A%22Mercurygram%20Tor%20Plugin%20%28Stable%20%2B%20Pre-release%29%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3A%20true%2C%20%5C%22filterReleaseTitlesByRegEx%5C%22%3A%20%5C%22%5E%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%28%5C%5C%5C%5C.%5C%5C%5C%5Cd%2B%29%3F%24%5C%22%2C%20%5C%22apkFilterRegEx%5C%22%3A%20%5C%22%5EMercurygram-tor-plugin-%5C%22%7D%22%7D)
 
 > **Stable users:** the in-app updater can be opted in to pre-release updates from **Settings → Mercurygram → Updates → Accept pre-release updates**. Enabling shows a warning dialog. Turning it back off while a pre-release is installed offers the matching 4-part stable as an update, rolling the install back. Installing a pre-release by other means (sideload, Obtainium) switches the toggle on by itself at the next update check, so it always reflects the channel you are actually on.
 
@@ -146,12 +145,12 @@ Mercurygram adds MTProto-layer mitigations that upstream Telegram and Telegram-F
   - Every default-network change (Wi-Fi ↔ cellular, VPN flip, IP rebind) forces a fresh PFS temp-key handshake so `auth_key_id` rotates across network boundaries (`MgNetworkChangeWatcher` + native `ConnectionsManager::rotateTempAuthKeys()`).
   - The CDN-redirect (`upload.fileCdnRedirect`) path is refused once per file download and the request is reissued against the main DC, keeping the long-lived permanent `auth_key_id` (which CDN nodes use because PFS is off there) off the wire.
   - `TEMP_AUTH_KEY_EXPIRE_TIME` is shortened from 24 h to 1 h via a runtime variable, with a `1h → 6h → 24h` ladder that bumps the TTL on a `bindTempAuthKey` `ENCRYPTED_MESSAGE_INVALID` rejection — protects against a future server-side policy tightening without logging the user out (when the ladder exhausts the toggle auto-disables). Probed lower bound on DC2 in 2026-05 is 60 s; 1 h leaves a 60× safety margin. See [`scripts/probe-temp-key-ttl.py`](scripts/probe-temp-key-ttl.py) to re-measure the floor after a rebase.
-- **Tor with idle auto-stop (optional companion APK)** — *Settings → Mercurygram → Privacy → Tor*, or *Settings → Data and Storage → Proxy Settings → Tor* (that screen is also reachable from the login screen, so an account can be created and logged in over Tor). Tor support now lives in a separate, optional companion APK on F-Droid (**Mercurygram Tor Plugin**, package `it.belloworld.tellurgram.plugin.tor`); toggling Use Tor prompts to install the plugin if it isn't present. The plugin runs the same daemon (vendored from [tor-android](https://github.com/guardianproject/tor-android), built reproducibly from source) in its own process — only the packaging changes. MTProto is pinned to a loopback SOCKS5 the moment the toggle flips so direct connections cannot leak even before bootstrap finishes. Tor shuts down after a debounced idle window (default 5 min, configurable) once the app is backgrounded and no VoIP / downloads are active, and restarts on resume or on a UnifiedPush fallback wake — keeping battery cost in the same range as upstream Telegram while the user is not actively using the app. Telegram still sees the Tor exit; latency-sensitive features (calls) may suffer. While Tor is on it owns the connection: adding, selecting or removing a regular proxy is refused with a hint rather than silently rerouting MTProto, and the proxy that was configured before is restored when Tor is turned off.
+- **Tor with idle auto-stop (optional companion APK)** — *Settings → Mercurygram → Privacy → Tor*, or *Settings → Data and Storage → Proxy Settings → Tor* (that screen is also reachable from the login screen, so an account can be created and logged in over Tor). Tor support now lives in a separate, optional companion APK (**Mercurygram Tor Plugin**, package `org.tellurgram.plugin.tor`); toggling Use Tor prompts to install the plugin if it isn't present. The plugin runs the same daemon (vendored from [tor-android](https://github.com/guardianproject/tor-android), built reproducibly from source) in its own process — only the packaging changes. MTProto is pinned to a loopback SOCKS5 the moment the toggle flips so direct connections cannot leak even before bootstrap finishes. Tor shuts down after a debounced idle window (default 5 min, configurable) once the app is backgrounded and no VoIP / downloads are active, and restarts on resume or on a UnifiedPush fallback wake — keeping battery cost in the same range as upstream Telegram while the user is not actively using the app. Telegram still sees the Tor exit; latency-sensitive features (calls) may suffer. While Tor is on it owns the connection: adding, selecting or removing a regular proxy is refused with a hint rather than silently rerouting MTProto, and the proxy that was configured before is restored when Tor is turned off.
   - *Anti-censorship transport* (*Tor → Anti-censorship*): where a network blocks Tor directly with deep-packet inspection (Russia, Iran), a plain Tor connection stalls at the first handshake. Two obfuscated transports are offered: **Snowflake** routes the handshake through a domain-fronted WebRTC relay so it still bootstraps with no setup (broker config is built in, nothing to paste); **obfs4 bridges** routes it through obfs4 bridges you paste yourself (one line per bridge, obtained out-of-band from Telegram's `@GetBridgesBot`). Default is **Direct connection** (fastest where Tor is not blocked), so existing users are unaffected. Both transports ship in the Tor plugin, built reproducibly from [pluggable-transports/snowflake](https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake) and [pluggable-transports/lyrebird](https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird).
 - **Privacy-respecting translation engine** — *Settings → Mercurygram → Privacy → Translation → Engine* picks how received messages (manual translate, per-chat auto-translate, and the in-chat translate bar) are translated, instead of always hitting Telegram's cloud:
   - *Telegram cloud* (default) — upstream behaviour; the text is sent to Telegram's servers, which forward it to Google.
   - *Alternative HTTP* — routes the text through a public [Mozhi](https://codeberg.org/aryak/mozhi) privacy proxy that aggregates several engines (DuckDuckGo, LibreTranslate, Google, MyMemory, Reverso); pick the engine and instance. Keeps the query off Telegram's servers.
-  - *Offline (external app)* — delegates every translation to [Offline Translator](https://f-droid.org/packages/dev.davidv.translator/) (GPL-3.0, Bergamot offline models) over an AIDL bound service. Background dispatch — the translator UI never opens — so the message text never leaves your device. Bold / italic / code formatting can be lost because Bergamot returns plain text.
+  - *Offline (external app)* — delegates every translation to Offline Translator (`dev.davidv.translator`) (GPL-3.0, Bergamot offline models) over an AIDL bound service. Background dispatch — the translator UI never opens — so the message text never leaves your device. Bold / italic / code formatting can be lost because Bergamot returns plain text.
   - *Auto-fallback* (default on) routes offline-engine failures (no model for the language pair, language not detected, service unreachable) to the Alternative HTTP path; Telegram cloud is never chosen as the fallback.
 - **On-device voice transcription** — *Settings → Mercurygram → Privacy → Voice transcription*. Transcribes voice and video messages locally with [whisper.cpp](https://github.com/ggml-org/whisper.cpp) (Tiny / Base / Small models, downloaded or imported on demand). The audio never leaves your device and it works without Telegram Premium, unlike the built-in cloud transcription. The spoken-language hint is per-account (e.g. English on a work account, Italian on a personal one). Changing the model or the language re-transcribes the message the next time you open it, instead of showing the earlier result, a message that is not on the device yet is downloaded first, and a model download started by mistake can be stopped by tapping its progress row.
 - **Disable global search** — opt-in per-account toggle at *Settings → Mercurygram → Privacy*. Suppresses Telegram's global search (public username/channel lookup and the `messages.searchGlobal` RPC) so a search query only ever filters your own chats and contacts locally, never broadcasting it to the server.
@@ -223,7 +222,7 @@ Services. No Google library, dependency or Firebase project is involved: the
 [embedded FCM distributor](https://codeberg.org/UnifiedPush/android-embedded_fcm_distributor)
 only sends an intent to Play Services, which answers with a plain WebPush
 endpoint. This is the same mechanism the Mastodon and SchildiChat Android apps
-ship through F-Droid.
+use.
 
 FCM accepts a push to such an endpoint only if it carries a
 [VAPID](https://www.rfc-editor.org/rfc/rfc8292) signature, which Telegram does
@@ -316,13 +315,13 @@ locale.
 
 Tag shape encodes the release channel (see the [Install](#install) section for the table):
 
-- **Stable** — `X.Y.Z.M` (4-part, `M ≥ 1`). `X.Y.Z` is the upstream Telegram version; `M` is the Mercurygram minor revision on top of it. Goes to the `it.belloworld.tellurgram` package, F-Droid, IzzyOnDroid.
-- **Snapshot** — `X.Y.Z.M.K` (5-part, `M ≥ 1`). Per-push automated build between stable `X.Y.Z.M` and `X.Y.Z.(M+1)`. `K` is per-stable-bump monotonic. Goes to the `it.belloworld.tellurgram.beta` package and (for opted-in stable installs) the `it.belloworld.tellurgram` package.
+- **Stable** — `X.Y.Z.M` (4-part, `M ≥ 1`). `X.Y.Z` is the upstream Telegram version; `M` is the Mercurygram minor revision on top of it. Goes to the `org.tellurgram` package.
+- **Snapshot** — `X.Y.Z.M.K` (5-part, `M ≥ 1`). Per-push automated build between stable `X.Y.Z.M` and `X.Y.Z.(M+1)`. `K` is per-stable-bump monotonic. Goes to the `org.tellurgram.beta` package and (for opted-in stable installs) the `org.tellurgram` package.
 - **Pre-stable** — `X.Y.Z.0.K` (5-part, `M = 0`). Per-push automated build issued between an upstream rebase and the first `X.Y.Z.M` (M ≥ 1) stable for that upstream. Lets testers exercise the upcoming stable before it gets the official 4-part tag. Stops being published once any `X.Y.Z.M` ≥ 1 stable exists for the current upstream. `M = 0` is the namespace marker — no `X.Y.Z.0` 4-part tag is ever created.
 
 Pure lex compare on the dotted integer vector (shorter padded with zero) gives the right chronology: `12.7.3.0.5 < 12.7.3.1 < 12.7.3.1.42 < 12.7.3.2`.
 
-`MgUpdateChecker` reads the GitHub tag from `PackageInfo.versionName` — the manifest carries the tag verbatim (see `gradle/mg-version.gradle`), so the canonical tag is available for every install path (in-app updater, sideload, F-Droid).
+`MgUpdateChecker` reads the GitHub tag from `PackageInfo.versionName` — the manifest carries the tag verbatim (see `gradle/mg-version.gradle`), so the canonical tag is available for every install path (in-app updater, sideload).
 
 ## API, Protocol documentation
 
@@ -350,7 +349,7 @@ Build with Android Studio or from the command line:
 # Fat APK (all ABIs)
 ./gradlew assembleAfatRelease
 
-# Single-ABI APKs (F-Droid)
+# Single-ABI APKs
 ./gradlew assembleAfatFdArm32Release   # armeabi-v7a
 ./gradlew assembleAfatFdArm64Release   # arm64-v8a
 ./gradlew assembleAfatFdX86Release     # x86

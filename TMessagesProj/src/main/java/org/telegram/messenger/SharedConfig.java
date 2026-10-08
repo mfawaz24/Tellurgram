@@ -328,7 +328,7 @@ public class SharedConfig {
                 .edit()
                 .putString("mg_translateAltEngine", engine)
                 .apply();
-        it.belloworld.tellurgram.translate.MgMozhiClient.clearInstanceBans();
+        org.tellurgram.translate.MgMozhiClient.clearInstanceBans();
     }
 
     public static void setMgTranslateAltInstanceMode(String mode) {
@@ -338,7 +338,7 @@ public class SharedConfig {
                 .edit()
                 .putString("mg_translateAltInstanceMode", mode)
                 .apply();
-        it.belloworld.tellurgram.translate.MgMozhiClient.clearInstanceBans();
+        org.tellurgram.translate.MgMozhiClient.clearInstanceBans();
     }
 
     public static void setMgTranslateAltPinnedInstance(String url) {
@@ -347,7 +347,7 @@ public class SharedConfig {
                 .edit()
                 .putString("mg_translateAltPinnedInstance", mg_translateAltPinnedInstance)
                 .apply();
-        it.belloworld.tellurgram.translate.MgMozhiClient.clearInstanceBans();
+        org.tellurgram.translate.MgMozhiClient.clearInstanceBans();
     }
 
     public static void setMgTranslateAltCustomInstance(String url) {
@@ -356,7 +356,7 @@ public class SharedConfig {
                 .edit()
                 .putString("mg_translateAltCustomInstance", mg_translateAltCustomInstance)
                 .apply();
-        it.belloworld.tellurgram.translate.MgMozhiClient.clearInstanceBans();
+        org.tellurgram.translate.MgMozhiClient.clearInstanceBans();
     }
 
     private static String sanitizeMgTranslateAltEngine(String engine) {
@@ -415,14 +415,14 @@ public class SharedConfig {
             // reach the controller until the next bind cycle (e.g. plugin
             // crash + recover), so 5→60 keeps killing tor at 5 minutes
             // and 60→5 leaves it running for the longer window.
-            it.belloworld.tellurgram.tor.MgTorClient.getInstance().pushIdleStopMinutesIfBound();
+            org.tellurgram.tor.MgTorClient.getInstance().pushIdleStopMinutesIfBound();
             // 0 → non-zero: idleCheck previously cancelled the ticker, so
             // the new finite idle never fires without an explicit re-arm.
             // pushAggregatedClientPaused has the side-effect of arming
             // the ticker if any client is paused; no-ops when tor isn't
             // running.
             if (previous <= 0 && minutes > 0) {
-                it.belloworld.tellurgram.tor.MgTorClient.getInstance().resumeIdleTickerIfNeeded();
+                org.tellurgram.tor.MgTorClient.getInstance().resumeIdleTickerIfNeeded();
             }
         } catch (Throwable t) {
             FileLog.e(t);
@@ -449,7 +449,7 @@ public class SharedConfig {
             // The plugin reads the transport only when it assembles its start()
             // argv, so a live change requires a daemon relaunch. No-op when Tor
             // is off or unbound (the next start picks up the new value).
-            it.belloworld.tellurgram.tor.MgTorClient.getInstance().applyTransportChange();
+            org.tellurgram.tor.MgTorClient.getInstance().applyTransportChange();
         } catch (Throwable t) {
             FileLog.e(t);
         }
@@ -473,7 +473,7 @@ public class SharedConfig {
                 .apply();
         if (mg_torTransportMode != MG_TOR_TRANSPORT_OBFS4) return;
         try {
-            it.belloworld.tellurgram.tor.MgTorClient.getInstance().applyTransportChange();
+            org.tellurgram.tor.MgTorClient.getInstance().applyTransportChange();
         } catch (Throwable t) {
             FileLog.e(t);
         }
@@ -681,7 +681,7 @@ public class SharedConfig {
     public static boolean disableUnifiedPush = false;
     public static String unifiedPushGateway = "https://p2p.belloworld.it/";
     // VAPID public key of the gateway above, used by the built-in FCM distributor only.
-    public static String mgFcmVapidKey = it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor.DEFAULT_VAPID_PUBLIC_KEY;
+    public static String mgFcmVapidKey = org.tellurgram.push.MgEmbeddedFcmDistributor.DEFAULT_VAPID_PUBLIC_KEY;
     public static String unifiedPushEndpointUrl = "";   // raw UP endpoint URL from last onNewEndpoint
     public static volatile byte[] webPushPrivateKey;    // PKCS#8-encoded P-256 private key
     public static volatile byte[] webPushPublicKey;     // Raw 65-byte uncompressed P-256 point (04||X||Y)
@@ -698,7 +698,7 @@ public class SharedConfig {
     public static String mgLastPreReleaseTag = "";
     public static boolean useSystemFont = false;
     // Mercurygram: when on, Emoji rendering loads user-supplied glyphs from a
-    // side-loaded pack (it.belloworld.tellurgram.emoji.MgEmojiPack) instead of
+    // side-loaded pack (org.tellurgram.emoji.MgEmojiPack) instead of
     // the bundled Noto set, falling back per-glyph to the bundle for any glyph
     // the pack is missing. Global because the emoji bitmap cache (Emoji.emojiBmp)
     // is a process-wide static, same as useSystemFont/useSystemEmoji.
@@ -707,7 +707,7 @@ public class SharedConfig {
     // raise-to-listen). Global: device hardware, not an account property.
     public static boolean mg_disableProximitySensor = false;
     // Mercurygram: upgrade http:// to https:// for links, web views and
-    // direct downloads (see it.belloworld.tellurgram.MgHttps). Global: the
+    // direct downloads (see org.tellurgram.MgHttps). Global: the
     // in-app browser and the image cache are shared by all accounts.
     public static boolean mg_enforceHttps = true;
 
@@ -777,7 +777,7 @@ public class SharedConfig {
     public static String mg_translateAltCustomInstance = "";
 
     // Mercurygram: On-device voice-message transcription via whisper.cpp
-    // (it.belloworld.tellurgram.transcribe.MgWhisperTranscriber). When enabled
+    // (org.tellurgram.transcribe.MgWhisperTranscriber). When enabled
     // and a model is installed, voice/round-video transcription runs locally
     // instead of via the premium-gated Telegram messages.transcribeAudio RPC —
     // private (audio never leaves the device) and available to non-premium
@@ -1143,9 +1143,9 @@ public class SharedConfig {
         mgDismissedPluginPromptTag = preferences.getString("mg_dismissedPluginPromptTag", null);
         if (mgPendingUpdate != null) {
             try {
-                it.belloworld.tellurgram.MgUpdateInfo info = it.belloworld.tellurgram.MgUpdateInfo.fromJson(mgPendingUpdate);
+                org.tellurgram.MgUpdateInfo info = org.tellurgram.MgUpdateInfo.fromJson(mgPendingUpdate);
                 if (info != null) {
-                    String currentVersion = it.belloworld.tellurgram.MgUpdateChecker.currentInstallVersion();
+                    String currentVersion = org.tellurgram.MgUpdateChecker.currentInstallVersion();
                     if (currentVersion != null && versionBiggerOrEqual(currentVersion, info.versionName)) {
                         clearMgPendingUpdate();
                     }
@@ -1656,14 +1656,14 @@ public class SharedConfig {
     }
 
     public static boolean isMgUpdateAvailable() {
-        return mgPendingUpdate != null && !it.belloworld.tellurgram.MgUpdateChecker.isFdroidBuild();
+        return mgPendingUpdate != null;
     }
 
-    public static it.belloworld.tellurgram.MgUpdateInfo getMgPendingUpdate() {
-        return it.belloworld.tellurgram.MgUpdateInfo.fromJson(mgPendingUpdate);
+    public static org.tellurgram.MgUpdateInfo getMgPendingUpdate() {
+        return org.tellurgram.MgUpdateInfo.fromJson(mgPendingUpdate);
     }
 
-    public static void setMgPendingUpdate(it.belloworld.tellurgram.MgUpdateInfo info) {
+    public static void setMgPendingUpdate(org.tellurgram.MgUpdateInfo info) {
         if (info == null) {
             clearMgPendingUpdate();
             return;
@@ -1671,7 +1671,7 @@ public class SharedConfig {
         // Tag change → the previously downloaded APK is stale; drop it so
         // the next download replaces it cleanly instead of the side-menu
         // "Install" shortcut firing the old cached APK from disk.
-        it.belloworld.tellurgram.MgUpdateInfo prev = getMgPendingUpdate();
+        org.tellurgram.MgUpdateInfo prev = getMgPendingUpdate();
         if (prev != null && !info.tagName.equals(prev.tagName)) {
             deleteCachedUpdateApk();
         }

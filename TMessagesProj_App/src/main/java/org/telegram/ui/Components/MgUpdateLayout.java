@@ -21,8 +21,8 @@ import org.telegram.ui.IUpdateLayout;
 
 import java.io.File;
 
-import it.belloworld.tellurgram.MgUpdateChecker;
-import it.belloworld.tellurgram.MgUpdateInfo;
+import org.tellurgram.MgUpdateChecker;
+import org.tellurgram.MgUpdateInfo;
 
 public class MgUpdateLayout extends IUpdateLayout {
 

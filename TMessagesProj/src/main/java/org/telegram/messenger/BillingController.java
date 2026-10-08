@@ -9,13 +9,13 @@ import android.net.Uri;
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 
-import it.belloworld.tellurgram.compat.billing.BillingFlowParams;
-import it.belloworld.tellurgram.compat.billing.BillingResult;
-import it.belloworld.tellurgram.compat.billing.ProductDetails;
-import it.belloworld.tellurgram.compat.billing.ProductDetailsResponseListener;
-import it.belloworld.tellurgram.compat.billing.Purchase;
-import it.belloworld.tellurgram.compat.billing.PurchasesResponseListener;
-import it.belloworld.tellurgram.compat.billing.QueryProductDetailsParams;
+import org.tellurgram.compat.billing.BillingFlowParams;
+import org.tellurgram.compat.billing.BillingResult;
+import org.tellurgram.compat.billing.ProductDetails;
+import org.tellurgram.compat.billing.ProductDetailsResponseListener;
+import org.tellurgram.compat.billing.Purchase;
+import org.tellurgram.compat.billing.PurchasesResponseListener;
+import org.tellurgram.compat.billing.QueryProductDetailsParams;
 
 import org.telegram.messenger.utils.BillingUtilities;
 import org.telegram.tgnet.TLRPC;

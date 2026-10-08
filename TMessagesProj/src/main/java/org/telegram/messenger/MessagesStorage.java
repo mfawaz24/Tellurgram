@@ -76,7 +76,7 @@ import java.util.function.Consumer;
 
 import me.vkryl.core.BitwiseUtils;
 
-import it.belloworld.tellurgram.folders.MgLocalFolders;
+import org.tellurgram.folders.MgLocalFolders;
 
 public class MessagesStorage extends BaseController {
 

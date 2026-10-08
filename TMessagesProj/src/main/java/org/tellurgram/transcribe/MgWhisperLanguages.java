@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.transcribe;
+package org.tellurgram.transcribe;
 
 /**
  * [MG] The set of spoken-language codes whisper.cpp can be pinned to.

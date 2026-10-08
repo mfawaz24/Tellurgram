@@ -206,7 +206,7 @@ public class TranslateController extends BaseController {
     // Mercurygram: the offline AIDL engine is selected AND installed/bindable.
     // The only translation path that keeps secret message text on-device.
     public static boolean isSecretOfflineTranslateAllowed() {
-        return it.belloworld.tellurgram.translate.MgTranslateDispatcher.isOfflineUsable();
+        return org.tellurgram.translate.MgTranslateDispatcher.isOfflineUsable();
     }
 
     // Mercurygram: single source of truth for the secret-chat translate rule —
@@ -1091,7 +1091,7 @@ public class TranslateController extends BaseController {
      * upstream RPC; FORCE_CLOUD / PUNT_TO_UPSTREAM tell the caller which RPC
      * path to take.
      */
-    private it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome
+    private org.tellurgram.translate.MgTranslateDispatcher.Outcome
     dispatchMgPerMessage(PendingTranslation pendingTranslation1, boolean isTranscription, long dialogId) {
         // Mercurygram: secret/encrypted dialogs are the privacy chokepoint —
         // route to the fail-closed offline-only dispatcher BEFORE the mode
@@ -1103,10 +1103,10 @@ public class TranslateController extends BaseController {
         if (!mgSecret) {
             final String mode = SharedConfig.mg_translateMode;
             if (SharedConfig.MG_TRANSLATE_MODE_DEFAULT.equals(mode)) {
-                return it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.PUNT_TO_UPSTREAM;
+                return org.tellurgram.translate.MgTranslateDispatcher.Outcome.PUNT_TO_UPSTREAM;
             }
             if (SharedConfig.MG_TRANSLATE_MODE_CLOUD.equals(mode)) {
-                return it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.FORCE_CLOUD;
+                return org.tellurgram.translate.MgTranslateDispatcher.Outcome.FORCE_CLOUD;
             }
         }
         final String mgToLanguage = pendingTranslation1.language;
@@ -1115,17 +1115,17 @@ public class TranslateController extends BaseController {
             final int mgId = pendingTranslation1.messageIds.get(i);
             final Utilities.Callback4<Boolean, Integer, TLRPC.TL_textWithEntities, String> mgCallback = pendingTranslation1.callbacks.get(i);
             final String mgText = pendingTranslation1.messageTexts.get(i).text;
-            final it.belloworld.tellurgram.translate.MgTranslateDispatcher.Result mgResult = (out, rateLimit, failure) -> AndroidUtilities.runOnUIThread(() -> {
+            final org.tellurgram.translate.MgTranslateDispatcher.Result mgResult = (out, rateLimit, failure) -> AndroidUtilities.runOnUIThread(() -> {
                 if (out != null) {
                     final TLRPC.TL_textWithEntities res = new TLRPC.TL_textWithEntities();
                     res.text = out;
                     mgCallback.run(isTranscription, mgId, res, mgToLanguage);
-                } else if (failure != null && failure.reason == it.belloworld.tellurgram.translate.MgAidlTranslate.Reason.PROVIDER_UNAVAILABLE) {
+                } else if (failure != null && failure.reason == org.tellurgram.translate.MgAidlTranslate.Reason.PROVIDER_UNAVAILABLE) {
                     // System failure — the engine itself is offline. Abort the
                     // batch: revert the chat-translate bar + show the bulletin.
                     toggleTranslatingDialog(dialogId, false);
                     NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR,
-                            it.belloworld.tellurgram.translate.MgTranslateDispatcher.mapBulletin(failure, rateLimit));
+                            org.tellurgram.translate.MgTranslateDispatcher.mapBulletin(failure, rateLimit));
                     mgCallback.run(isTranscription, mgId, null, mgToLanguage);
                 } else {
                     // Per-message failure (language not detected, model missing
@@ -1141,12 +1141,12 @@ public class TranslateController extends BaseController {
                 }
             });
             if (mgSecret) {
-                it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(mgText, null, mgToLanguage, mgResult);
+                org.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(mgText, null, mgToLanguage, mgResult);
             } else {
-                it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatch(mgText, null, mgToLanguage, mgResult);
+                org.tellurgram.translate.MgTranslateDispatcher.dispatch(mgText, null, mgToLanguage, mgResult);
             }
         }
-        return it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED;
+        return org.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED;
     }
 
     /**
@@ -1159,7 +1159,7 @@ public class TranslateController extends BaseController {
      * builds (including the alreadyTranslated skip rules) — the result list is
      * consumed positionally, exactly like the RPC response.
      */
-    private it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome
+    private org.tellurgram.translate.MgTranslateDispatcher.Outcome
     dispatchMgPerPoll(PendingPollTranslation pendingTranslation1) {
         final ArrayList<String> mgTexts = new ArrayList<>();
         for (Pair<PollText, PollText> pair : pendingTranslation1.messageTexts) {
@@ -1177,7 +1177,7 @@ public class TranslateController extends BaseController {
                 mgTexts.add(src.solution.text);
             }
         }
-        return it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatchTexts(mgTexts, pendingTranslation1.language, mgResults -> AndroidUtilities.runOnUIThread(() -> {
+        return org.tellurgram.translate.MgTranslateDispatcher.dispatchTexts(mgTexts, pendingTranslation1.language, mgResults -> AndroidUtilities.runOnUIThread(() -> {
             final ArrayList<Integer> ids = pendingTranslation1.messageIds;
             final ArrayList<Utilities.Callback3<Integer, PollText, String>> callbacks = pendingTranslation1.callbacks;
             if (mgResults == null) {
@@ -1323,9 +1323,9 @@ public class TranslateController extends BaseController {
                 // picked a non-default mg_translateMode. Privacy invariant: the
                 // offline path NEVER silently falls back to Telegram cloud — the
                 // dispatcher's fallback chain is offline → Alternative HTTP only.
-                final it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome =
+                final org.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome =
                         dispatchMgPerMessage(pendingTranslation1, isTranscription, dialogId);
-                if (mgOutcome == it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
+                if (mgOutcome == org.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
                     return;
                 }
                 // Mercurygram: defence-in-depth. A secret/encrypted dialog must
@@ -1339,7 +1339,7 @@ public class TranslateController extends BaseController {
                 // straight to messages.translateText. PUNT_TO_UPSTREAM uses the upstream
                 // server-side method string unchanged.
                 final String method;
-                if (mgOutcome == it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.FORCE_CLOUD) {
+                if (mgOutcome == org.tellurgram.translate.MgTranslateDispatcher.Outcome.FORCE_CLOUD) {
                     method = "enabled";
                 } else {
                     method = getMessagesController().translationsAutoEnabled;
@@ -1640,7 +1640,7 @@ public class TranslateController extends BaseController {
 
                 // Mercurygram: honor mg_translateMode for polls too — without
                 // this the alternative/offline engines were bypassed here.
-                if (dispatchMgPerPoll(pendingTranslation1) == it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
+                if (dispatchMgPerPoll(pendingTranslation1) == org.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
                     return;
                 }
 
@@ -2202,8 +2202,8 @@ public class TranslateController extends BaseController {
         // Mercurygram: route through MgTranslateDispatcher when the user picked a
         // non-default mg_translateMode. Caption translations stay silent on failure
         // (translatedText = null + done.run()) to match upstream UX.
-        final it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome =
-                it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatch(
+        final org.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome =
+                org.tellurgram.translate.MgTranslateDispatcher.dispatch(
                         storyItem.caption, null, toLang, (out, rateLimit, failure) -> AndroidUtilities.runOnUIThread(() -> {
                     storyItem.translatedLng = toLang;
                     if (out != null) {
@@ -2219,7 +2219,7 @@ public class TranslateController extends BaseController {
                         done.run();
                     }
                 }));
-        if (mgOutcome == it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
+        if (mgOutcome == org.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
             return;
         }
 
@@ -2374,7 +2374,7 @@ public class TranslateController extends BaseController {
         // affordance on the offline engine being usable.
         final boolean mgSecret = DialogObject.isEncryptedDialog(key.dialogId);
         final long mgStart = System.currentTimeMillis();
-        final it.belloworld.tellurgram.translate.MgTranslateDispatcher.Result mgResult =
+        final org.tellurgram.translate.MgTranslateDispatcher.Result mgResult =
                 (out, rateLimit, failure) -> AndroidUtilities.runOnUIThread(() -> {
                     messageObject.messageOwner.translatedToLanguage = toLang;
                     if (out != null) {
@@ -2390,12 +2390,12 @@ public class TranslateController extends BaseController {
                         AndroidUtilities.runOnUIThread(done, Math.max(0, 400L - (System.currentTimeMillis() - mgStart)));
                     }
                 });
-        final it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome = mgSecret
-                ? it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(
+        final org.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome = mgSecret
+                ? org.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(
                         messageObject.messageOwner.message, null, toLang, mgResult)
-                : it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatch(
+                : org.tellurgram.translate.MgTranslateDispatcher.dispatch(
                         messageObject.messageOwner.message, null, toLang, mgResult);
-        if (mgOutcome == it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
+        if (mgOutcome == org.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
             return;
         }
         // Encrypted dialogs must NEVER reach the messages.translateText cloud RPC.

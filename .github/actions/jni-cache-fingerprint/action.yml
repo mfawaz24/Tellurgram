@@ -6,9 +6,7 @@ description: >-
   versions, and the gradle-pinned NDK + build-tools versions. Both the
   _prewarm-native reusable workflow and the build-mg composite invoke
   this so the hashFiles() input is byte-identical and the cache keys
-  match. The verify-decide jobs in beta.yml / release.yml hash this same
-  file into the repro-verified marker key, so an NDK bump (or any other
-  input below) invalidates the marker and forces a full 4-ABI re-verify.
+  match.
 
 runs:
   using: composite
@@ -58,9 +56,8 @@ runs:
         # Gradle-pinned NDK + build-tools versions. NDK bumps change the
         # codegen of SIMD assembly (especially x86) but the apt-installed
         # host pkgs above don't see them (NDK is sdkmanager-installed).
-        # Without this line, an NDK bump leaves the repro-verified marker
-        # valid → next push drops back to arm64-only verify and silently
-        # misses any per-ABI regression the new NDK introduces.
+        # Without this line, an NDK bump would restore natives built with
+        # the old NDK.
         gradle_file=TMessagesProj/build.gradle
         ndk=$(grep -oE 'ndkVersion[[:space:]]+"[0-9.]+"' "$gradle_file" | grep -oE '[0-9.]+' || true)
         bt=$(grep -oE "buildToolsVersion[[:space:]]+'[0-9.]+'" "$gradle_file" | grep -oE '[0-9.]+' || true)

@@ -75,15 +75,15 @@ import androidx.dynamicanimation.animation.FloatValueHolder;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
 
-import it.belloworld.tellurgram.compat.gms.common.Status;
-import it.belloworld.tellurgram.compat.gms.tasks.Task;
-import it.belloworld.tellurgram.compat.gms.wallet.AutoResolveHelper;
-import it.belloworld.tellurgram.compat.gms.wallet.IsReadyToPayRequest;
-import it.belloworld.tellurgram.compat.gms.wallet.PaymentData;
-import it.belloworld.tellurgram.compat.gms.wallet.PaymentDataRequest;
-import it.belloworld.tellurgram.compat.gms.wallet.PaymentsClient;
-import it.belloworld.tellurgram.compat.gms.wallet.Wallet;
-import it.belloworld.tellurgram.compat.gms.wallet.WalletConstants;
+import org.tellurgram.compat.gms.common.Status;
+import org.tellurgram.compat.gms.tasks.Task;
+import org.tellurgram.compat.gms.wallet.AutoResolveHelper;
+import org.tellurgram.compat.gms.wallet.IsReadyToPayRequest;
+import org.tellurgram.compat.gms.wallet.PaymentData;
+import org.tellurgram.compat.gms.wallet.PaymentDataRequest;
+import org.tellurgram.compat.gms.wallet.PaymentsClient;
+import org.tellurgram.compat.gms.wallet.Wallet;
+import org.tellurgram.compat.gms.wallet.WalletConstants;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
 import com.stripe.android.exception.APIConnectionException;
@@ -1232,7 +1232,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                 webView.setWebViewClient(new WebViewClient() {
                     @Override
                     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                        WebResourceResponse https = it.belloworld.tellurgram.MgHttps.intercept(request);
+                        WebResourceResponse https = org.tellurgram.MgHttps.intercept(request);
                         return https != null ? https : super.shouldInterceptRequest(view, request);
                     }
 
@@ -2518,7 +2518,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                     webView.setWebViewClient(new WebViewClient() {
                         @Override
                         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                            WebResourceResponse https = it.belloworld.tellurgram.MgHttps.intercept(request);
+                            WebResourceResponse https = org.tellurgram.MgHttps.intercept(request);
                             return https != null ? https : super.shouldInterceptRequest(view, request);
                         }
 

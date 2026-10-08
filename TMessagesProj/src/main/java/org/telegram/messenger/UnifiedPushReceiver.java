@@ -17,7 +17,7 @@ import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.Locale;
 
-import it.belloworld.tellurgram.WebPushDecryptor;
+import org.tellurgram.WebPushDecryptor;
 
 public class UnifiedPushReceiver extends PushService {
 
@@ -121,13 +121,13 @@ public class UnifiedPushReceiver extends PushService {
 
             // All distributors route through the /aesgcm gateway which serializes
             // WebPush headers into the body (common-proxies compatible format)
-            String gateway = it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor.gatewayBase();
+            String gateway = org.tellurgram.push.MgEmbeddedFcmDistributor.gatewayBase();
 
             try {
                 // The embedded FCM distributor already points at the gateway's /fcm route,
                 // which folds the headers itself and signs the push for FCM. Wrapping it in
                 // /aesgcm would fold twice and strip the VAPID signing.
-                boolean fcm = it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor.isFcmEndpoint(endpoint.getUrl());
+                boolean fcm = org.tellurgram.push.MgEmbeddedFcmDistributor.isFcmEndpoint(endpoint.getUrl());
                 String gatewayUrl = fcm
                         ? endpoint.getUrl()
                         : gateway + "aesgcm?e=" + URLEncoder.encode(endpoint.getUrl(), StandardCharsets.UTF_8.name());
@@ -153,7 +153,7 @@ public class UnifiedPushReceiver extends PushService {
                 String simplePushUrl = fcm
                         ? endpoint.getUrl()
                         : gateway + URLEncoder.encode(endpoint.getUrl(), StandardCharsets.UTF_8.name());
-                it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.sendSimplePushRegistration(simplePushUrl);
+                org.tellurgram.push.UnifiedPushListenerServiceProvider.sendSimplePushRegistration(simplePushUrl);
             } catch (Exception e) {
                 FileLog.e(e);
             }
@@ -166,7 +166,7 @@ public class UnifiedPushReceiver extends PushService {
                     }
                 }
             });
-            it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.notifyStateChanged();
+            org.tellurgram.push.UnifiedPushListenerServiceProvider.notifyStateChanged();
         });
     }
 
@@ -249,7 +249,7 @@ public class UnifiedPushReceiver extends PushService {
         final boolean torStartingForFallback = SharedConfig.mg_useTor;
         if (torStartingForFallback) {
             acquireWakeLock(pm);
-            it.belloworld.tellurgram.tor.MgTorClient.getInstance().requestStartForPushFallback();
+            org.tellurgram.tor.MgTorClient.getInstance().requestStartForPushFallback();
         }
         AndroidUtilities.runOnUIThread(() -> {
             boolean stageQueueScheduled = false;
@@ -321,11 +321,11 @@ public class UnifiedPushReceiver extends PushService {
         lastRegistrationFailure = reason;
         // Without this the settings screen keeps claiming it is waiting for an endpoint that
         // will never arrive.
-        it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.notifyStateChanged();
+        org.tellurgram.push.UnifiedPushListenerServiceProvider.notifyStateChanged();
         Utilities.globalQueue.postRunnable(() -> {
             SharedConfig.pushStringGetTimeEnd = SystemClock.elapsedRealtime();
             PushListenerController.sendRegistrationToServer(PushListenerController.PUSH_TYPE_WEB, null);
-            it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.revokeServerTokens();
+            org.tellurgram.push.UnifiedPushListenerServiceProvider.revokeServerTokens();
         });
     }
 }

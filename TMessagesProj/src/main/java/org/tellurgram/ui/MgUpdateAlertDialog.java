@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.ui;
+package org.tellurgram.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -26,8 +26,8 @@ import org.telegram.ui.Components.LayoutHelper;
 
 import java.io.File;
 
-import it.belloworld.tellurgram.MgUpdateChecker;
-import it.belloworld.tellurgram.MgUpdateInfo;
+import org.tellurgram.MgUpdateChecker;
+import org.tellurgram.MgUpdateInfo;
 
 public class MgUpdateAlertDialog extends BottomSheet {
 

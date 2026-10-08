@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram;
+package org.tellurgram;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -38,17 +38,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MgUpdateChecker {
 
-    private static final String GITHUB_LATEST_URL = "https://api.github.com/repos/Mercurygram/Mercurygram/releases/latest";
-    private static final String GITHUB_LIST_URL = "https://api.github.com/repos/Mercurygram/Mercurygram/releases";
-    private static final String GITHUB_TAG_URL_PREFIX = "https://api.github.com/repos/Mercurygram/Mercurygram/releases/tags/";
-    private static final String MG_CERT_SHA256 = "1E73DE100E2646BE671AFAD2CB4BB471538E062A745AE5ADBE6C7D1666FD1EE9";
+    private static final String GITHUB_LATEST_URL = "https://api.github.com/repos/mfawaz24/Tellurgram/releases/latest";
+    private static final String GITHUB_LIST_URL = "https://api.github.com/repos/mfawaz24/Tellurgram/releases";
+    private static final String GITHUB_TAG_URL_PREFIX = "https://api.github.com/repos/mfawaz24/Tellurgram/releases/tags/";
     private static final long CHECK_INTERVAL = 3600 * 1000; // 1 hour
     // Tighter throttle while a pending update is staged: a newer tag
     // landing 5+ minutes after the previous check should not stay hidden
     // behind the full 1-hour gate.
     private static final long CHECK_INTERVAL_PENDING = 5 * 60 * 1000;
 
-    private static Boolean isFdroidBuildCached = null;
     private static volatile String cachedInstallVersion;
     private static final AtomicBoolean isDownloading = new AtomicBoolean(false);
     private static final AtomicBoolean isDownloadingPlugin = new AtomicBoolean(false);
@@ -104,35 +102,27 @@ public class MgUpdateChecker {
         return tag != null && tag.split("\\.", -1).length >= 5;
     }
 
-    public static boolean isFdroidBuild() {
-        if (isFdroidBuildCached != null) return isFdroidBuildCached;
-        try {
-            isFdroidBuildCached = !matchesInstalledMgCert();
-        } catch (Exception e) {
-            FileLog.e(e);
-            isFdroidBuildCached = true; // fail-safe: disable updater
-        }
-        return isFdroidBuildCached;
-    }
-
-    private static boolean matchesInstalledMgCert() throws Exception {
-        PackageManager pm = ApplicationLoader.applicationContext.getPackageManager();
-        String pkg = ApplicationLoader.applicationContext.getPackageName();
-        Signature[] sigs;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            PackageInfo pi = pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES);
-            sigs = pi.signingInfo.getApkContentsSigners();
-        } else {
-            PackageInfo pi = pm.getPackageInfo(pkg, PackageManager.GET_SIGNATURES);
-            sigs = pi.signatures;
-        }
-        return matchesMgCert(sigs);
-    }
-
+    // Downloaded APKs must be signed with the same key as the running app,
+    // whichever key that is — Android would refuse the update otherwise.
     private static boolean matchesMgCert(Signature[] sigs) {
         if (sigs == null || sigs.length == 0) return false;
-        String sha256 = sha256Hex(sigs[0].toByteArray());
-        return MG_CERT_SHA256.equalsIgnoreCase(sha256);
+        try {
+            PackageManager pm = ApplicationLoader.applicationContext.getPackageManager();
+            String pkg = ApplicationLoader.applicationContext.getPackageName();
+            Signature[] own;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                own = pm.getPackageInfo(pkg, PackageManager.GET_SIGNING_CERTIFICATES)
+                        .signingInfo.getApkContentsSigners();
+            } else {
+                own = pm.getPackageInfo(pkg, PackageManager.GET_SIGNATURES).signatures;
+            }
+            if (own == null || own.length == 0) return false;
+            String expected = sha256Hex(own[0].toByteArray());
+            return !expected.isEmpty() && expected.equalsIgnoreCase(sha256Hex(sigs[0].toByteArray()));
+        } catch (Exception e) {
+            FileLog.e(e);
+            return false;
+        }
     }
 
     private static String sha256Hex(byte[] data) {
@@ -197,8 +187,6 @@ public class MgUpdateChecker {
     }
 
     private static void checkInternal(boolean force, String pinnedTag) {
-        if (isFdroidBuild()) return;
-
         // Local reconciliation, no network: ahead of the auto-update and
         // throttle gates so the channel flag tracks the running install at
         // once instead of lagging a CHECK_INTERVAL behind it.
@@ -433,14 +421,11 @@ public class MgUpdateChecker {
      *    main + plugin share MG_BUILD_TAG release-for-release (see AGENTS.md
      *    "Tor plugin"). No GitHub API call needed.
      *  - Reuses {@link #verifyApkSignature}: plugin APK is signed with the
-     *    same keystore as main on the GitHub channel (signing-key invariant),
-     *    so MG_CERT_SHA256 matches.
+     *    same keystore as main (signing-key invariant), so the signer check
+     *    passes.
      *  - Writes to cache/mg_tor_plugin.apk, not mg_update.apk, so a
      *    concurrent main updater download can't clobber and so a later
      *    main installUpdate(...) doesn't accidentally install the plugin.
-     * F-Droid channel callers must gate on {@link #isFdroidBuild()} before
-     * calling — F-Droid plugin is signed with a different cert; this method
-     * also short-circuits as a safety net.
      */
     public static void downloadPlugin(ProgressCallback callback) {
         if (!isDownloadingPlugin.compareAndSet(false, true)) {
@@ -448,11 +433,6 @@ public class MgUpdateChecker {
             // cold-start prompt both fire): tell the new caller so its
             // progress UI dismisses instead of spinning forever.
             AndroidUtilities.runOnUIThread(() -> callback.onError("Already downloading"));
-            return;
-        }
-        if (isFdroidBuild()) {
-            isDownloadingPlugin.set(false);
-            AndroidUtilities.runOnUIThread(() -> callback.onError("F-Droid channel"));
             return;
         }
         if (Build.SUPPORTED_ABIS.length == 0) {
@@ -467,7 +447,7 @@ public class MgUpdateChecker {
             return;
         }
         final String abi = Build.SUPPORTED_ABIS[0];
-        final String url = "https://github.com/Mercurygram/Mercurygram/releases/download/"
+        final String url = "https://github.com/mfawaz24/Tellurgram/releases/download/"
                 + tag + "/Mercurygram-tor-plugin-" + tag + "-" + abi + ".apk";
 
         Utilities.globalQueue.postRunnable(() -> {
@@ -653,11 +633,8 @@ public class MgUpdateChecker {
     // currentInstallVersion() fallback to BuildVars.BUILD_VERSION_STRING
     // (3-dotted upstream form, e.g. "12.7.3") on PM exception, which
     // would otherwise produce a false-positive against any 4/5-dotted
-    // plugin tag. F-Droid channel returns false: the plugin's catalog
-    // drives its own update cadence and the signing certs differ so the
-    // in-app download path is not authoritative there anyway.
+    // plugin tag.
     public static boolean isPluginOutdated(String pluginPkg) {
-        if (isFdroidBuild()) return false;
         String installed = installedPluginVersion(pluginPkg);
         if (installed == null) return false;
         String main = currentInstallVersion();
@@ -669,7 +646,7 @@ public class MgUpdateChecker {
     // Returns the tag of the currently installed APK. versionName is set
     // to the GitHub release tag verbatim by gradle/mg-version.gradle, so
     // PackageInfo carries the canonical 5-dotted/4-dotted tag for every
-    // build path (CI release, CI beta, F-Droid, sideload).
+    // build path (CI release, CI beta, sideload).
     public static String currentInstallVersion() {
         // Cached: installing a new APK kills the process, so versionName
         // cannot change under us -- and checkInternal()'s reconciliation puts

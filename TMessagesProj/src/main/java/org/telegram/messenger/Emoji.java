@@ -124,7 +124,7 @@ public class Emoji {
                 // Mercurygram: route through the custom emoji pack — returns the
                 // user-supplied glyph when a pack is installed + enabled, else
                 // falls back to the bundled asset per-glyph.
-                Bitmap bitmap = it.belloworld.tellurgram.emoji.MgEmojiPack.loadEmojiBitmap(page, page2);
+                Bitmap bitmap = org.tellurgram.emoji.MgEmojiPack.loadEmojiBitmap(page, page2);
                 try {
                     if (emojiAlphaMasks == null) {
                         emojiAlphaMasks = loadEmojiAlphaMasks();

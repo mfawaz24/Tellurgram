@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.translate;
+package org.tellurgram.translate;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -41,7 +41,7 @@ import dev.davidv.translator.TranslationError;
  * first time.
  *
  * Picked over a bundled engine to keep MG free of native ML code,
- * model downloads, and the F-Droid reproducibility risks they carry;
+ * model downloads, and the reproducibility risks they carry;
  * mirrors the UnifiedPush delegation pattern.
  */
 public final class MgAidlTranslate {
@@ -205,9 +205,6 @@ public final class MgAidlTranslate {
         }
     }
 
-    public static String getFdroidInstallUrl() {
-        return "https://f-droid.org/packages/" + PROVIDER_PACKAGE + "/";
-    }
 
     /**
      * Fires an AIDL translation request and routes the result to

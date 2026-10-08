@@ -4628,7 +4628,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     f = FileLoader.getInstance(currentAccount).getPathToMessage(currentMessageObject.messageOwner);
                 }
                 if (f == null || !f.exists()) {
-                    File cached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(currentMessageObject);
+                    File cached = org.tellurgram.MgLocalMedia.cachedFile(currentMessageObject);
                     if (cached != null) {
                         f = cached;
                     }
@@ -4960,7 +4960,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                             f = new File(FileLoader.getDirectory(FileLoader.MEDIA_DIR_CACHE), f.getName());
                         }
                         if (currentMessageObject != null && currentMessageObject.isVideo() && (f == null || !f.exists())) {
-                            File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(currentMessageObject);
+                            File mgCached = org.tellurgram.MgLocalMedia.cachedFile(currentMessageObject);
                             if (mgCached != null) {
                                 f = mgCached;
                             }
@@ -5022,7 +5022,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                                     } else {
                                         f = FileLoader.getInstance(currentAccount).getPathToMessage(currentMessageObject.messageOwner);
                                         if (currentMessageObject.isVideo() && (f == null || !f.exists())) {
-                                            File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(currentMessageObject);
+                                            File mgCached = org.tellurgram.MgLocalMedia.cachedFile(currentMessageObject);
                                             if (mgCached != null) {
                                                 f = mgCached;
                                             }
@@ -5076,7 +5076,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                                         } else {
                                             f = FileLoader.getInstance(currentAccount).getPathToMessage(msg.messageOwner);
                                             if (msg.isVideo() && (f == null || !f.exists())) {
-                                                File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(msg);
+                                                File mgCached = org.tellurgram.MgLocalMedia.cachedFile(msg);
                                                 if (mgCached != null) {
                                                     f = mgCached;
                                                 }
@@ -11442,7 +11442,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (entry.cropState == null) {
                 return currentEditMode != EDIT_MODE_CROP;
             }
-            currentCroppedBitmap = it.belloworld.tellurgram.MgPhotoCrop.bakeCropForViewer(entry, bitmap, orientation, AndroidUtilities.getPhotoSize());
+            currentCroppedBitmap = org.tellurgram.MgPhotoCrop.bakeCropForViewer(entry, bitmap, orientation, AndroidUtilities.getPhotoSize());
             if (currentCroppedBitmap == null) {
                 return false;
             }
@@ -17238,7 +17238,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 file = FileLoader.getInstance(currentAccount).getPathToMessage(currentMessageObject.messageOwner);
             }
             if (isVideo && (file == null || !file.exists())) {
-                File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(currentMessageObject);
+                File mgCached = org.tellurgram.MgLocalMedia.cachedFile(currentMessageObject);
                 if (mgCached != null) {
                     file = mgCached;
                 }

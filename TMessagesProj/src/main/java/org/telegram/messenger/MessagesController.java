@@ -139,7 +139,7 @@ import java.util.stream.Collectors;
 
 import me.vkryl.core.BitwiseUtils;
 
-import it.belloworld.tellurgram.folders.MgLocalFolders;
+import org.tellurgram.folders.MgLocalFolders;
 
 public class MessagesController extends BaseController implements NotificationCenter.NotificationCenterDelegate {
 
@@ -16280,7 +16280,7 @@ public class MessagesController extends BaseController implements NotificationCe
         if (TextUtils.isEmpty(regid) || registeringForPush || getUserConfig().getClientUserId() == 0) {
             return;
         }
-        it.belloworld.tellurgram.push.MgSimplePush.syncOnRegisterForPush(currentAccount);
+        org.tellurgram.push.MgSimplePush.syncOnRegisterForPush(currentAccount);
         if (getUserConfig().registeredForPush && regid.equals(SharedConfig.pushString)) {
             return;
         }
@@ -16966,7 +16966,7 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void getDifference(int pts, int date, int qts, boolean slice) {
         registerForPush(SharedConfig.pushType, SharedConfig.pushString);
-        it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.ensureRegistered();
+        org.tellurgram.push.UnifiedPushListenerServiceProvider.ensureRegistered();
         if (getMessagesStorage().getLastPtsValue() == 0) {
             loadCurrentState();
             return;
@@ -19918,7 +19918,7 @@ public class MessagesController extends BaseController implements NotificationCe
                 for (int a = 0, size2 = messageObjects.size(); a < size2; a++) {
                     messagesRes.messages.add(messageObjects.get(a).messageOwner);
                 }
-                it.belloworld.tellurgram.MgMessageHistory.getInstance().archiveEditsBefore(currentAccount, editingMessages.keyAt(b), messagesRes.messages);
+                org.tellurgram.MgMessageHistory.getInstance().archiveEditsBefore(currentAccount, editingMessages.keyAt(b), messagesRes.messages);
                 getMessagesStorage().putMessages(messagesRes, editingMessages.keyAt(b), -2, 0, false, 0, 0);
             }
             LongSparseArray<ArrayList<MessageObject>> editingMessagesFinal = editingMessages;
@@ -21099,7 +21099,7 @@ public class MessagesController extends BaseController implements NotificationCe
         LongSparseArray<ArrayList<Integer>> deletedMessagesFinal = deletedMessages;
         if (deletedMessages != null) {
             for (int a = 0, size = deletedMessages.size(); a < size; a++) {
-                it.belloworld.tellurgram.MgMessageHistory.getInstance().archiveDeleted(currentAccount, deletedMessages.keyAt(a), deletedMessages.valueAt(a));
+                org.tellurgram.MgMessageHistory.getInstance().archiveDeleted(currentAccount, deletedMessages.keyAt(a), deletedMessages.valueAt(a));
             }
         }
         LongSparseArray<ArrayList<Integer>> deletedQuickRepliesMessagesFinal = deletedQuickReplyMessages;

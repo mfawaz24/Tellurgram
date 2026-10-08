@@ -16,7 +16,7 @@ TAG="${1:-}"
     || { echo "Tag '$TAG' is not 4-dotted (X.Y.Z.M). Snapshots are published by beta.yml."; exit 1; }
 
 # Sign via Gradle directly (not apksigner) to preserve zero-padding in ZIP
-# extra fields, which is required for F-Droid reproducible builds.
+# extra fields, which reproducible builds require.
 
 # HACK: cache built native artifacts to avoid full NDK rebuild on every run
 if [ -d TMessagesProj/jni.bak ]; then

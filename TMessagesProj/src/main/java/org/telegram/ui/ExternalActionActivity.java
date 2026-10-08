@@ -50,7 +50,7 @@ import org.telegram.ui.Components.SizeNotifierFrameLayout;
 
 import java.util.ArrayList;
 
-import it.belloworld.tellurgram.HiddenAccountHelper;
+import org.tellurgram.HiddenAccountHelper;
 
 public class ExternalActionActivity extends Activity implements INavigationLayout.INavigationLayoutDelegate {
 

@@ -34,7 +34,7 @@ inputs:
     required: false
     default: ''
   build-tag:
-    description: 'MG_BUILD_TAG (real GitHub tag baked into versionName/versionCode by gradle/mg-version.gradle). Required for every build path — the gradle build fails at configure if MG_BUILD_TAG is absent (no git-describe fallback). CI passes it explicitly; release.sh requires it as $1; the F-Droid recipe writes it via a prebuild step added by .github/scripts/fdroid_sync.py.'
+    description: 'MG_BUILD_TAG (real GitHub tag baked into versionName/versionCode by gradle/mg-version.gradle). Required for every build path — the gradle build fails at configure if MG_BUILD_TAG is absent (no git-describe fallback). CI passes it explicitly; release.sh requires it as $1.'
     required: true
   app-id:
     description: 'Telegram APP_ID (from secrets).'
@@ -84,8 +84,7 @@ runs:
       shell: bash
       # Source the versions from TMessagesProj/build.gradle so upstream
       # rebases that bump ndkVersion / buildToolsVersion don't require a
-      # parallel CI edit. Same approach as scripts/check-reproducibility.sh
-      # and .github/scripts/fdroid_sync.py.
+      # parallel CI edit.
       run: |
         gradle_file=TMessagesProj/build.gradle
         ndk=$(grep -oE 'ndkVersion[[:space:]]+"[0-9.]+"' "$gradle_file" | grep -oE '[0-9.]+')

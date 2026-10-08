@@ -1,7 +1,7 @@
-package it.belloworld.tellurgram.compat.gms.auth;
+package org.tellurgram.compat.gms.auth;
 
 import android.content.Intent;
-import it.belloworld.tellurgram.compat.gms.tasks.Task;
+import org.tellurgram.compat.gms.tasks.Task;
 
 /** Stub — Google Sign-In removed in FOSS builds. */
 public class GoogleSignInClient {

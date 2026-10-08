@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.compat.gms.tasks;
+package org.tellurgram.compat.gms.tasks;
 
 import java.util.function.Consumer;
 

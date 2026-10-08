@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.translate
+package org.tellurgram.translate
 
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
@@ -49,14 +49,6 @@ class MgAidlTranslateTest {
         // suite needs revisiting.
         assertFalse(MgAidlTranslate.isProviderInstalled(ctx))
         assertFalse(MgAidlTranslate.isUsable(ctx))
-    }
-
-    @Test
-    fun fdroidUrlPointsAtProviderPackage() {
-        assertEquals(
-            "https://f-droid.org/packages/" + MgAidlTranslate.PROVIDER_PACKAGE + "/",
-            MgAidlTranslate.getFdroidInstallUrl(),
-        )
     }
 
     @Test

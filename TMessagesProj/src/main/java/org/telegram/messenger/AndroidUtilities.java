@@ -240,7 +240,7 @@ import java.util.zip.GZIPOutputStream;
 
 import me.vkryl.core.BitwiseUtils;
 
-import it.belloworld.tellurgram.MgUpdateChecker;
+import org.tellurgram.MgUpdateChecker;
 
 public class AndroidUtilities {
     public final static int REPLACING_TAG_TYPE_LINK = 0;
@@ -2370,7 +2370,7 @@ public class AndroidUtilities {
 
     public static Typeface getTypeface(String assetPath) {
         if (SharedConfig.useSystemFont) {
-            Typeface sys = it.belloworld.tellurgram.MgSystemFont.typefaceFor(assetPath);
+            Typeface sys = org.tellurgram.MgSystemFont.typefaceFor(assetPath);
             if (sys != null) {
                 return sys;
             }
@@ -4178,7 +4178,7 @@ public class AndroidUtilities {
             f = FileLoader.getInstance(UserConfig.selectedAccount).getPathToMessage(message.messageOwner);
         }
         if (f == null || !f.exists()) {
-            File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(message);
+            File mgCached = org.tellurgram.MgLocalMedia.cachedFile(message);
             if (mgCached != null) {
                 f = mgCached;
             }
@@ -4317,7 +4317,7 @@ public class AndroidUtilities {
             f = FileLoader.getInstance(message.currentAccount).getPathToMessage(message.messageOwner);
         }
         if (f == null || !f.exists()) {
-            File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(message);
+            File mgCached = org.tellurgram.MgLocalMedia.cachedFile(message);
             if (mgCached != null) {
                 f = mgCached;
             }

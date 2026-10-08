@@ -455,7 +455,7 @@ public class WebPlayerView extends ViewGroup implements VideoPlayer.VideoPlayerD
         StringBuilder result = null;
         URLConnection httpConnection = null;
         try {
-            URL downloadUrl = new URL(it.belloworld.tellurgram.MgHttps.upgrade(url));
+            URL downloadUrl = new URL(org.tellurgram.MgHttps.upgrade(url));
             httpConnection = downloadUrl.openConnection();
             httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20150101 Firefox/47.0 (Chrome)");
             if (tryGzip) {
@@ -478,7 +478,7 @@ public class WebPlayerView extends ViewGroup implements VideoPlayer.VideoPlayerD
                 if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM || status == HttpURLConnection.HTTP_SEE_OTHER) {
                     String newUrl = httpURLConnection.getHeaderField("Location");
                     String cookies = httpURLConnection.getHeaderField("Set-Cookie");
-                    downloadUrl = new URL(it.belloworld.tellurgram.MgHttps.upgrade(newUrl));
+                    downloadUrl = new URL(org.tellurgram.MgHttps.upgrade(newUrl));
                     httpConnection = downloadUrl.openConnection();
                     httpConnection.setRequestProperty("Cookie", cookies);
                     httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20150101 Firefox/47.0 (Chrome)");

@@ -3932,7 +3932,7 @@ public abstract class BotWebViewContainer extends FrameLayout implements Notific
                             return proxyTON(request);
                         }
                         // Leaves firstRequest set, so the https load it redirects to is handled as the first one.
-                        final WebResourceResponse https = it.belloworld.tellurgram.MgHttps.intercept(request);
+                        final WebResourceResponse https = org.tellurgram.MgHttps.intercept(request);
                         if (https != null) {
                             return https;
                         }

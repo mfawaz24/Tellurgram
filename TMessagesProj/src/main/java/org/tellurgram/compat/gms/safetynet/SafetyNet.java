@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.compat.gms.safetynet;
+package org.tellurgram.compat.gms.safetynet;
 
 import android.content.Context;
 

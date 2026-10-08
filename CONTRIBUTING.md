@@ -68,11 +68,11 @@ The current MG translations for `de`, `es`, `pt-rBR`, `nl`, `ru`, `uk`, `ko`,
 native-speaker review. Italian (`it`) was reviewed by a native speaker.
 Corrections via PR are very welcome — don't assume anything is locked in.
 
-## F-Droid metadata translations
+## Store listing translations
 
 The store listings under
 [`TMessagesProj_App/fastlane/metadata/android/`](TMessagesProj_App/fastlane/metadata/android)
-follow the standard fastlane F-Droid layout:
+follow the standard fastlane layout:
 
 ```
 TMessagesProj_App/fastlane/metadata/android/<locale>/
@@ -81,13 +81,13 @@ TMessagesProj_App/fastlane/metadata/android/<locale>/
     description.txt   # long description
 ```
 
-They live under the app module rather than the repo root so that F-Droid
-scopes them to `it.belloworld.tellurgram` alone; the Tor plugin has its own
+They live under the app module rather than the repo root so they are
+scoped to `org.tellurgram` alone; the Tor plugin has its own
 listing in `TMessagesProj_PluginTor/src/main/play/listings/`.
 
 Source of truth: `TMessagesProj_App/fastlane/metadata/android/en-US/`.
 Translators may add or update `name.txt`, `summary.txt`, `description.txt` for
-any locale. F-Droid renders these with a small HTML subset (`<b>`, `<i>`,
+any locale. Store listings render these with a small HTML subset (`<b>`, `<i>`,
 `<br>`, `<a>`) — Markdown is shown literally, so don't use it.
 
 ## Code contributions
@@ -96,7 +96,7 @@ For non-translation code changes, follow the conventions in
 [`AGENTS.md`](AGENTS.md):
 
 - Tag commits `[MG]` (Mercurygram features) or `[TF]` (Telegram-FOSS / de-googling).
-- Prefer adding new files in `it.belloworld.tellurgram.*` over modifying
+- Prefer adding new files in `org.tellurgram.*` over modifying
   upstream files.
 - New `SharedConfig` flags use the `mg_` SharedPreferences prefix.
 - Bug fixes against an existing `[MG]` feature should be folded into the

@@ -581,7 +581,7 @@
             </intent-filter>
         </service>
 
-        <receiver android:name="it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor"
+        <receiver android:name="org.tellurgram.push.MgEmbeddedFcmDistributor"
             android:enabled="true" android:exported="false">
             <intent-filter>
                 <action android:name="org.unifiedpush.android.distributor.feature.BYTES_MESSAGE"/>

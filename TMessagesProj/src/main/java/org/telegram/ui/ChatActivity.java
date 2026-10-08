@@ -14105,8 +14105,8 @@ public class ChatActivity extends BaseFragment implements
         // onTextSpansChanged, the internal re-search) funnels through this, so
         // gating it suppresses the account.getWebPagePreview RPC URL leak
         // regardless of entry point (#26). Other compose surfaces gate at their
-        // own call sites — see it.belloworld.tellurgram.MgLinkPreview.
-        if (it.belloworld.tellurgram.MgLinkPreview.suppressed(currentAccount)) {
+        // own call sites — see org.tellurgram.MgLinkPreview.
+        if (org.tellurgram.MgLinkPreview.suppressed(currentAccount)) {
             return;
         }
         if (currentEncryptedChat != null && getMessagesController().secretWebpagePreview == 0 || editingMessageObject != null && (!editingMessageObject.isWebpage() || editingMessageObject.messageOwner.media.webpage instanceof TLRPC.TL_webPagePending)) {
@@ -18982,7 +18982,7 @@ public class ChatActivity extends BaseFragment implements
                                 canSave = true;
                             }
                         }
-                        if (!canSave && it.belloworld.tellurgram.MgLocalMedia.cachedFile(messageObject) != null) {
+                        if (!canSave && org.tellurgram.MgLocalMedia.cachedFile(messageObject) != null) {
                             canSave = true;
                         }
                         if (canSave) {
@@ -19052,7 +19052,7 @@ public class ChatActivity extends BaseFragment implements
                             canSave = true;
                         }
                     }
-                    if (!canSave && it.belloworld.tellurgram.MgLocalMedia.cachedFile(messageObject) != null) {
+                    if (!canSave && org.tellurgram.MgLocalMedia.cachedFile(messageObject) != null) {
                         canSave = true;
                     }
                     if (canSave) {
@@ -26299,7 +26299,7 @@ public class ChatActivity extends BaseFragment implements
     // MgChatGhostController; these accessors expose the private structures its
     // inject path must read or mutate (the adapter is package-private, so the
     // adapter operations are wrapped rather than exposed).
-    public final it.belloworld.tellurgram.ui.MgChatGhostController mgGhost = new it.belloworld.tellurgram.ui.MgChatGhostController(this);
+    public final org.tellurgram.ui.MgChatGhostController mgGhost = new org.tellurgram.ui.MgChatGhostController(this);
 
     public void mgProcessDeletedMessages(ArrayList<Integer> ids) {
         processDeletedMessages(ids, ChatObject.isChannel(currentChat) ? -dialog_id : 0, false);
@@ -33404,7 +33404,7 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private void saveMessageToGallery(MessageObject messageObject) {
-        File mgFile = it.belloworld.tellurgram.MgLocalMedia.cachedFile(messageObject);
+        File mgFile = org.tellurgram.MgLocalMedia.cachedFile(messageObject);
         String path = mgFile != null ? mgFile.getPath() : null;
         if (TextUtils.isEmpty(path)) {
             return;
@@ -33638,7 +33638,7 @@ public class ChatActivity extends BaseFragment implements
                 break;
             }
             case OPTION_SHARE: {
-                File mgFile = it.belloworld.tellurgram.MgLocalMedia.cachedFile(selectedObject);
+                File mgFile = org.tellurgram.MgLocalMedia.cachedFile(selectedObject);
                 String path = mgFile != null ? mgFile.getPath() : getFileLoader().getPathToMessage(selectedObject.messageOwner).toString();
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType(selectedObject.getDocument().mime_type);
@@ -33661,7 +33661,7 @@ public class ChatActivity extends BaseFragment implements
                 break;
             }
             case OPTION_SAVE_TO_GALLERY2: {
-                File mgFile = it.belloworld.tellurgram.MgLocalMedia.cachedFile(selectedObject);
+                File mgFile = org.tellurgram.MgLocalMedia.cachedFile(selectedObject);
                 String path = mgFile != null ? mgFile.getPath() : null;
                 if (Build.VERSION.SDK_INT >= 23 && (Build.VERSION.SDK_INT <= 28 || BuildVars.NO_SCOPED_STORAGE) && getParentActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     getParentActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4);
@@ -33820,7 +33820,7 @@ public class ChatActivity extends BaseFragment implements
                     if (TextUtils.isEmpty(fileName)) {
                         fileName = selectedObject.getFileName();
                     }
-                    File mgFile = it.belloworld.tellurgram.MgLocalMedia.cachedFile(selectedObject);
+                    File mgFile = org.tellurgram.MgLocalMedia.cachedFile(selectedObject);
                     String path = mgFile != null ? mgFile.getPath() : null;
                     MediaController.saveFile(path, getParentActivity(), 2, fileName, selectedObject.getDocument() != null ? selectedObject.getDocument().mime_type : "", uri -> {
                         if (getParentActivity() == null) {
@@ -34346,11 +34346,11 @@ public class ChatActivity extends BaseFragment implements
                 getMessagesController().revertWelcomeEphemeralMessage(selectedObject);
                 break;
             case OPTION_DETAILS: {
-                presentFragment(new it.belloworld.tellurgram.ui.MessageDetailsActivity(selectedObject));
+                presentFragment(new org.tellurgram.ui.MessageDetailsActivity(selectedObject));
                 break;
             }
             case OPTION_EDIT_HISTORY: {
-                presentFragment(new it.belloworld.tellurgram.ui.MgMessageEditHistoryActivity(selectedObject));
+                presentFragment(new org.tellurgram.ui.MgMessageEditHistoryActivity(selectedObject));
                 break;
             }
             case OPTION_SUGGESTION_ADD_OFFER:

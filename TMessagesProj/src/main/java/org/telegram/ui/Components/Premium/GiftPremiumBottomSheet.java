@@ -19,10 +19,10 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import it.belloworld.tellurgram.compat.billing.BillingClient;
-import it.belloworld.tellurgram.compat.billing.BillingFlowParams;
-import it.belloworld.tellurgram.compat.billing.ProductDetails;
-import it.belloworld.tellurgram.compat.billing.QueryProductDetailsParams;
+import org.tellurgram.compat.billing.BillingClient;
+import org.tellurgram.compat.billing.BillingFlowParams;
+import org.tellurgram.compat.billing.ProductDetails;
+import org.tellurgram.compat.billing.QueryProductDetailsParams;
 
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;

@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.tor
+package org.tellurgram.tor
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -241,9 +241,7 @@ class MgTorClientPrefsTest {
         // Stub-commit branch only runs when the plugin APK is present.
         // CI emulator never has it installed; a dev device with the
         // plugin sideloaded does. Skipped otherwise so the other preInit
-        // branches stay meaningful in both environments. Also skip the
-        // F-Droid + Android <12 force-off branch — covered separately.
-        Assume.assumeFalse(MgTorClient.isFdroidPreS())
+        // branches stay meaningful in both environments.
         Assume.assumeTrue(MgTorClient.isPluginInstalled())
         SharedConfig.toggleMgUseTor()
         try {
@@ -264,9 +262,6 @@ class MgTorClientPrefsTest {
         // and the blocking stub be pinned to 127.0.0.1:1 so MTProto can't
         // fall through to direct. The previous behaviour silently flipped
         // mg_useTor off — defeating the user's explicit privacy choice.
-        // F-Droid + Android <12 takes a different branch (forced-off) so
-        // skip there; covered by preInitForceDisablesOnFdroidPreS.
-        Assume.assumeFalse(MgTorClient.isFdroidPreS())
         Assume.assumeFalse(MgTorClient.isPluginInstalled())
         prefs.edit()
             .putString("proxy_ip", "1.2.3.4")
@@ -293,7 +288,6 @@ class MgTorClientPrefsTest {
         // the snapshot must stay intact (it'll be consumed by a later
         // user-initiated disable via stop()/restoreOnDisable), and the
         // blocking stub is pinned regardless so MTProto stays privacy-correct.
-        Assume.assumeFalse(MgTorClient.isFdroidPreS())
         Assume.assumeFalse(MgTorClient.isPluginInstalled())
         prefs.edit()
             // Simulate the previous Tor cycle's committed blocking stub.
@@ -324,40 +318,6 @@ class MgTorClientPrefsTest {
         assertEquals(9050, prefs.getInt("mg_tor_savedProxy_port", -1))
         assertEquals(MgTorClient.State.PLUGIN_NOT_INSTALLED,
             MgTorClient.getInstance().state)
-    }
-
-    @Test
-    fun preInitForceDisablesOnFdroidPreS() {
-        // F-Droid main on Android <12 takes the force-off branch (plugin's
-        // BIND permission can't be allowlisted without knownSigner on pre-S).
-        // Restores the snapshot if present, otherwise clears, and flips
-        // mg_useTor off — the Settings UI hides the toggle, so silent
-        // recovery is the only way out of a pre-upgrade mg_useTor=true.
-        Assume.assumeTrue(MgTorClient.isFdroidPreS())
-        // The snapshot is enabled, so the restore only writes it back when
-        // the proxy is still in the user's list. proxyList is process-wide
-        // and loaded once, so seed it through SharedConfig rather than
-        // through the proxy_list pref, which a sibling test may already
-        // have caused to be read.
-        SharedConfig.addProxy(SharedConfig.ProxyInfo("5.6.7.8", 9050, "u", "p", ""))
-        prefs.edit()
-            .putBoolean("mg_tor_savedProxy_present", true)
-            .putString("mg_tor_savedProxy_ip", "5.6.7.8")
-            .putInt("mg_tor_savedProxy_port", 9050)
-            .putString("mg_tor_savedProxy_user", "u")
-            .putString("mg_tor_savedProxy_pass", "p")
-            .putString("mg_tor_savedProxy_secret", "")
-            .putBoolean("mg_tor_savedProxy_enabled", true)
-            .commit()
-        SharedConfig.toggleMgUseTor()
-
-        MgTorClient.preInit()
-
-        assertFalse(SharedConfig.mg_useTor)
-        assertEquals("5.6.7.8", prefs.getString("proxy_ip", ""))
-        assertEquals(9050, prefs.getInt("proxy_port", -1))
-        // Snapshot consumed (key removed, not flipped to false).
-        assertFalse(prefs.contains("mg_tor_savedProxy_present"))
     }
 
     @Test
@@ -393,7 +353,6 @@ class MgTorClientPrefsTest {
 
     @Test
     fun blocksForeignProxyWriteWhileTorOwnsTheSlot() {
-        Assume.assumeFalse(MgTorClient.isFdroidPreS())
         SharedConfig.toggleMgUseTor()
         try {
             // preInit pins the blocking stub, which is what takes ownership

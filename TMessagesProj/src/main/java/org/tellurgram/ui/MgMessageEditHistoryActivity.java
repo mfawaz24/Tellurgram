@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.ui;
+package org.tellurgram.ui;
 
 import android.view.View;
 
@@ -16,7 +16,7 @@ import org.telegram.ui.Components.UniversalFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.belloworld.tellurgram.MgMessageHistory;
+import org.tellurgram.MgMessageHistory;
 
 /**
  * Mercurygram — per-message edit-history viewer. Lists the current server

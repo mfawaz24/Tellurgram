@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.transcribe;
+package org.tellurgram.transcribe;
 
 import android.content.Context;
 import android.net.Uri;
@@ -26,10 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * The model is deliberately NOT bundled in the APK — it is fetched on first use
  * or imported by the user. This keeps the main APK slim and reproducible (the
  * model is never part of the build). Download + manual import mirror the
- * Sayboard pattern (free model + manual alternative) so no new F-Droid
- * antifeature is incurred beyond the NonFreeNet the app already carries for
- * talking to Telegram's servers. Download style mirrors
- * {@link it.belloworld.tellurgram.MgUpdateChecker#downloadUpdate}.
+ * Sayboard pattern (free model + manual alternative). Download style mirrors
+ * {@link org.tellurgram.MgUpdateChecker#downloadUpdate}.
  */
 public final class MgWhisperModel {
 

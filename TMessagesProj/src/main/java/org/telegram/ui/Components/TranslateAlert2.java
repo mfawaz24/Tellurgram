@@ -327,7 +327,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
         final String mgText = reqText == null ? "" : reqText.toString();
         final String mgFromLng = simplifyLanguage(fromLanguage);
         final String mgToLng = simplifyLanguage(toLanguage);
-        final it.belloworld.tellurgram.translate.MgTranslateDispatcher.Result mgResult =
+        final org.tellurgram.translate.MgTranslateDispatcher.Result mgResult =
                 (out, rateLimit, failure) -> AndroidUtilities.runOnUIThread(() -> {
                     if (out != null) {
                         firstTranslation = false;
@@ -336,7 +336,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
                         return;
                     }
                     if (isDismissed()) return;
-                    final CharSequence msg = it.belloworld.tellurgram.translate.MgTranslateDispatcher.mapBulletin(failure, rateLimit);
+                    final CharSequence msg = org.tellurgram.translate.MgTranslateDispatcher.mapBulletin(failure, rateLimit);
                     if (firstTranslation) {
                         dismiss();
                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, msg);
@@ -354,19 +354,19 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
         // never fall through to a network path regardless of mg_translateMode / the
         // caller-side menu gate.
         if (encrypted) {
-            it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(mgText, mgFromLng, mgToLng, mgResult);
+            org.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(mgText, mgFromLng, mgToLng, mgResult);
             return;
         }
 
         if (!(reqSum && reqPeer != null) && reqRichMessage == null) {
-            final it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome =
-                    it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatch(mgText, mgFromLng, mgToLng, mgResult);
-            if (mgOutcome == it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
+            final org.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome =
+                    org.tellurgram.translate.MgTranslateDispatcher.dispatch(mgText, mgFromLng, mgToLng, mgResult);
+            if (mgOutcome == org.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
                 return;
             }
             // FORCE_CLOUD: skip the upstream translationsManualEnabled "alternative"
             // branch and fall straight through to messages.translateText below.
-            if (mgOutcome != it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.FORCE_CLOUD) {
+            if (mgOutcome != org.tellurgram.translate.MgTranslateDispatcher.Outcome.FORCE_CLOUD) {
                 final String method = MessagesController.getInstance(currentAccount).translationsManualEnabled;
                 if ("alternative".equalsIgnoreCase(method)) {
                     translateAlt();
@@ -591,7 +591,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
             final boolean[] fullyDone = new boolean[1];
             for (int i = 0; i < parts.size(); ++i) {
                 final int index = i;
-                it.belloworld.tellurgram.translate.MgMozhiClient.translate(parts.get(i), fromLng, toLng, (res, rateLimit) -> {
+                org.tellurgram.translate.MgMozhiClient.translate(parts.get(i), fromLng, toLng, (res, rateLimit) -> {
                     if (fullyDone[0]) return;
                     if (res != null) {
                         results.set(index, res);
@@ -613,7 +613,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
                 });
             }
         } else {
-            it.belloworld.tellurgram.translate.MgMozhiClient.translate(etext, fromLng, toLng, done);
+            org.tellurgram.translate.MgMozhiClient.translate(etext, fromLng, toLng, done);
         }
     }
 

@@ -13,9 +13,9 @@ import org.telegram.ui.IUpdateLayout;
 
 import java.io.File;
 
-import it.belloworld.tellurgram.MgUpdateChecker;
-import it.belloworld.tellurgram.MgUpdateInfo;
-import it.belloworld.tellurgram.ui.MgUpdateAlertDialog;
+import org.tellurgram.MgUpdateChecker;
+import org.tellurgram.MgUpdateInfo;
+import org.tellurgram.ui.MgUpdateAlertDialog;
 
 public class ApplicationLoaderImpl extends ApplicationLoader {
     @Override
@@ -30,7 +30,7 @@ public class ApplicationLoaderImpl extends ApplicationLoader {
 
     @Override
     protected PushListenerController.IPushListenerServiceProvider onCreatePushProvider() {
-        return it.belloworld.tellurgram.push.UnifiedPushListenerServiceProvider.INSTANCE;
+        return org.tellurgram.push.UnifiedPushListenerServiceProvider.INSTANCE;
     }
 
     @Override

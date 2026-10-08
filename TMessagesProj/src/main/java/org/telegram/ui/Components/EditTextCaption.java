@@ -1155,7 +1155,7 @@ public class EditTextCaption extends EditTextBoldCursor implements FloatingToolb
                 try {
                     String html = clipData.getItemAt(0).getHtmlText();
                     SpannableStringBuilder pasted = new SpannableStringBuilder(CopyUtilities.fromHTML(html));
-                    it.belloworld.tellurgram.MgUrlCleaner.clean(pasted);
+                    org.tellurgram.MgUrlCleaner.clean(pasted);
                     Emoji.replaceEmoji(pasted, getPaint().getFontMetricsInt(), false, null);
                     AnimatedEmojiSpan[] spans = pasted.getSpans(0, pasted.length(), AnimatedEmojiSpan.class);
                     if (spans != null) {
@@ -1182,7 +1182,7 @@ public class EditTextCaption extends EditTextBoldCursor implements FloatingToolb
                     FileLog.e(e);
                 }
             }
-            if (it.belloworld.tellurgram.MgUrlCleaner.handlePaste(this, clipData)) {
+            if (org.tellurgram.MgUrlCleaner.handlePaste(this, clipData)) {
                 return true;
             }
         } else if (id == android.R.id.copy) {

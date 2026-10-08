@@ -2129,7 +2129,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                     path = getFileLoader().getPathToMessage(selectedObject.messageOwner).toString();
                 }
                 if (path == null || path.length() == 0 || !new File(path).exists()) {
-                    File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(selectedObject);
+                    File mgCached = org.tellurgram.MgLocalMedia.cachedFile(selectedObject);
                     if (mgCached != null) {
                         path = mgCached.getPath();
                     }
@@ -2222,7 +2222,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                     path = getFileLoader().getPathToMessage(selectedObject.messageOwner).toString();
                 }
                 if (path == null || path.length() == 0 || !new File(path).exists()) {
-                    File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(selectedObject);
+                    File mgCached = org.tellurgram.MgLocalMedia.cachedFile(selectedObject);
                     if (mgCached != null) {
                         path = mgCached.getPath();
                     }
@@ -2258,7 +2258,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                     path = getFileLoader().getPathToMessage(selectedObject.messageOwner).toString();
                 }
                 if (path == null || path.length() == 0 || !new File(path).exists()) {
-                    File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(selectedObject);
+                    File mgCached = org.tellurgram.MgLocalMedia.cachedFile(selectedObject);
                     if (mgCached != null) {
                         path = mgCached.getPath();
                     }
@@ -2298,7 +2298,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                     path = getFileLoader().getPathToMessage(selectedObject.messageOwner).toString();
                 }
                 if (path == null || path.length() == 0 || !new File(path).exists()) {
-                    File mgCached = it.belloworld.tellurgram.MgLocalMedia.cachedFile(selectedObject);
+                    File mgCached = org.tellurgram.MgLocalMedia.cachedFile(selectedObject);
                     if (mgCached != null) {
                         path = mgCached.getPath();
                     }
@@ -2435,7 +2435,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                         canSave = true;
                     }
                 }
-                if (!canSave && it.belloworld.tellurgram.MgLocalMedia.cachedFile(messageObject) != null) {
+                if (!canSave && org.tellurgram.MgLocalMedia.cachedFile(messageObject) != null) {
                     canSave = true;
                 }
                 if (canSave) {

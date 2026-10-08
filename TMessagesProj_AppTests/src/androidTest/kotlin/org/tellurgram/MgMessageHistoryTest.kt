@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram
+package org.tellurgram
 
 import android.content.ContentValues
 import android.content.Context

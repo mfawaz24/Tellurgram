@@ -108,7 +108,7 @@ def getAppHash() {
     return "\"" + properties.get("APP_HASH") + "\""
 }
 
-// If all requested tasks target the same single F-Droid per-ABI flavor, return that ABI
+// If all requested tasks target the same single per-ABI flavor, return that ABI
 // so the library's CMake build can be limited to just that ABI. Returns null otherwise
 // (fat builds, local development, multiple ABIs requested).
 // Note: flavors are matched longest-first so AfatFdX86_64 is matched before AfatFdX86.
@@ -174,7 +174,7 @@ android {
 
         multiDexEnabled true
 
-        // Limit CMake to a single ABI for per-ABI F-Droid builds; has no effect otherwise.
+        // Limit CMake to a single ABI for per-ABI builds; has no effect otherwise.
         if (singleFdAbi) ndk.abiFilters singleFdAbi
 
         externalNativeBuild {
@@ -290,7 +290,7 @@ task patchNativeSources {
         // "n8.1.2-30-g45f1910444" or "45f1910444" depending on how the
         // submodule was fetched. Pinning it to the full submodule SHA makes the
         // archives byte-identical across shallow and full checkouts, which
-        // F-Droid reproducibility needs. Upstream never hit this: it builds
+        // reproducible builds need. Upstream never hit this: it builds
         // from a checkout that has tags.
         def ffmpegDir = file("${projectDir}/jni/third_party/ffmpeg")
         def ffmpegSha = providers.exec {
@@ -324,11 +324,11 @@ def mediaBuildScript = 'build_ffmpeg_libvpx_dav1d_android_ndk27_merged.sh'
 // libtmessages.so); ffmpeg does the same in FFMPEG_CONFIGURATION. Those strings
 // are literal text, so upstream's -ffile-prefix-map flags cannot sanitize the
 // absolute paths inside them, and an APK built from /home/you/src would never
-// match one F-Droid built from its own build root. The old build_libvpx_clang.sh
+// match one built from a different build root. The old build_libvpx_clang.sh
 // dodged this with a relative --prefix; upstream's script is absolute
 // throughout. So run it through fixed literal paths instead: a symlink to jni/
 // and a symlink to the NDK. Every path the configure line records is then the
-// same string on a dev box, in CI, and on the F-Droid buildserver.
+// same string on a dev box and in CI.
 //
 // BUILD_ROOT is deliberately left at its default under jni/ffmpeg, reached
 // through the same symlink: libvpx's out-of-tree build resolves generated
@@ -345,8 +345,7 @@ def mediaNdkLink   = '/var/tmp/mg-ndk'
 // Pinned rustc for jni/prebuild/build_tlottie.sh, installed by jni/setup_rust.sh
 // into fixed literal homes for the same reason the media build runs through
 // /var/tmp/mg-jni: rustc records the crate-registry path in its output, so a
-// per-machine CARGO_HOME would make libtlottie.a differ between our build and
-// F-Droid's.
+// per-machine CARGO_HOME would make libtlottie.a differ between machines.
 def rustToolchain  = '1.97.1'
 def rustupHome     = '/var/tmp/mg-rustup'
 def cargoHome      = '/var/tmp/mg-cargo'
@@ -431,9 +430,9 @@ def pointSymlink = { String linkPath, String target ->
             }
 
             // tlottie replaced rlottie in 12.10.0. Upstream commits the four
-            // cargo-built archives; F-Droid cannot ship binaries it did not
-            // build, so run upstream's own builder here for the same reason the
-            // media libraries are built above.
+            // cargo-built archives; build them from source instead, so run
+            // upstream's own builder here for the same reason the media
+            // libraries are built above.
             //
             // Reproducibility: rustc bakes the source path and the crate
             // registry path into its output. The source side is already fixed
@@ -482,7 +481,7 @@ def pointSymlink = { String linkPath, String target ->
 
             // openh264: 12.10.1 stopped compiling it from source in
             // voip/CMakeLists.txt and imports a committed prebuild/<abi>/
-            // libopenh264.a instead. Same F-Droid rule as the media libraries,
+            // libopenh264.a instead. Same build-from-source rule as the media libraries,
             // so run upstream's own builder over the jni/third_party/openh264
             // submodule. It drives openh264's Makefile, which bakes the object
             // paths of its build tree into the archive member names, so it goes

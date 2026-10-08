@@ -12,7 +12,7 @@ repositories {
     google()
 }
 
-// Per-ABI F-Droid optimization: if the requested Gradle task set targets a single
+// Per-ABI optimization: if the requested Gradle task set targets a single
 // afatFd* flavor, limit CMake to that ABI. Mirrors TMessagesProj/build.gradle's
 // detectSingleFdAbi() — keep in sync.
 def detectSingleFdAbi() {
@@ -63,7 +63,7 @@ android {
     buildToolsVersion '35.0.0'
     ndkVersion "27.2.12479018"
 
-    namespace 'it.belloworld.tellurgram.plugin.tor'
+    namespace 'org.tellurgram.plugin.tor'
 
     defaultConfig {
         applicationId 'org.tellurgram.plugin.tor'
@@ -74,7 +74,7 @@ android {
 
         multiDexEnabled true
 
-        // Limit CMake to a single ABI for per-ABI F-Droid builds; no effect on fat builds.
+        // Limit CMake to a single ABI for per-ABI builds; no effect on fat builds.
         if (singleFdAbi) ndk.abiFilters singleFdAbi
 
         externalNativeBuild {
@@ -97,7 +97,7 @@ android {
         }
     }
 
-    // Match main app: compressed .so for smaller F-Droid download.
+    // Match main app: compressed .so for a smaller download.
     packaging {
         jniLibs {
             useLegacyPackaging = true
@@ -150,8 +150,7 @@ android {
             storePassword RELEASE_STORE_PASSWORD
             keyAlias RELEASE_KEY_ALIAS
             keyPassword RELEASE_KEY_PASSWORD
-            // Match main app release signing exactly — F-Droid reproducible build
-            // requires identical signing block layout, and signature pinning in
+            // Match main app release signing exactly — signature pinning in
             // main relies on byte-equal cert across both APKs.
             enableV1Signing false
             enableV2Signing true
@@ -221,7 +220,7 @@ android {
     }
 
     variantFilter { variant ->
-        // Only build release variants for the per-ABI F-Droid flavors.
+        // Only build release variants for the per-ABI flavors.
         if (variant.buildType.name != "release" && !project.hasProperty("MG_PLUGIN_DEBUG_BUILDS")) {
             setIgnore(true)
         }
@@ -268,7 +267,7 @@ task patchNativeSources {
              ['build_tor.sh',       androidAbis],
              // Snowflake pluggable transport (Go). Standalone executable shipped
              // as jni/<abi>/libsnowflake.so (jniLibs, not CMake). Needs `go` on
-             // PATH; F-Droid recipe provisions a pinned toolchain.
+             // PATH.
              ['build_snowflake.sh', androidAbis],
              // lyrebird (obfs4 transport, Go). Standalone executable shipped as
              // jni/<abi>/libobfs4proxy.so. Same Go toolchain as snowflake.

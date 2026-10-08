@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.compat.gms.auth;
+package org.tellurgram.compat.gms.auth;
 
 /** Stub — Google Sign-In removed in FOSS builds. */
 public class GoogleSignInOptions {

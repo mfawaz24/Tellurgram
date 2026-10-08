@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.ui;
+package org.tellurgram.ui;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import it.belloworld.tellurgram.translate.MgAidlTranslate;
+import org.tellurgram.translate.MgAidlTranslate;
 
 public class MercurygramTranslationSettingsActivity extends UniversalFragment {
 
@@ -96,7 +96,7 @@ public class MercurygramTranslationSettingsActivity extends UniversalFragment {
             case ID_INSTALL_TRANSLATOR:
                 Context ctx = getParentActivity();
                 if (ctx != null) {
-                    Browser.openUrl(ctx, MgAidlTranslate.getFdroidInstallUrl());
+                    Browser.openUrl(ctx, "market://details?id=" + MgAidlTranslate.PROVIDER_PACKAGE);
                 }
                 break;
             case ID_ALT_ENGINE:

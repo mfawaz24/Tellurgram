@@ -107,7 +107,7 @@ import org.telegram.ui.Components.spoilers.SpoilersTextView;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import it.belloworld.tellurgram.folders.MgLocalFolders;
+import org.tellurgram.folders.MgLocalFolders;
 
 public class FilterCreateActivity extends BaseFragment {
 

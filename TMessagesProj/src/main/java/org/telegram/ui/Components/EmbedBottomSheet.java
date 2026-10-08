@@ -386,7 +386,7 @@ public class EmbedBottomSheet extends BottomSheet {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                WebResourceResponse https = it.belloworld.tellurgram.MgHttps.intercept(request);
+                WebResourceResponse https = org.tellurgram.MgHttps.intercept(request);
                 return https != null ? https : super.shouldInterceptRequest(view, request);
             }
 

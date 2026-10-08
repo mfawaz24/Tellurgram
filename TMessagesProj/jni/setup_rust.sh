@@ -3,10 +3,10 @@
 #
 # Upstream commits the four cargo-built libtlottie.a archives; we build them
 # instead, so every environment that builds this repo needs a Rust toolchain:
-# a developer machine, the GitHub runners, the podman test container and the
-# F-Droid buildserver. None of them agree on where a toolchain would live, and
+# a developer machine, the GitHub runners and the podman test container.
+# None of them agree on where a toolchain would live, and
 # rustc bakes the crate-registry path into its output, so a per-environment
-# CARGO_HOME would make the archives differ between our build and F-Droid's.
+# CARGO_HOME would make the archives differ between environments.
 #
 # Both homes are therefore fixed literals, exactly like the /var/tmp/mg-jni
 # symlink the media build uses and for the same reproducibility reason. This

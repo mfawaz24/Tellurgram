@@ -5,15 +5,12 @@
     <!--
         Two-cert allowlist permission: apps signed with the same key as the
         plugin OR any cert in mg_known_main_certs may bind the service.
-        Mercurygram ships under two signing keys (developer keystore +
-        F-Droid per-app key); the knownSigner extension lets a main app
-        signed with either bind a plugin signed with either.
+        The knownSigner extension lets a main app signed with any listed
+        key bind the plugin.
 
         protectionLevel="signature|knownSigner" requires API 31+. On older
         devices the OS treats it as plain "signature" — strict cert match —
-        so a F-Droid main + dev-signed plugin combination fails to bind.
-        The Tor toggle is hidden in that configuration; see
-        MercurygramSettingsActivity for the gate.
+        so a main and plugin signed with different keys fail to bind.
 
         Two layers protect the SOCKS endpoint:
           1) The OS enforces the manifest permission (signature OR knownCerts).

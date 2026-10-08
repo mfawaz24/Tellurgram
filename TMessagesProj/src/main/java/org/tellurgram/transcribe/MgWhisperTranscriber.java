@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.transcribe;
+package org.tellurgram.transcribe;
 
 import android.os.Build;
 import android.text.TextUtils;
@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadFactory;
  * [MG] On-device voice-message transcription using whisper.cpp.
  *
  * Mirrors the threading/callback shape of
- * {@link it.belloworld.tellurgram.translate.MgAidlTranslate}: a single
+ * {@link org.tellurgram.translate.MgAidlTranslate}: a single
  * serialized worker, a lazily-loaded engine context that is cached and reused,
  * and a typed {@link Failure} surface mapped to localized bulletins by the
  * caller. All native calls happen on the worker thread; callbacks are posted to

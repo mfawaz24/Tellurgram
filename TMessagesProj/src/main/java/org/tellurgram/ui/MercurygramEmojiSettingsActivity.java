@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.ui;
+package org.tellurgram.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +16,7 @@ import org.telegram.ui.Components.UniversalFragment;
 
 import java.util.ArrayList;
 
-import it.belloworld.tellurgram.emoji.MgEmojiPack;
+import org.tellurgram.emoji.MgEmojiPack;
 
 public class MercurygramEmojiSettingsActivity extends UniversalFragment {
 

@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.translate;
+package org.tellurgram.translate;
 
 import android.net.Uri;
 import android.util.Log;
@@ -94,7 +94,7 @@ public final class MgMozhiClient {
                                 + "&from=" + Uri.encode(fromCode)
                                 + "&to=" + Uri.encode(toCode)
                                 + "&text=" + text;
-                        connection = (HttpURLConnection) new URI(it.belloworld.tellurgram.MgHttps.upgrade(uri)).toURL().openConnection();
+                        connection = (HttpURLConnection) new URI(org.tellurgram.MgHttps.upgrade(uri)).toURL().openConnection();
                         connection.setRequestMethod("GET");
                         connection.setConnectTimeout(MG_ALT_CONNECT_TIMEOUT_MS);
                         connection.setReadTimeout(MG_ALT_READ_TIMEOUT_MS);

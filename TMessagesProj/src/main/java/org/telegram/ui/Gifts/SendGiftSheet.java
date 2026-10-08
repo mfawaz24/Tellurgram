@@ -31,9 +31,9 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
-import it.belloworld.tellurgram.compat.billing.BillingClient;
-import it.belloworld.tellurgram.compat.billing.BillingFlowParams;
-import it.belloworld.tellurgram.compat.billing.ProductDetails;
+import org.tellurgram.compat.billing.BillingClient;
+import org.tellurgram.compat.billing.BillingFlowParams;
+import org.tellurgram.compat.billing.ProductDetails;
 
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
