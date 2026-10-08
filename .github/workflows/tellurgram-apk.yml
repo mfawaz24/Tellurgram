@@ -22,6 +22,14 @@ on:
     branches:
       - new
       - prod
+    # Only changes that can affect the APK start a build.
+    paths-ignore:
+      - '**.md'
+      - '**.yml'
+      - '**.yaml'
+      - '.github/**'
+      - 'LICENSE'
+      - '.gitignore'
 
 concurrency:
   group: tellurgram-apk-${{ github.ref }}
@@ -176,6 +184,7 @@ jobs:
           name: Tellurgram ${{ env.BUILD_TAG }}
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
+          make_latest: true
           files: |
             ${{ steps.rename.outputs.apk_path }}
             ${{ steps.rename.outputs.latest_path }}
