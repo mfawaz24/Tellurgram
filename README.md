@@ -7,6 +7,7 @@ Tellurgram keeps all of Mercurygram's privacy and security improvements and adds
 - Improved defaults for a better experience out of the box
 - Enforced HTTPS
 - No more TG Premium upselling and promotions
+- And more!
 
 ## Download
 
