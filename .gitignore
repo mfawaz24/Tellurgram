@@ -36,3 +36,5 @@ API_KEYS
 # into the native-cache keys by the job that generated it. Never committed.
 .jni-cache-fingerprint
 .jni-cache-fingerprint.tmp
+# Release signing keystores. Never committed.
+*.jks
