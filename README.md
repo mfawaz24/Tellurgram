@@ -1,6 +1,6 @@
 # Tellurgram
 
-An unofficial Telegram client for Android, forked from [Mercurygram](https://github.com/jralo7/Mercurygram).
+An unofficial de-googled, libre Telegram client for Android, forked from [Mercurygram](https://github.com/jralo7/Mercurygram).
 
 Tellurgram keeps all of Mercurygram's privacy and security improvements and adds its own changes:
 
