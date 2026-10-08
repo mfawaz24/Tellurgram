@@ -1,16 +1,16 @@
 name: Tellurgram APK
 
 # Builds a single arm64 release APK and uploads it as a workflow artifact.
-# Builds on prod (pushes, or manual runs without a build-tag) also publish
-# it as a GitHub release tagged vX.Y.Z.M, which
-# Obtainium installs from (see README). X.Y.Z is APP_VERSION_NAME and M counts
-# up from 1 per upstream version. Releases are only published when signed
-# with the RELEASE_* key, never the public test key.
+# Builds on prod (pushes, or manual runs without a build-tag) also publish it
+# as a GitHub release tagged vX.Y.Z.M, where X.Y.Z is APP_VERSION_NAME and M
+# counts up from 1 per upstream version.
+#
 # Needs repo secrets APP_ID and APP_HASH (Telegram API credentials from
 # https://my.telegram.org). Signs with the RELEASE_KEYSTORE secret (base64
 # keystore) plus RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS and
-# RELEASE_KEY_PASSWORD; without RELEASE_KEYSTORE it falls back to the public
-# test keystore in TMessagesProj/config, which is not safe for distribution.
+# RELEASE_KEY_PASSWORD, and checks the result against the RELEASE_CERT_SHA256
+# repo variable. prod builds fail without them; other branches fall back to
+# the public test keystore in TMessagesProj/config and never publish.
 
 on:
   workflow_dispatch:
@@ -150,6 +150,9 @@ jobs:
               -PRELEASE_KEY_PASSWORD="$KS_KEY_PASS"
             )
             echo "signed=true" >> "$GITHUB_OUTPUT"
+          elif [ "$GITHUB_REF" = refs/heads/prod ]; then
+            echo "RELEASE_KEYSTORE is not set; prod builds must be signed with the release key" >&2
+            exit 1
           else
             echo "::warning::RELEASE_KEYSTORE not set; signing with the public test keystore"
           fi
@@ -170,6 +173,23 @@ jobs:
           # filter skips it.
           cp "$APK_DIR/afatFdArm64.apk" "$APK_DIR/Tellurgram-arm64-v8a.apk"
           echo "latest_path=$APK_DIR/Tellurgram-arm64-v8a.apk" >> "$GITHUB_OUTPUT"
+
+      - name: Verify signing certificate
+        if: steps.build.outputs.signed == 'true'
+        env:
+          EXPECTED: ${{ vars.RELEASE_CERT_SHA256 }}
+          APK: ${{ steps.rename.outputs.apk_path }}
+        run: |
+          set -euo pipefail
+          [ -n "$EXPECTED" ] || { echo "Set the RELEASE_CERT_SHA256 repository variable" >&2; exit 1; }
+          ACTUAL=$("$ANDROID_SDK_ROOT/build-tools/${BUILD_TOOLS_VERSION}/apksigner" verify --print-certs "$APK" \
+            | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          norm() { echo "$1" | tr -d ': ' | tr 'A-F' 'a-f'; }
+          if [ "$(norm "$ACTUAL")" != "$(norm "$EXPECTED")" ]; then
+            echo "APK is signed with ${ACTUAL:-an unknown certificate}, expected ${EXPECTED}" >&2
+            exit 1
+          fi
+          echo "Signed with the release certificate ${ACTUAL}"
 
       - name: Upload APK
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
