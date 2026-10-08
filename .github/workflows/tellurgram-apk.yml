@@ -1,6 +1,10 @@
 name: Tellurgram APK
 
 # Builds a single arm64 release APK and uploads it as a workflow artifact.
+# Pushes to prod also publish it as a GitHub release tagged vX.Y.Z.M, which
+# Obtainium installs from (see README). X.Y.Z is APP_VERSION_NAME and M counts
+# up from 1 per upstream version. Releases are only published when signed
+# with the RELEASE_* key, never the public test key.
 # Needs repo secrets APP_ID and APP_HASH (Telegram API credentials from
 # https://my.telegram.org). Signs with the RELEASE_KEYSTORE secret (base64
 # keystore) plus RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS and
@@ -11,9 +15,9 @@ on:
   workflow_dispatch:
     inputs:
       build-tag:
-        description: 'MG_BUILD_TAG baked into versionName/versionCode (X.Y.Z.M or X.Y.Z.M.K)'
-        required: true
-        default: '12.10.1.1'
+        description: 'MG_BUILD_TAG baked into versionName/versionCode (X.Y.Z.M or X.Y.Z.M.K); empty picks the next release number'
+        required: false
+        default: ''
   push:
     branches:
       - new
@@ -27,14 +31,33 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     permissions:
-      contents: read
-    env:
-      BUILD_TAG: ${{ inputs.build-tag || '12.10.1.1' }}
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           submodules: recursive
+
+      - name: Compute version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_TAG: ${{ inputs.build-tag }}
+        run: |
+          set -euo pipefail
+          if [ -n "$INPUT_TAG" ]; then
+            echo "BUILD_TAG=$INPUT_TAG" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          # The v prefix keeps these tags out of release.yml's '[0-9]*' trigger.
+          APP_VN=$(grep '^APP_VERSION_NAME=' gradle.properties | cut -d= -f2)
+          APP_VN_ESC=${APP_VN//./\\.}
+          LAST=$(gh api "repos/${GITHUB_REPOSITORY}/releases" --paginate --jq '.[].tag_name' \
+            | grep -E "^v${APP_VN_ESC}\.[0-9]+$" | sed 's/.*\.//' | sort -n | tail -1 || true)
+          M=$(( ${LAST:-0} + 1 ))
+          # mg-version.gradle packs M into two digits of versionCode.
+          [ "$M" -le 99 ] || { echo "No release numbers left for ${APP_VN}" >&2; exit 1; }
+          echo "Version: ${APP_VN}.${M}"
+          echo "BUILD_TAG=${APP_VN}.${M}" >> "$GITHUB_ENV"
 
       - name: Set up JDK 17
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
@@ -98,6 +121,7 @@ jobs:
           printf 'APP_ID = %s\nAPP_HASH = %s\n' "$APP_ID" "$APP_HASH" > API_KEYS
 
       - name: Build APK
+        id: build
         env:
           KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE }}
           KS_PASS: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
@@ -116,6 +140,7 @@ jobs:
               -PRELEASE_KEY_ALIAS="$KS_KEY_ALIAS"
               -PRELEASE_KEY_PASSWORD="$KS_KEY_PASS"
             )
+            echo "signed=true" >> "$GITHUB_OUTPUT"
           else
             echo "::warning::RELEASE_KEYSTORE not set; signing with the public test keystore"
           fi
@@ -137,3 +162,17 @@ jobs:
         with:
           name: Tellurgram-${{ env.BUILD_TAG }}-arm64-v8a
           path: ${{ steps.rename.outputs.apk_path }}
+
+      - name: Publish release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/prod' && steps.build.outputs.signed == 'true'
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
+        with:
+          tag_name: v${{ env.BUILD_TAG }}
+          name: Tellurgram ${{ env.BUILD_TAG }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          files: ${{ steps.rename.outputs.apk_path }}
+
+      - name: Note unpublished release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/prod' && steps.build.outputs.signed != 'true'
+        run: echo "::warning::Not publishing a release because RELEASE_KEYSTORE is not set"
