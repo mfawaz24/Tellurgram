@@ -1,0 +1,47 @@
+name: Sync Mercurygram upstream
+
+# Merges new commits from jralo7/Mercurygram into the mg-upstream branch once
+# a day. Bring them into main by merging mg-upstream when ready. A merge
+# conflict fails the job and leaves mg-upstream untouched — resolve locally.
+#
+# GITHUB_TOKEN cannot push commits that change .github/workflows, which
+# upstream merges often do. Set the SYNC_TOKEN secret to a PAT with the
+# `repo` and `workflow` scopes; without it those pushes are rejected.
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout mg-upstream
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: mg-upstream
+          fetch-depth: 0
+          token: ${{ secrets.SYNC_TOKEN || github.token }}
+
+      - name: Merge Mercurygram
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch --no-tags https://github.com/jralo7/Mercurygram.git Mercurygram
+          upstream=$(git rev-parse --short FETCH_HEAD)
+          if git merge-base --is-ancestor FETCH_HEAD HEAD; then
+            echo "Already up to date with Mercurygram ${upstream}" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git merge --no-edit -m "Merge Mercurygram upstream ${upstream}" FETCH_HEAD
+          git push origin HEAD:mg-upstream
+          echo "Merged Mercurygram ${upstream} into mg-upstream" >> "$GITHUB_STEP_SUMMARY"
