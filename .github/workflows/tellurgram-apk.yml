@@ -1,9 +1,11 @@
 name: Tellurgram APK
 
 # Builds a single arm64 release APK and uploads it as a workflow artifact.
-# Signed with the public test keystore in TMessagesProj/config (fine for
-# personal installs, not for distribution). Needs repo secrets APP_ID and
-# APP_HASH (Telegram API credentials from https://my.telegram.org).
+# Needs repo secrets APP_ID and APP_HASH (Telegram API credentials from
+# https://my.telegram.org). Signs with the RELEASE_KEYSTORE secret (base64
+# keystore) plus RELEASE_KEYSTORE_PASSWORD, RELEASE_KEY_ALIAS and
+# RELEASE_KEY_PASSWORD; without RELEASE_KEYSTORE it falls back to the public
+# test keystore in TMessagesProj/config, which is not safe for distribution.
 
 on:
   workflow_dispatch:
@@ -96,7 +98,29 @@ jobs:
           printf 'APP_ID = %s\nAPP_HASH = %s\n' "$APP_ID" "$APP_HASH" > API_KEYS
 
       - name: Build APK
-        run: ./gradlew :TMessagesProj_App:assembleAfatFdArm64Release -PMG_BUILD_TAG="$BUILD_TAG" --no-daemon
+        env:
+          KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE }}
+          KS_PASS: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          KS_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          KS_KEY_PASS: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          SIGNING=()
+          if [ -n "$KEYSTORE_B64" ]; then
+            [ -n "$KS_PASS" ] && [ -n "$KS_KEY_ALIAS" ] && [ -n "$KS_KEY_PASS" ] \
+              || { echo "RELEASE_KEYSTORE is set but a RELEASE_* password or alias secret is missing" >&2; exit 1; }
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            SIGNING=(
+              -PRELEASE_STORE_FILE="$RUNNER_TEMP/release.keystore"
+              -PRELEASE_STORE_PASSWORD="$KS_PASS"
+              -PRELEASE_KEY_ALIAS="$KS_KEY_ALIAS"
+              -PRELEASE_KEY_PASSWORD="$KS_KEY_PASS"
+            )
+          else
+            echo "::warning::RELEASE_KEYSTORE not set; signing with the public test keystore"
+          fi
+          ./gradlew :TMessagesProj_App:assembleAfatFdArm64Release \
+              -PMG_BUILD_TAG="$BUILD_TAG" "${SIGNING[@]}" --no-daemon
 
       - name: Rename APK
         id: rename
