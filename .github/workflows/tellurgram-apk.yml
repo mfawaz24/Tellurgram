@@ -14,7 +14,7 @@ on:
         default: '12.10.1.1'
   push:
     branches:
-      - adblock
+      - new
       - main
 
 concurrency:
