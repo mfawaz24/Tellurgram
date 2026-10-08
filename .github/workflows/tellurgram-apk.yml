@@ -1,7 +1,8 @@
 name: Tellurgram APK
 
 # Builds a single arm64 release APK and uploads it as a workflow artifact.
-# Pushes to prod also publish it as a GitHub release tagged vX.Y.Z.M, which
+# Builds on prod (pushes, or manual runs without a build-tag) also publish
+# it as a GitHub release tagged vX.Y.Z.M, which
 # Obtainium installs from (see README). X.Y.Z is APP_VERSION_NAME and M counts
 # up from 1 per upstream version. Releases are only published when signed
 # with the RELEASE_* key, never the public test key.
@@ -177,7 +178,7 @@ jobs:
           path: ${{ steps.rename.outputs.apk_path }}
 
       - name: Publish release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/prod' && steps.build.outputs.signed == 'true'
+        if: github.ref == 'refs/heads/prod' && (github.event_name == 'push' || inputs.build-tag == '') && steps.build.outputs.signed == 'true'
         uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
         with:
           tag_name: v${{ env.BUILD_TAG }}
@@ -190,5 +191,5 @@ jobs:
             ${{ steps.rename.outputs.latest_path }}
 
       - name: Note unpublished release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/prod' && steps.build.outputs.signed != 'true'
+        if: github.ref == 'refs/heads/prod' && (github.event_name == 'push' || inputs.build-tag == '') && steps.build.outputs.signed != 'true'
         run: echo "::warning::Not publishing a release because RELEASE_KEYSTORE is not set"
