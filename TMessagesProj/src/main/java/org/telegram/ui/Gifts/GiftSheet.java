@@ -55,9 +55,9 @@ import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import it.belloworld.tellurgram.compat.billing.BillingClient;
-import it.belloworld.tellurgram.compat.billing.ProductDetails;
-import it.belloworld.tellurgram.compat.billing.QueryProductDetailsParams;
+import org.tellurgram.compat.billing.BillingClient;
+import org.tellurgram.compat.billing.ProductDetails;
+import org.tellurgram.compat.billing.QueryProductDetailsParams;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BillingController;

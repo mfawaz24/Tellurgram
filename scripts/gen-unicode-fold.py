@@ -20,7 +20,7 @@ coverage is frozen at the Unicode version of the run that produced the table:
 rerun this when a new release adds another decorative alphabet.
 
 Run it by hand and paste the output into MgUnicodeFold.java; nothing regenerates
-the table at build time, the F-Droid server must build the committed bytes.
+the table at build time, so every build uses the committed bytes.
 
     python3 scripts/gen-unicode-fold.py
     python3 scripts/gen-unicode-fold.py --input confusables.txt

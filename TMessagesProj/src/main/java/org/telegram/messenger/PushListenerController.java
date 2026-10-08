@@ -126,7 +126,7 @@ public class PushListenerController {
                     buffer.position(0);
 
                     if (SharedConfig.pushAuthKey == null) {
-                        it.belloworld.tellurgram.push.MgPushWatchdog.onNullPushKey();
+                        org.tellurgram.push.MgPushWatchdog.onNullPushKey();
                     }
                     if (SharedConfig.pushAuthKeyId == null) {
                         SharedConfig.pushAuthKeyId = new byte[8];

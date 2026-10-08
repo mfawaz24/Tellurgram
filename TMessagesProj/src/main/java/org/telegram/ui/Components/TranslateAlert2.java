@@ -331,7 +331,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
         }
         final String mgFromLng = simplifyLanguage(fromLanguage);
         final String mgToLng = simplifyLanguage(toLanguage);
-        final it.belloworld.tellurgram.translate.MgTranslateDispatcher.ResultWithEntities mgResult =
+        final org.tellurgram.translate.MgTranslateDispatcher.ResultWithEntities mgResult =
                 (out, rateLimit, failure) -> AndroidUtilities.runOnUIThread(() -> {
                     if (out != null) {
                         firstTranslation = false;
@@ -342,7 +342,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
                         return;
                     }
                     if (isDismissed()) return;
-                    final CharSequence msg = it.belloworld.tellurgram.translate.MgTranslateDispatcher.mapBulletin(failure, rateLimit);
+                    final CharSequence msg = org.tellurgram.translate.MgTranslateDispatcher.mapBulletin(failure, rateLimit);
                     if (firstTranslation) {
                         dismiss();
                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, msg);
@@ -360,19 +360,19 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
         // never fall through to a network path regardless of mg_translateMode / the
         // caller-side menu gate.
         if (encrypted) {
-            it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(mgSource, mgFromLng, mgToLng, mgResult);
+            org.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(mgSource, mgFromLng, mgToLng, mgResult);
             return;
         }
 
         if (!(reqSum && reqPeer != null) && reqRichMessage == null) {
-            final it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome =
-                    it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatch(mgSource, mgFromLng, mgToLng, mgResult);
-            if (mgOutcome == it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
+            final org.tellurgram.translate.MgTranslateDispatcher.Outcome mgOutcome =
+                    org.tellurgram.translate.MgTranslateDispatcher.dispatch(mgSource, mgFromLng, mgToLng, mgResult);
+            if (mgOutcome == org.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED) {
                 return;
             }
             // FORCE_CLOUD: skip the upstream translationsManualEnabled "alternative"
             // branch and fall straight through to messages.translateText below.
-            if (mgOutcome != it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.FORCE_CLOUD) {
+            if (mgOutcome != org.tellurgram.translate.MgTranslateDispatcher.Outcome.FORCE_CLOUD) {
                 final String method = MessagesController.getInstance(currentAccount).translationsManualEnabled;
                 if ("alternative".equalsIgnoreCase(method)) {
                     translateAlt();
@@ -557,7 +557,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
         // through it would have defaulted to "en", worse than letting the
         // backend autodetect. The worker substitutes "auto" when fromLng is
         // null/empty, and splits long text into per-request chunks itself.
-        it.belloworld.tellurgram.translate.MgMozhiClient.translate(text, fromLng, toLng, done);
+        org.tellurgram.translate.MgMozhiClient.translate(text, fromLng, toLng, done);
     }
 
 //    private ArrayList<Runnable> cancelTrackingDownloads = new ArrayList<>();

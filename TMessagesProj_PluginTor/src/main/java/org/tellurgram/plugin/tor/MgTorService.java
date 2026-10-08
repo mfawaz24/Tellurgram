@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.plugin.tor;
+package org.tellurgram.plugin.tor;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

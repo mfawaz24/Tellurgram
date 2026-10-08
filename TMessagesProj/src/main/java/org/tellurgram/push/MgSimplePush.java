@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.push;
+package org.tellurgram.push;
 
 import android.text.TextUtils;
 

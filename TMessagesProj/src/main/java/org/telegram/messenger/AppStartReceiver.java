@@ -13,8 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
 
-import it.belloworld.tellurgram.location.MgBackgroundLocationGate;
-import it.belloworld.tellurgram.push.MgPushWatchdog;
+import org.tellurgram.location.MgBackgroundLocationGate;
+import org.tellurgram.push.MgPushWatchdog;
 
 public class AppStartReceiver extends BroadcastReceiver {
 

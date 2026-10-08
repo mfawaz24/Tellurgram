@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.tor
+package org.tellurgram.tor
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry

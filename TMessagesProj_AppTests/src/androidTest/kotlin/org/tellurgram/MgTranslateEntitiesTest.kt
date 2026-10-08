@@ -1,6 +1,6 @@
-package it.belloworld.tellurgram
+package org.tellurgram
 
-import it.belloworld.tellurgram.translate.MgTranslateEntities
+import org.tellurgram.translate.MgTranslateEntities
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

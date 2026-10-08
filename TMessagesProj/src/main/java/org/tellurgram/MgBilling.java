@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram;
+package org.tellurgram;
 
 import org.telegram.messenger.BuildVars;
 import org.telegram.ui.ActionBar.BaseFragment;

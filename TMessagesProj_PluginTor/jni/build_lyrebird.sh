@@ -16,8 +16,8 @@
 # directly in jni/<abi>/ (the module's jniLibs.srcDirs root, build.gradle:92),
 # NOT through CMake: it is a standalone binary, not a linked shared library.
 #
-# REPRODUCIBILITY (F-Droid ships bit-for-bit reproducible builds, so every
-# native artifact must be byte-identical across hosts). Same neutralisation as
+# REPRODUCIBILITY (every native artifact must be byte-identical across
+# hosts). Same neutralisation as
 # build_snowflake.sh:
 #   -trimpath            strip absolute module/GOPATH/GOROOT paths from the binary
 #   -ldflags "-buildid=" clear the non-deterministic build id
@@ -29,13 +29,13 @@
 #   GOTOOLCHAIN=<pin>    the Go compiler version DETERMINES the output bytes, so
 #                        it is pinned here (see build_snowflake.sh header for the
 #                        full rationale). Shared with build_snowflake.sh so a
-#                        single golang-go bootstrap on the F-Droid buildserver
+#                        single golang-go bootstrap on a build host
 #                        covers both transports. lyrebird's go.mod floor
 #                        (go 1.22.0) is below this pin, so it stays valid; bump
 #                        alongside the snowflake pin.
 #
 # Verify a built .so is byte-identical across two runs (and ideally two hosts)
-# with `scripts/check-reproducibility.sh` before committing.
+# before committing.
 #
 # Requires: NDK env var (same as build_tor.sh) and a Go >=1.21 on PATH (only as
 # the GOTOOLCHAIN bootstrap; the actual compile uses the pinned version below).

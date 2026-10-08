@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.ui;
+package org.tellurgram.ui;
 
 import android.util.LongSparseArray;
 import android.util.SparseArray;
@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import it.belloworld.tellurgram.MgMessageHistory;
+import org.tellurgram.MgMessageHistory;
 
 /**
  * Saved-message-history ghost machinery for one ChatActivity: keeps the

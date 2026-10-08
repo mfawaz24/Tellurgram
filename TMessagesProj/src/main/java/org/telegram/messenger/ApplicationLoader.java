@@ -246,14 +246,14 @@ public class ApplicationLoader extends Application {
         SharedPrefsHelper.init(applicationContext);
         // Clear stale Orbot proxy entries from the pre-embedded-Tor era so
         // upgrades don't silently keep routing MTProto through 127.0.0.1:9050.
-        it.belloworld.tellurgram.tor.MgTorClient.migrateLegacyOrbotEntry();
+        org.tellurgram.tor.MgTorClient.migrateLegacyOrbotEntry();
         // Pin the proxy entry to the unreachable loopback stub BEFORE the
         // ConnectionsManager singletons below read proxy_port via their
         // init() path. Without this, the first native_setProxySettings()
         // call on a Tor-enabled cold start targets the previous session's
         // persisted ephemeral SOCKS port (now dead, possibly rebound by
         // another app) until MgTorController.init() further down runs.
-        it.belloworld.tellurgram.tor.MgTorClient.preInit();
+        org.tellurgram.tor.MgTorClient.preInit();
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) { //TODO improve account
             UserConfig.getInstance(a).loadConfig();
             MessagesController.getInstance(a);
@@ -284,7 +284,7 @@ public class ApplicationLoader extends Application {
             ContactsController.getInstance(a).checkAppAccount();
             DownloadController.getInstance(a);
         }
-        it.belloworld.tellurgram.folders.MgFolderSync.startAll(); // Mercurygram: folder sync via Saved Messages
+        org.tellurgram.folders.MgFolderSync.startAll(); // Mercurygram: folder sync via Saved Messages
         BillingController.getInstance().startConnection();
     }
 
@@ -368,9 +368,9 @@ public class ApplicationLoader extends Application {
         LauncherIconController.tryFixLauncherIconIfNeeded();
         ProxyRotationController.init();
 
-        it.belloworld.tellurgram.MgNetworkChangeWatcher.init(applicationContext);
+        org.tellurgram.MgNetworkChangeWatcher.init(applicationContext);
         SharedConfig.applyReduceTrackingFingerprintToNative();
-        it.belloworld.tellurgram.tor.MgTorClient.init(applicationContext);
+        org.tellurgram.tor.MgTorClient.init(applicationContext);
         //if (BuildConfig.DEBUG_PRIVATE_VERSION) {
         //    Choreographer60FpsContent.getInstance().addFrameCallback(debugEverySecondChecks, 1);
         //}
@@ -422,7 +422,7 @@ public class ApplicationLoader extends Application {
 
     private void initPushServices() {
         AndroidUtilities.runOnUIThread(() -> {
-            it.belloworld.tellurgram.push.MgPushWatchdog.schedule(applicationContext); // Mercurygram: periodic push watchdog
+            org.tellurgram.push.MgPushWatchdog.schedule(applicationContext); // Mercurygram: periodic push watchdog
             if (getPushProvider().hasServices()) {
                 getPushProvider().onRequestPushToken();
             } else {

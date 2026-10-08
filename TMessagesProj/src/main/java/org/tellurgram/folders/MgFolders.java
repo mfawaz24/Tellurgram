@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.folders;
+package org.tellurgram.folders;
 
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.MessagesController;

@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.tor;
+package org.tellurgram.tor;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -37,7 +37,7 @@ import org.telegram.messenger.voip.VoIPService;
 import org.telegram.utils.proxy.ProxySettings;
 import org.telegram.tgnet.ConnectionsManager;
 
-import it.belloworld.tellurgram.MgUpdateChecker;
+import org.tellurgram.MgUpdateChecker;
 
 import org.telegram.ui.ActionBar.AlertDialog;
 
@@ -48,8 +48,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import it.belloworld.tellurgram.plugin.tor.IMgTorCallback;
-import it.belloworld.tellurgram.plugin.tor.IMgTorService;
+import org.tellurgram.plugin.tor.IMgTorCallback;
+import org.tellurgram.plugin.tor.IMgTorService;
 
 /**
  * Main-app client for the Tor companion plugin (`:TMessagesProj_PluginTor`).
@@ -96,21 +96,15 @@ public final class MgTorClient {
         return PLUGIN_PACKAGE_BASE;
     }
 
-    // Cert allowlist: Mercurygram ships under two signing keys (developer
-    // keystore + F-Droid per-app key); the runtime pin accepts both for
-    // BOTH main and plugin, enabling F-Droid main + GitHub plugin (and
-    // every other combination) on devices where the OS-level BIND
-    // permission can also span them (API 31+ via knownSigner — see
-    // plugin's AndroidManifest.xml). Must stay in lockstep with both
-    //   - res/values/mg_known_main_certs.xml in the plugin module
-    //   - AllowedAPKSigningKeys in both F-Droid recipes (main + plugin)
+    // Cert allowlist: the runtime pin accepts these keys for BOTH main and
+    // plugin, on top of the OS-level BIND permission (API 31+ via
+    // knownSigner — see plugin's AndroidManifest.xml). Must stay in
+    // lockstep with res/values/mg_known_main_certs.xml in the plugin module.
     // Hex, lowercase, no colons — matches apksigner's --print-certs
-    // --print-canonicalized format and the F-Droid recipe convention.
+    // --print-canonicalized format.
     private static final String[] ALLOWED_CERT_SHA256_HEX = {
-            // Developer keystore (GitHub + reproducible F-Droid APKs).
+            // Developer keystore.
             "1e73de100e2646be671afad2cb4bb471538e062a745ae5adbe6c7d1666fd1ee9",
-            // F-Droid per-app key for it.belloworld.tellurgram.
-            "feb802f2f14cee16efd9fec5d809fa3bef7a2b349b989f816d42aad9c39ef77a",
     };
     private static volatile byte[][] allowedCertSha256Cache;
 
@@ -349,32 +343,6 @@ public final class MgTorClient {
      */
     public static void preInit() {
         if (!SharedConfig.mg_useTor) return;
-        // F-Droid main + pre-Android-12: plugin's BIND permission needs
-        // knownSigner (API 31+) for the cross-key bind to work. Without it
-        // the OS refuses the bindService regardless of main's runtime
-        // allowlist, so Tor is unreachable on this configuration. The
-        // Settings UI hides the toggle here, leaving no recovery surface —
-        // force mg_useTor off + restore prior proxy (or clear) at cold
-        // start so MTProto isn't permanently wedged on the blocking stub.
-        if (isFdroidPreS()) {
-            // Flip the flag FIRST: while mg_useTor is true, blocksProxyWrite
-            // rejects every proxy write that isn't Tor's own loopback, which
-            // includes the snapshot restore below.
-            try { SharedConfig.toggleMgUseTor(); }
-            catch (Throwable t) { FileLog.e(t); }
-            try {
-                if (!restoreSnapshottedProxy()) {
-                    clearProxyOnDisk();
-                }
-            } catch (Throwable t) { FileLog.e(t); }
-            // No toast: the user has no UI to recover from this state on
-            // this platform (toggle hidden by Settings activity), and the
-            // existing "plugin not installed" string is misleading here
-            // (it suggests installing would fix it — it wouldn't). Keep
-            // the flip silent; future polish: add a dedicated "Tor not
-            // supported on F-Droid + Android <12" string + Toast.
-            return;
-        }
         // Pin the blocking stub unconditionally when mg_useTor is set:
         // preserves the user's privacy choice across an upgrade or plugin
         // uninstall. ConnectionsManager sees 127.0.0.1:1 on first proxy
@@ -606,19 +574,6 @@ public final class MgTorClient {
         notifyProxySettingsChanged();
     }
 
-    /**
-     * F-Droid build running on Android <12: the plugin's BIND permission
-     * uses knownSigner (API 31+) to allowlist both signing keys; on older
-     * devices the OS treats the protectionLevel as plain "signature" and
-     * refuses cross-key binds. The Settings UI hides the Tor toggle in
-     * this configuration, and preInit force-disables mg_useTor so a stale
-     * pre-upgrade flag doesn't leave MTProto wedged on the blocking stub.
-     */
-    public static boolean isFdroidPreS() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.S
-                && MgUpdateChecker.isFdroidBuild();
-    }
-
     /** True iff the plugin is installed, signature-verified, and bound (or known-bindable). */
     public static boolean isAvailable() {
         if (appContext == null) return false;
@@ -689,8 +644,7 @@ public final class MgTorClient {
      * Soft "a newer plugin exists" signal — installed plugin's versionName is
      * behind main (disk-only compare via {@link MgUpdateChecker#isPluginOutdated}).
      * Distinct from {@link #isPluginUpdateRequired()} (hard floor breach that
-     * blocks binding). GitHub channel only — F-Droid drives plugin updates from
-     * its catalog. Used by the manual "Update Tor plugin" settings row.
+     * blocks binding). Used by the manual "Update Tor plugin" settings row.
      */
     public static boolean isPluginUpdateAvailable() {
         return isPluginInstalled()
@@ -712,9 +666,8 @@ public final class MgTorClient {
      * main APK upgrade. A plugin ahead of main (dev iteration, beta
      * rollback) is NOT flagged — see MgUpdateChecker.isPluginOutdated.
      *
-     * <p>Silent on F-Droid (catalog drives plugin updates), when the
-     * plugin is absent (preInit's PLUGIN_NOT_INSTALLED path handles
-     * that), when a main update is already pending (user will install
+     * <p>Silent when the plugin is absent (preInit's PLUGIN_NOT_INSTALLED
+     * path handles that), when a main update is already pending (user will install
      * main first and re-trigger this check), when the user dismissed
      * the prompt for the current main tag, and after the first
      * invocation per process (so a Settings re-open or onResume bounce
@@ -1249,19 +1202,18 @@ public final class MgTorClient {
     public int getSocksPort() { return socksPort; }
 
     /**
-     * Where to send the user to install / update the plugin: the F-Droid
-     * catalog entry, the one channel that both lacks an in-app install path
-     * and has somewhere to send the user. The GitHub channel downloads and
-     * installs the plugin in-app (MgUpdateChecker.runPluginInstall), and
-     * Google Play has no plugin listing to open, so callers there show a
-     * dismissible "not available here" alert instead of linking out to an APK.
-     *
-     * <p>Cross-channel installs still bind on API 31+ (either cert of the
-     * dual-key allowlist is accepted), but staying on one channel keeps main
-     * and plugin versionCodes in lockstep release-for-release.
+     * Where to send the user to install / update the plugin: the GitHub
+     * release matching this main's versionName (set by
+     * gradle/mg-version.gradle) instead of /releases/latest, which GitHub
+     * server-filters to non-prerelease — a 5-dotted prerelease main would
+     * otherwise land on a stable-only page with a versionCode-mismatched
+     * plugin APK.
      */
     public Intent buildPluginInstallIntent() {
-        Uri uri = Uri.parse("https://f-droid.org/packages/" + PLUGIN_PACKAGE_BASE + "/");
+        String tag = MgUpdateChecker.currentInstallVersion();
+        Uri uri = (tag != null && !tag.isEmpty())
+                ? Uri.parse("https://github.com/mfawaz24/Tellurgram/releases/tag/" + tag)
+                : Uri.parse("https://github.com/mfawaz24/Tellurgram/releases");
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
@@ -1350,21 +1302,18 @@ public final class MgTorClient {
             FileLog.e(se);
             updateState(State.PLUGIN_SIGNATURE_MISMATCH);
             // pre-S OS treats `signature|knownSigner` as strict signature,
-            // so any cross-key combination (F-Droid main + dev plugin OR
-            // dev main + F-Droid plugin) deterministically lands here on
-            // Android 11. preInit's isFdroidPreS() proactively force-rolls
-            // mg_useTor for the F-Droid-main case; mirror the recovery
-            // here for the converse (dev-main pre-S) so the user isn't
-            // silently pinned on 127.0.0.1:1 with no UI affordance.
+            // so a main and plugin signed with different keys
+            // deterministically land here on Android 11. Roll mg_useTor
+            // back so the user isn't silently pinned on 127.0.0.1:1 with
+            // no UI affordance.
             // S+ deliberately falls through to terminalBindFailure with
             // mg_useTor preserved — at API 31+ knownSigner works, so a
             // SecurityException there is a real install mismatch the
             // user needs to resolve, not an OS limitation we can paper over.
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 try {
-                    // Flag first, same reason as preInit's isFdroidPreS
-                    // branch: blocksProxyWrite drops the restore below while
-                    // mg_useTor is still true.
+                    // Flag first: blocksProxyWrite drops the restore below
+                    // while mg_useTor is still true.
                     if (SharedConfig.mg_useTor) SharedConfig.toggleMgUseTor();
                     if (!restoreSnapshottedProxy()) {
                         clearProxyOnDisk();

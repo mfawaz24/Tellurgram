@@ -387,8 +387,8 @@ public class ConnectionsManager extends BaseController {
     }
 
     private void sendRequestInternal(TLObject object, RequestDelegate onComplete, RequestDelegateTimestamp onCompleteTimestamp, QuickAckDelegate onQuickAck, WriteToSocketDelegate onWriteToSocket, int flags, int datacenterId, int connectionType, boolean immediate, int requestToken) {
-        if (it.belloworld.tellurgram.folders.MgFolders.dropIfMercurygram(object, onComplete)) return; // Mercurygram: folders with a negative id never reach the server
-        if (it.belloworld.tellurgram.MgAiBlock.dropIfBlocked(currentAccount, object, onComplete, onCompleteTimestamp)) return; // Tellurgram: AI requests never reach the server while blocked
+        if (org.tellurgram.folders.MgFolders.dropIfMercurygram(object, onComplete)) return; // Mercurygram: folders with a negative id never reach the server
+        if (org.tellurgram.MgAiBlock.dropIfBlocked(currentAccount, object, onComplete, onCompleteTimestamp)) return; // Tellurgram: AI requests never reach the server while blocked
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("send request " + object + " with token = " + requestToken);
         }
@@ -776,7 +776,7 @@ public class ConnectionsManager extends BaseController {
         // MG: drive embedded tor daemon lifecycle off app foreground/background.
         // Guarded by mg_useTor so the call is zero-cost when tor is off.
         if (!byScreenState && SharedConfig.mg_useTor) {
-            it.belloworld.tellurgram.tor.MgTorClient.getInstance().onAppPausedChanged(currentAccount, appResumeCount);
+            org.tellurgram.tor.MgTorClient.getInstance().onAppPausedChanged(currentAccount, appResumeCount);
         }
         if (appResumeCount == 0) {
             if (lastPauseTime == 0) {
@@ -1018,7 +1018,7 @@ public class ConnectionsManager extends BaseController {
         }
 
         // MG: Tor owns the single native proxy slot while mg_useTor is on.
-        if (it.belloworld.tellurgram.tor.MgTorClient.blocksProxyWrite(enabled, address, port)) return;
+        if (org.tellurgram.tor.MgTorClient.blocksProxyWrite(enabled, address, port)) return;
 
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             if (enabled && settings != null && settings.isValid()) {

@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.folders
+package org.tellurgram.folders
 
 import org.json.JSONObject
 import org.junit.Assert.assertEquals

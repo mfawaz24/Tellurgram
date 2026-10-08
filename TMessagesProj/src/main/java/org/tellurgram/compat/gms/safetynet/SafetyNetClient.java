@@ -1,6 +1,6 @@
-package it.belloworld.tellurgram.compat.gms.safetynet;
+package org.tellurgram.compat.gms.safetynet;
 
-import it.belloworld.tellurgram.compat.gms.tasks.Task;
+import org.tellurgram.compat.gms.tasks.Task;
 
 /** Stub — SafetyNet removed in FOSS builds. */
 public class SafetyNetClient {

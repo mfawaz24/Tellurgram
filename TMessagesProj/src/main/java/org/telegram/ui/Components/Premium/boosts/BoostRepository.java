@@ -4,11 +4,11 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Pair;
 
-import it.belloworld.tellurgram.MgBilling;
-import it.belloworld.tellurgram.compat.billing.BillingClient;
-import it.belloworld.tellurgram.compat.billing.BillingFlowParams;
-import it.belloworld.tellurgram.compat.billing.ProductDetails;
-import it.belloworld.tellurgram.compat.billing.QueryProductDetailsParams;
+import org.tellurgram.MgBilling;
+import org.tellurgram.compat.billing.BillingClient;
+import org.tellurgram.compat.billing.BillingFlowParams;
+import org.tellurgram.compat.billing.ProductDetails;
+import org.tellurgram.compat.billing.QueryProductDetailsParams;
 
 import org.json.JSONObject;
 import org.telegram.messenger.AccountInstance;

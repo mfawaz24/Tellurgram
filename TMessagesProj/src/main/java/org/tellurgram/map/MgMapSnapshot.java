@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.map;
+package org.tellurgram.map;
 
 import android.content.Context;
 import android.graphics.Bitmap;

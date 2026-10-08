@@ -30,7 +30,7 @@ android {
     defaultConfig.applicationId = APP_PACKAGE
 
     // [MG] compress native .so in the APK (AGP default since 4.1 is uncompressed).
-    // ~13 MB smaller download on the single-ABI F-Droid build. Deterministic.
+    // ~13 MB smaller download on single-ABI builds. Deterministic.
     packaging {
         jniLibs {
             useLegacyPackaging = true
@@ -78,7 +78,7 @@ android {
             enableV1Signing true
             enableV2Signing true
             enableV3Signing true
-            // v4 .idsig sits beside the APK and would mismatch fdroid's reproducible build
+            // v4 .idsig sits beside the APK and is not needed for sideloaded installs
             enableV4Signing false
         }
 
@@ -90,7 +90,7 @@ android {
             // v1 (JAR) signing disabled: Mercurygram's MANIFEST.MF is too large
             // (~900 KB / 10k entries) for apksigner's multi-block deflate to match
             // the single-pass deflate apksigcopier expects when grafting the dev
-            // signature onto the F-Droid reproducible build. Dropping v1 forces
+            // signature onto a reproducible rebuild. Dropping v1 forces
             // minSdk >= 24 globally so v2+v3 alone cover every supported install
             // (see defaultConfig.minSdkVersion below). v4 .idsig sidecar would
             // not be in the APK and would mismatch the reproducible build.

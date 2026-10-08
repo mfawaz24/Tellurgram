@@ -389,7 +389,7 @@ public class TranslateAlert3 extends BottomSheetWithRecyclerListView {
         if (!summarized && dialogId == 0 && messageId == 0) {
             final String mgFromLng = TranslateAlert2.simplifyLanguage(from_lang);
             final String mgToLng = TranslateAlert2.simplifyLanguage(to_lang);
-            final it.belloworld.tellurgram.translate.MgTranslateDispatcher.ResultWithEntities mgResult =
+            final org.tellurgram.translate.MgTranslateDispatcher.ResultWithEntities mgResult =
                 (out, rateLimit, failure) -> AndroidUtilities.runOnUIThread(() -> {
                     if (isDismissed()) {
                         return;
@@ -406,7 +406,7 @@ public class TranslateAlert3 extends BottomSheetWithRecyclerListView {
                     // way leave the sheet on a dismiss-only button rather than letting
                     // "Use This Translation" replace the selection with blank text.
                     if (out == null) {
-                        final CharSequence msg = it.belloworld.tellurgram.translate.MgTranslateDispatcher.mapBulletin(failure, rateLimit);
+                        final CharSequence msg = org.tellurgram.translate.MgTranslateDispatcher.mapBulletin(failure, rateLimit);
                         BulletinFactory.of(topBulletinContainer, resourcesProvider).createErrorBulletin(msg).show();
                     }
                     button.setText(getString(R.string.OK));
@@ -415,11 +415,11 @@ public class TranslateAlert3 extends BottomSheetWithRecyclerListView {
             final boolean mgHandled;
             if (secret) {
                 // dispatchSecret always handles it on-device (fail-closed).
-                it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(fromText, mgFromLng, mgToLng, mgResult);
+                org.tellurgram.translate.MgTranslateDispatcher.dispatchSecret(fromText, mgFromLng, mgToLng, mgResult);
                 mgHandled = true;
             } else {
-                mgHandled = it.belloworld.tellurgram.translate.MgTranslateDispatcher.dispatch(fromText, mgFromLng, mgToLng, mgResult)
-                        == it.belloworld.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED;
+                mgHandled = org.tellurgram.translate.MgTranslateDispatcher.dispatch(fromText, mgFromLng, mgToLng, mgResult)
+                        == org.tellurgram.translate.MgTranslateDispatcher.Outcome.HANDLED;
             }
             if (mgHandled) {
                 adapter.update(true);

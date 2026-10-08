@@ -282,10 +282,10 @@ import me.vkryl.android.animator.BoolAnimator;
 import me.vkryl.android.animator.FactorAnimator;
 import me.vkryl.android.util.ClickHelper;
 
-import it.belloworld.tellurgram.HiddenAccountHelper;
-import it.belloworld.tellurgram.MgDefaultFolder;
-import it.belloworld.tellurgram.MgPins;
-import it.belloworld.tellurgram.folders.MgFolders;
+import org.tellurgram.HiddenAccountHelper;
+import org.tellurgram.MgDefaultFolder;
+import org.tellurgram.MgPins;
+import org.tellurgram.folders.MgFolders;
 
 public class DialogsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, FloatingDebugProvider, FactorAnimator.Target, MainTabsActivity.TabFragmentDelegate {
     private final int ADDITIONAL_LIST_HEIGHT_DP = Build.VERSION.SDK_INT >= 31 ? 48 : 0;

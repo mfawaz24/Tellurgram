@@ -52,7 +52,7 @@ import org.telegram.ui.RestrictedLanguagesSelectActivity;
 import org.telegram.ui.Stories.recorder.ButtonWithCounterView;
 import org.telegram.ui.Stories.recorder.HintView2;
 
-import it.belloworld.tellurgram.translate.MgTranslateDispatcher;
+import org.tellurgram.translate.MgTranslateDispatcher;
 
 import java.util.ArrayList;
 import java.util.List;

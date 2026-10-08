@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.transcribe;
+package org.tellurgram.transcribe;
 
 import android.media.AudioFormat;
 import android.media.MediaCodec;

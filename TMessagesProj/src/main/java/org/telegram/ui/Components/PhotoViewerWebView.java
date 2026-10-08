@@ -307,7 +307,7 @@ public class PhotoViewerWebView extends FrameLayout {
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                WebResourceResponse https = it.belloworld.tellurgram.MgHttps.intercept(request);
+                WebResourceResponse https = org.tellurgram.MgHttps.intercept(request);
                 if (https != null) {
                     return https;
                 }

@@ -1,12 +1,8 @@
 // Single source of truth for MG_VERSION_NAME / MG_VERSION_CODE.
 //
 // Resolves MG_BUILD_TAG from one of (highest priority first):
-//   1. -PMG_BUILD_TAG=<tag>   project property (CI, release.sh,
-//      scripts/check-reproducibility.sh).
-//   2. gradle.properties      MG_BUILD_TAG=<tag> entry. The F-Droid
-//      recipe `prebuild` step in .github/scripts/fdroid_sync.py and
-//      scripts/check-reproducibility.sh appends this line inside the
-//      build container.
+//   1. -PMG_BUILD_TAG=<tag>   project property (CI, release.sh).
+//   2. gradle.properties      MG_BUILD_TAG=<tag> entry.
 //   3. local.properties       MG_BUILD_TAG=<tag> entry. Developer-machine
 //      override (gitignored).
 //   4. Fail the build with an actionable message.

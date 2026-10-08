@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.translate
+package org.tellurgram.translate
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

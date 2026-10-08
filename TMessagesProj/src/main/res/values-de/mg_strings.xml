@@ -110,7 +110,7 @@
     <string name="MercurygramTranslationModeOffline">Offline (externe App)</string>
     <string name="MercurygramTranslationAbout">Die Telegram-Cloud sendet den Text an die Server von Telegram (die ihn an Google weiterleiten). Alternatives HTTP leitet den Text über einen öffentlichen Mozhi-Datenschutz-Proxy, der mehrere Engines bündelt (DuckDuckGo, LibreTranslate, Google, MyMemory, Reverso) — wähle Engine und Instanz unten. Offline übergibt jede Übersetzung über einen gebundenen Hintergrunddienst an eine separate FOSS-App (Offline Translator, dev.davidv.translator) — die Nachricht verlässt dein Gerät nie. Fett-, Kursiv- und Code-Formatierung können auf dem Offline-Weg verloren gehen, da die Engine reinen Text zurückgibt.</string>
     <string name="MercurygramTranslationOfflineSection">Offline-Übersetzer</string>
-    <string name="MercurygramTranslationInstallApp">Offline Translator aus F-Droid installieren</string>
+    <string name="MercurygramTranslationInstallApp">Offline Translator installieren</string>
     <string name="MercurygramTranslationOfflineNoApp">Offline Translator (dev.davidv.translator) ist der FOSS-Referenzanbieter — bringt offline Bergamot-Modelle mit und stellt einen gebundenen Hintergrunddienst bereit, an den Tellurgram jede Übersetzung still delegiert. Solange er nicht installiert ist, verwenden Übersetzungen den unten erlaubten Fallback.</string>
     <string name="MercurygramTranslationOfflineProviderReady">Offline Translator ist installiert. Öffne ihn einmal, um das/die Sprachpaar(e) herunterzuladen, aus dem/denen und in das/die du übersetzen möchtest.</string>
     <string name="MercurygramTranslationAutoFallback">Automatischer Fallback bei Fehler</string>

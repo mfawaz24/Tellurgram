@@ -1,6 +1,6 @@
-package it.belloworld.tellurgram
+package org.tellurgram
 
-import it.belloworld.tellurgram.search.MgSearchQuery
+import org.tellurgram.search.MgSearchQuery
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

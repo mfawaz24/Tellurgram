@@ -16,7 +16,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 
-import it.belloworld.tellurgram.location.MgBackgroundLocationGate;
+import org.tellurgram.location.MgBackgroundLocationGate;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 

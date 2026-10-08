@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.ui;
+package org.tellurgram.ui;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -28,11 +28,11 @@ import org.unifiedpush.android.connector.UnifiedPush;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
-import it.belloworld.tellurgram.HiddenAccountHelper;
-import it.belloworld.tellurgram.MgMessageHistory;
-import it.belloworld.tellurgram.MgUpdateChecker;
-import it.belloworld.tellurgram.push.MgEmbeddedFcmDistributor;
-import it.belloworld.tellurgram.transcribe.MgWhisperModel;
+import org.tellurgram.HiddenAccountHelper;
+import org.tellurgram.MgMessageHistory;
+import org.tellurgram.MgUpdateChecker;
+import org.tellurgram.push.MgEmbeddedFcmDistributor;
+import org.tellurgram.transcribe.MgWhisperModel;
 
 public class MercurygramSettingsActivity extends UniversalFragment {
 
@@ -197,14 +197,12 @@ public class MercurygramSettingsActivity extends UniversalFragment {
 
         // Tor lives on its own screen so the proxy list can reach it too
         // (that screen is available before login, where Settings is not).
-        if (!it.belloworld.tellurgram.tor.MgTorClient.isFdroidPreS()) {
-            items.add(UItem.asButton(ID_TOR_SETTINGS,
-                    LocaleController.getString(R.string.MercurygramTor),
-                    LocaleController.getString(SharedConfig.mg_useTor
-                            ? R.string.NotificationsOn : R.string.NotificationsOff)));
-            items.add(UItem.asShadow(MgSettingsScope.withAllAccountsNote(
-                    LocaleController.getString(R.string.MercurygramTorAbout))));
-        }
+        items.add(UItem.asButton(ID_TOR_SETTINGS,
+                LocaleController.getString(R.string.MercurygramTor),
+                LocaleController.getString(SharedConfig.mg_useTor
+                        ? R.string.NotificationsOn : R.string.NotificationsOff)));
+        items.add(UItem.asShadow(MgSettingsScope.withAllAccountsNote(
+                LocaleController.getString(R.string.MercurygramTorAbout))));
 
         items.add(UItem.asCheck(ID_DISABLE_GLOBAL_SEARCH,
                         LocaleController.getString(R.string.MercurygramDisableGlobalSearch))
@@ -277,6 +275,15 @@ public class MercurygramSettingsActivity extends UniversalFragment {
                     LocaleController.getString(R.string.MercurygramCheckForUpdatesNow), checkSubtitle));
             items.add(UItem.asShadow(null));
         }
+
+        String checkSubtitle = SharedConfig.mgLastUpdateCheckTime > 0
+                ? LocaleController.formatString("MercurygramCheckForUpdatesLastChecked",
+                        R.string.MercurygramCheckForUpdatesLastChecked,
+                        LocaleController.formatDateTime(SharedConfig.mgLastUpdateCheckTime / 1000, true))
+                : LocaleController.getString(R.string.MercurygramCheckForUpdatesNever);
+        items.add(UItem.asButton(ID_CHECK_FOR_UPDATES_NOW,
+                LocaleController.getString(R.string.MercurygramCheckForUpdatesNow), checkSubtitle));
+        items.add(UItem.asShadow(null));
 
         items.add(UItem.asHeader(LocaleController.getString(R.string.MercurygramSettingsNotifications)));
         CharSequence pushValue;
@@ -468,7 +475,7 @@ public class MercurygramSettingsActivity extends UniversalFragment {
         if (!SharedConfig.mg_useCustomEmojiPack) {
             return LocaleController.getString(R.string.MercurygramEmojiRowDisabled);
         }
-        int installed = it.belloworld.tellurgram.emoji.MgEmojiPack.installedCount();
+        int installed = org.tellurgram.emoji.MgEmojiPack.installedCount();
         return installed > 0
                 ? LocaleController.formatString("MercurygramEmojiInstalled",
                         R.string.MercurygramEmojiInstalled, installed)

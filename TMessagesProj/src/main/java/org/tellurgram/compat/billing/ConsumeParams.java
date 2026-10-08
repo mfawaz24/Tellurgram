@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.compat.billing;
+package org.tellurgram.compat.billing;
 
 /** Stub: billing is disabled in FOSS builds. */
 public class ConsumeParams {

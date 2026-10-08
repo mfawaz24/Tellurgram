@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.ui;
+package org.tellurgram.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -26,7 +26,7 @@ import org.telegram.ui.Components.UniversalFragment;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
-import it.belloworld.tellurgram.MgUpdateChecker;
+import org.tellurgram.MgUpdateChecker;
 
 /**
  * Tor settings, split out of {@link MercurygramSettingsActivity} so the proxy
@@ -47,11 +47,6 @@ public class MgTorSettingsActivity extends UniversalFragment {
 
     @Override
     protected void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
-        // F-Droid main on pre-Android-12 can't bind the plugin (plugin's
-        // BIND permission uses knownSigner, API 31+ only). Both entry points
-        // hide their row there, so this is only a backstop against ever
-        // rendering a toggle that could not work.
-        if (it.belloworld.tellurgram.tor.MgTorClient.isFdroidPreS()) return;
         items.add(MgSettingsScope.globalCheck(ID_USE_TOR, LocaleController.getString(R.string.MercurygramTor))
                 .setChecked(SharedConfig.mg_useTor));
         if (SharedConfig.mg_useTor) {
@@ -64,19 +59,18 @@ public class MgTorSettingsActivity extends UniversalFragment {
         }
         // Manual plugin update/repair (mirrors the main "Check for updates
         // now" button). Shown whenever the plugin is installed on the
-        // GitHub channel; F-Droid drives plugin updates from its catalog and
-        // Play installs cannot sideload, so the row is hidden there.
-        // Subtitle reflects freshness from disk.
+        // GitHub channel; Play installs cannot sideload, so the row is hidden
+        // there. Subtitle reflects freshness from disk.
         if (MgUpdateChecker.canSelfInstall()
-                && it.belloworld.tellurgram.tor.MgTorClient.isPluginInstalled()) {
+                && org.tellurgram.tor.MgTorClient.isPluginInstalled()) {
             // "needs update" = hard floor breach (blocks binding) OR soft
             // versionName drift. Including the floor breach guarantees this
             // repair row offers the install when handleUseTorClick refuses
             // to bind, even in a tag layout where the breach doesn't show
             // up as plain versionName drift.
             boolean pluginNeedsUpdate =
-                    it.belloworld.tellurgram.tor.MgTorClient.isPluginUpdateRequired()
-                    || it.belloworld.tellurgram.tor.MgTorClient.isPluginUpdateAvailable();
+                    org.tellurgram.tor.MgTorClient.isPluginUpdateRequired()
+                    || org.tellurgram.tor.MgTorClient.isPluginUpdateAvailable();
             String pluginSubtitle = pluginNeedsUpdate
                     ? LocaleController.getString(R.string.MercurygramTorPluginOutdated)
                     : LocaleController.getString(R.string.YourVersionIsLatest);
@@ -95,7 +89,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
         // when mg_useTor=true (the toggle UI itself reflects the live state,
         // and bailOutUnavailable already flipped the flag off if the lib is
         // missing on this build).
-        if (!SharedConfig.mg_useTor && !it.belloworld.tellurgram.tor.MgTorClient.isPluginInstalled()) {
+        if (!SharedConfig.mg_useTor && !org.tellurgram.tor.MgTorClient.isPluginInstalled()) {
             // "Install it" only makes sense where the app can actually get it.
             torAbout = torAbout + "\n\n" + LocaleController.getString(MgUpdateChecker.hasPluginInstallPath()
                     ? R.string.MercurygramTorPluginMissing
@@ -117,8 +111,8 @@ public class MgTorSettingsActivity extends UniversalFragment {
                 handleTorIdleTimeoutClick();
                 break;
             case ID_UPDATE_TOR_PLUGIN:
-                if (it.belloworld.tellurgram.tor.MgTorClient.isPluginUpdateRequired()
-                        || it.belloworld.tellurgram.tor.MgTorClient.isPluginUpdateAvailable()) {
+                if (org.tellurgram.tor.MgTorClient.isPluginUpdateRequired()
+                        || org.tellurgram.tor.MgTorClient.isPluginUpdateAvailable()) {
                     // runPluginInstall shows its own delayed spinner and toasts
                     // MercurygramTorPluginDownloadFailed on error.
                     MgUpdateChecker.runPluginInstall(this::getParentActivity);
@@ -156,7 +150,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
             // start() so a rapid off/on toggle from another caller (resume,
             // push wake) cannot race the in-flight shutdown.
             Utilities.globalQueue.postRunnable(() ->
-                    it.belloworld.tellurgram.tor.MgTorClient.getInstance().stop());
+                    org.tellurgram.tor.MgTorClient.getInstance().stop());
             refreshList();
             return;
         }
@@ -168,9 +162,9 @@ public class MgTorSettingsActivity extends UniversalFragment {
         // toggle stays OFF; the user updates, returns, and re-enables.
         // (Plugin absent → isPluginUpdateRequired() is false; the
         // PLUGIN_NOT_INSTALLED install flow below still handles install.)
-        if (it.belloworld.tellurgram.tor.MgTorClient.isPluginUpdateRequired()) {
+        if (org.tellurgram.tor.MgTorClient.isPluginUpdateRequired()) {
             promptInstallOrUpdatePlugin(context,
-                    it.belloworld.tellurgram.tor.MgTorClient.State.PLUGIN_OUTDATED);
+                    org.tellurgram.tor.MgTorClient.State.PLUGIN_OUTDATED);
             return;
         }
         // No pre-check on isAvailable(): pre-bind the state is always
@@ -189,7 +183,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
                             // restored from stop() on toggle-off so the
                             // user's SOCKS5 / MTProto-proxy config isn't
                             // silently destroyed by the Tor cycle.
-                            it.belloworld.tellurgram.tor.MgTorClient.snapshotCurrentProxy();
+                            org.tellurgram.tor.MgTorClient.snapshotCurrentProxy();
                             SharedConfig.toggleMgUseTor();
                             // userInitiatedStart routes through the plugin's
                             // start() path. The plugin deliberately does NOT
@@ -203,7 +197,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
                             // once); a re-crash trips the cap again until
                             // the plugin process is reclaimed.
                             Utilities.globalQueue.postRunnable(() ->
-                                    it.belloworld.tellurgram.tor.MgTorClient.getInstance().userInitiatedStart());
+                                    org.tellurgram.tor.MgTorClient.getInstance().userInitiatedStart());
                             refreshList();
                             showTorBootstrapDialog();
                         })
@@ -244,7 +238,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
         // dismiss), so it cleanly separates "user said no" from "the window
         // went away on its own".
         dialog.setOnCancelListener(d -> userCancelled.set(true));
-        final AtomicReference<it.belloworld.tellurgram.tor.MgTorClient.ProgressListener> selfRef = new AtomicReference<>();
+        final AtomicReference<org.tellurgram.tor.MgTorClient.ProgressListener> selfRef = new AtomicReference<>();
         // Flips true once onReady fires; dismiss before that with userCancelled
         // also true is treated as a user-initiated cancel and tears tor down +
         // flips the toggle back off so the user is not silently left on a
@@ -253,26 +247,26 @@ public class MgTorSettingsActivity extends UniversalFragment {
         // Stops the user-initiated-cancel branch from also firing the
         // settings-side toggle-off path (which itself dispatches stop()).
         final java.util.concurrent.atomic.AtomicBoolean abortHandled = new java.util.concurrent.atomic.AtomicBoolean(false);
-        it.belloworld.tellurgram.tor.MgTorClient.ProgressListener listener =
-                new it.belloworld.tellurgram.tor.MgTorClient.ProgressListener() {
+        org.tellurgram.tor.MgTorClient.ProgressListener listener =
+                new org.tellurgram.tor.MgTorClient.ProgressListener() {
                     @Override
-                    public void onState(it.belloworld.tellurgram.tor.MgTorClient.State state) {
+                    public void onState(org.tellurgram.tor.MgTorClient.State state) {
                         // Plugin missing / wrong-sig / outdated → drive the
                         // install-or-update flow. Without this branch the
                         // dialog would hang on "0%" forever because the
                         // controller never reaches onProgress / onReady /
                         // onFailed; PLUGIN_NOT_INSTALLED arrives only via
                         // onState.
-                        if (state != it.belloworld.tellurgram.tor.MgTorClient.State.PLUGIN_NOT_INSTALLED
-                                && state != it.belloworld.tellurgram.tor.MgTorClient.State.PLUGIN_BIND_REFUSED
-                                && state != it.belloworld.tellurgram.tor.MgTorClient.State.PLUGIN_OUTDATED
-                                && state != it.belloworld.tellurgram.tor.MgTorClient.State.PLUGIN_SIGNATURE_MISMATCH) {
+                        if (state != org.tellurgram.tor.MgTorClient.State.PLUGIN_NOT_INSTALLED
+                                && state != org.tellurgram.tor.MgTorClient.State.PLUGIN_BIND_REFUSED
+                                && state != org.tellurgram.tor.MgTorClient.State.PLUGIN_OUTDATED
+                                && state != org.tellurgram.tor.MgTorClient.State.PLUGIN_SIGNATURE_MISMATCH) {
                             return;
                         }
                         abortHandled.set(true);
-                        final it.belloworld.tellurgram.tor.MgTorClient.State pluginState = state;
+                        final org.tellurgram.tor.MgTorClient.State pluginState = state;
                         AndroidUtilities.runOnUIThread(() -> {
-                            it.belloworld.tellurgram.tor.MgTorClient.getInstance().removeProgressListener(selfRef.get());
+                            org.tellurgram.tor.MgTorClient.getInstance().removeProgressListener(selfRef.get());
                             try { dialog.dismiss(); } catch (Throwable ignored) {}
                             // Roll the user's mg_useTor flip back: nothing is
                             // routing traffic, the prior proxy snapshot needs
@@ -282,7 +276,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
                                 SharedConfig.toggleMgUseTor();
                             }
                             Utilities.globalQueue.postRunnable(() ->
-                                    it.belloworld.tellurgram.tor.MgTorClient.getInstance().stop());
+                                    org.tellurgram.tor.MgTorClient.getInstance().stop());
                             refreshList();
                             promptInstallOrUpdatePlugin(context, pluginState);
                         });
@@ -297,7 +291,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
                     public void onReady(int socksPort) {
                         ready.set(true);
                         AndroidUtilities.runOnUIThread(() -> {
-                            it.belloworld.tellurgram.tor.MgTorClient.getInstance().removeProgressListener(selfRef.get());
+                            org.tellurgram.tor.MgTorClient.getInstance().removeProgressListener(selfRef.get());
                             try { dialog.dismiss(); } catch (Throwable ignored) {}
                         });
                     }
@@ -309,16 +303,16 @@ public class MgTorSettingsActivity extends UniversalFragment {
                         // below doesn't double-dispatch a redundant stop().
                         abortHandled.set(true);
                         AndroidUtilities.runOnUIThread(() -> {
-                            it.belloworld.tellurgram.tor.MgTorClient.getInstance().removeProgressListener(selfRef.get());
+                            org.tellurgram.tor.MgTorClient.getInstance().removeProgressListener(selfRef.get());
                             try { dialog.dismiss(); } catch (Throwable ignored) {}
                             Toast.makeText(context, reason != null ? reason : "tor failed", Toast.LENGTH_LONG).show();
                         });
                     }
                 };
         selfRef.set(listener);
-        it.belloworld.tellurgram.tor.MgTorClient.getInstance().addProgressListener(listener);
+        org.tellurgram.tor.MgTorClient.getInstance().addProgressListener(listener);
         dialog.setOnDismissListener(d -> {
-            it.belloworld.tellurgram.tor.MgTorClient.getInstance().removeProgressListener(listener);
+            org.tellurgram.tor.MgTorClient.getInstance().removeProgressListener(listener);
             if (ready.get() || abortHandled.get()) return;
             // Passive dismiss (activity recreate on rotation, fragment
             // teardown, system OOM): keep mg_useTor on and let the
@@ -334,14 +328,14 @@ public class MgTorSettingsActivity extends UniversalFragment {
                 SharedConfig.toggleMgUseTor();
             }
             Utilities.globalQueue.postRunnable(() ->
-                    it.belloworld.tellurgram.tor.MgTorClient.getInstance().stop());
+                    org.tellurgram.tor.MgTorClient.getInstance().stop());
             refreshList();
         });
         showDialog(dialog);
     }
 
     private void promptInstallOrUpdatePlugin(Context context,
-                                             it.belloworld.tellurgram.tor.MgTorClient.State state) {
+                                             org.tellurgram.tor.MgTorClient.State state) {
         int msgRes;
         switch (state) {
             case PLUGIN_OUTDATED:
@@ -364,18 +358,18 @@ public class MgTorSettingsActivity extends UniversalFragment {
         // instead of offering a button that leads nowhere.
         boolean noInstallPath = !MgUpdateChecker.hasPluginInstallPath();
         boolean signatureMismatch =
-                state == it.belloworld.tellurgram.tor.MgTorClient.State.PLUGIN_SIGNATURE_MISMATCH;
+                state == org.tellurgram.tor.MgTorClient.State.PLUGIN_SIGNATURE_MISMATCH;
         // A refused bind is not an install problem either: the plugin is
         // already there, so keep its own message.
         boolean bindRefused =
-                state == it.belloworld.tellurgram.tor.MgTorClient.State.PLUGIN_BIND_REFUSED;
+                state == org.tellurgram.tor.MgTorClient.State.PLUGIN_BIND_REFUSED;
         if (noInstallPath && !signatureMismatch && !bindRefused) {
             msgRes = R.string.MercurygramTorPluginUnavailable;
         }
         AlertDialog.Builder b = new AlertDialog.Builder(context)
                 .setTitle(LocaleController.getString(R.string.MercurygramTor))
                 .setMessage(LocaleController.getString(msgRes));
-        if (state == it.belloworld.tellurgram.tor.MgTorClient.State.PLUGIN_BIND_REFUSED) {
+        if (state == org.tellurgram.tor.MgTorClient.State.PLUGIN_BIND_REFUSED) {
             // The plugin is installed and the OS refused to start it, so
             // installing again changes nothing. Send the user to the plugin's
             // app-info screen, where the autostart and battery restrictions
@@ -385,7 +379,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
                     (d, which) -> {
                         try {
                             context.startActivity(
-                                    it.belloworld.tellurgram.tor.MgTorClient.getInstance().buildPluginAppInfoIntent());
+                                    org.tellurgram.tor.MgTorClient.getInstance().buildPluginAppInfoIntent());
                         } catch (Throwable ignored) {}
                     });
         } else if (signatureMismatch || noInstallPath) {
@@ -394,16 +388,6 @@ public class MgTorSettingsActivity extends UniversalFragment {
             b.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
             b.setPositiveButton(LocaleController.getString(R.string.MercurygramTorInstallPlugin),
                     (d, which) -> {
-                        // F-Droid: its plugin APK is signed with a different
-                        // cert, so hand off to the catalog entry instead of
-                        // downloading a copy this build would refuse to install.
-                        if (!MgUpdateChecker.canSelfInstall()) {
-                            try {
-                                context.startActivity(
-                                        it.belloworld.tellurgram.tor.MgTorClient.getInstance().buildPluginInstallIntent());
-                            } catch (Throwable ignored) {}
-                            return;
-                        }
                         MgUpdateChecker.runPluginInstall(this::getParentActivity);
                     });
         }

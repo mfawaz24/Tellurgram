@@ -12,8 +12,8 @@ grep -q "'/nonexistent'" "$MESON" && exit
 # pin yields "1.5.4-0-g54706fc" in one checkout and "54706fc6" in another. Both
 # strings land in libtmessages' merged SHF_STRINGS pool, where the 9-byte
 # length difference shifts every following offset and makes the .so differ
-# between two builds of identical sources, which broke F-Droid reproducibility
-# when the fdroidserver container's checkout stopped carrying dav1d's tags.
+# between two builds of identical sources, which broke reproducibility
+# whenever a checkout did not carry dav1d's tags.
 # Point the probe at a non-existent git dir: the command fails and meson falls
 # back to vcs_tag's default, meson.project_version(), a fixed "1.5.4". Same
 # approach as GIT_EXE for ggml in CMakeLists.txt; ffmpeg gets the equivalent

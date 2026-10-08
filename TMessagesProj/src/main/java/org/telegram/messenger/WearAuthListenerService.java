@@ -4,8 +4,8 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
-import it.belloworld.tellurgram.compat.gms.wearable.MessageEvent;
-import it.belloworld.tellurgram.compat.gms.wearable.WearableListenerService;
+import org.tellurgram.compat.gms.wearable.MessageEvent;
+import org.tellurgram.compat.gms.wearable.WearableListenerService;
 
 import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.WearAuthSheet;

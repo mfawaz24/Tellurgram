@@ -1,6 +1,6 @@
-package it.belloworld.tellurgram.compat.integrity;
+package org.tellurgram.compat.integrity;
 
-import it.belloworld.tellurgram.compat.gms.tasks.Task;
+import org.tellurgram.compat.gms.tasks.Task;
 
 /** Stub — Play Integrity removed in FOSS builds. */
 public class IntegrityManager {

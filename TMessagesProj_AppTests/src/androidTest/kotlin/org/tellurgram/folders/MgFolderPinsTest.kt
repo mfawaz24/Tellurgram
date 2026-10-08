@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.folders
+package org.tellurgram.folders
 
 import org.junit.After
 import org.junit.Assert.assertFalse

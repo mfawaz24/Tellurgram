@@ -77,7 +77,7 @@ public class HttpGetFileTask extends AsyncTask<String, Void, File> {
         for (int i = 0; i < 5; ++i) {
             boolean resuming = i > 0;
             try {
-                URL url = new URL(it.belloworld.tellurgram.MgHttps.upgrade(urlString));
+                URL url = new URL(org.tellurgram.MgHttps.upgrade(urlString));
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 if (resuming) {

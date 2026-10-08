@@ -1254,7 +1254,7 @@ public class ContactsActivity extends BaseFragment implements FactorAnimator.Tar
             userConfig.saveConfig(false);
             BulletinFactory.of(this).createSimpleBulletin(R.raw.passcode_lock_close,
                     getString(R.string.MercurygramPreferSecretChatsHint), getString(R.string.Settings), Bulletin.DURATION_PROLONG,
-                    () -> presentFragment(new it.belloworld.tellurgram.ui.MercurygramSettingsActivity())).show();
+                    () -> presentFragment(new org.tellurgram.ui.MercurygramSettingsActivity())).show();
         }
         if (checkPermission && Build.VERSION.SDK_INT >= 23) {
             Activity activity = getParentActivity();

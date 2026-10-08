@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.location;
+package org.tellurgram.location;
 
 import android.Manifest;
 import android.app.PendingIntent;

@@ -99,7 +99,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.math.MathUtils;
 
-import it.belloworld.tellurgram.map.MgMapSnapshot;
+import org.tellurgram.map.MgMapSnapshot;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
@@ -12682,7 +12682,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             (
                 UserConfig.getInstance(currentAccount).isPremium()
                 ||
-                it.belloworld.tellurgram.transcribe.MgWhisperTranscriber.isUsable()
+                org.tellurgram.transcribe.MgWhisperTranscriber.isUsable()
                 ||
                 TranscribeButton.isFreeTranscribeInChat(currentMessageObject)
                 ||

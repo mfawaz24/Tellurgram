@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.transcribe;
+package org.tellurgram.transcribe;
 
 /**
  * [MG] Thin JNI surface to whisper.cpp (see {@code TMessagesProj/jni/whisper_jni.cpp}).

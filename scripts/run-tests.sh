@@ -218,7 +218,7 @@ RUN install -m 0755 -d /etc/apt/keyrings \
 
 ENV PATH=$JAVA_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
 
-# Android cmdline-tools — same release as scripts/check-reproducibility.sh.
+# Android cmdline-tools.
 RUN mkdir -p $ANDROID_HOME/cmdline-tools \
  && curl -fsSL -o /tmp/clt.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
  && unzip -q /tmp/clt.zip -d $ANDROID_HOME/cmdline-tools \

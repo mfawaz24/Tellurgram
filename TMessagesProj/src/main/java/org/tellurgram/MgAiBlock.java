@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram;
+package org.tellurgram;
 
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.RequestDelegate;

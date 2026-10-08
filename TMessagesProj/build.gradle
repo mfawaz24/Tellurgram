@@ -122,7 +122,7 @@ def getAppHash() {
     return "\"" + properties.get("APP_HASH") + "\""
 }
 
-// If all requested tasks target the same single F-Droid per-ABI flavor, return that ABI
+// If all requested tasks target the same single per-ABI flavor, return that ABI
 // so the library's CMake build can be limited to just that ABI. Returns null otherwise
 // (fat builds, local development, multiple ABIs requested).
 // Note: flavors are matched longest-first so AfatFdX86_64 is matched before AfatFdX86.
@@ -188,7 +188,7 @@ android {
 
         multiDexEnabled true
 
-        // Limit CMake to a single ABI for per-ABI F-Droid builds; has no effect otherwise.
+        // Limit CMake to a single ABI for per-ABI builds; has no effect otherwise.
         if (singleFdAbi) ndk.abiFilters singleFdAbi
 
         externalNativeBuild {
@@ -295,7 +295,7 @@ task patchNativeSources {
         // "n8.1.2-30-g45f1910444" or "45f1910444" depending on how the
         // submodule was fetched. Pinning it to the full submodule SHA makes the
         // archives byte-identical across shallow and full checkouts, which
-        // F-Droid reproducibility needs. Upstream never hit this: it builds
+        // reproducible builds need. Upstream never hit this: it builds
         // from a checkout that has tags.
         def ffmpegDir = file("${projectDir}/jni/third_party/ffmpeg")
         def ffmpegSha = providers.exec {

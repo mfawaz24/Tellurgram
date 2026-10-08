@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram;
+package org.tellurgram;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.tor
+package org.tellurgram.tor
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -6,7 +6,7 @@ import org.junit.Test
 /**
  * Locks down MgTorClient.pluginPackage() — the resolver for the Tor plugin
  * package. It must yield the single unsuffixed release plugin: every main
- * flavor (.beta debug, .web standalone, stable, F-Droid) is signed with the
+ * flavor (.beta debug, .web standalone, stable) is signed with the
  * same release.keystore as the release plugin, so all bind one package and no
  * suffixed plugin variant is ever built or published. A per-flavor suffix here
  * once pointed at a `...plugin.tor.beta` package nothing installs, which fired

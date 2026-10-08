@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.emoji;
+package org.tellurgram.emoji;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -29,10 +29,10 @@ import java.util.zip.ZipInputStream;
  * Mercurygram: user-supplied custom emoji pack.
  *
  * Mercurygram ships the Noto emoji set because the Apple set is proprietary and
- * can't be bundled in a FOSS / F-Droid build. This lets a user side-load their
+ * can't be bundled in a FOSS build. This lets a user side-load their
  * own emoji images at runtime into app-private storage — nothing proprietary
- * enters the repo or the APK, the build processes no new assets (F-Droid
- * reproducibility untouched), and we never download the pack ourselves (same
+ * enters the repo or the APK, the build processes no new assets
+ * (reproducibility untouched), and we never download the pack ourselves (same
  * posture as the manual whisper-model import: the user vouches for their file).
  *
  * Pack format = the Telegram-Android per-glyph PNG layout: files named

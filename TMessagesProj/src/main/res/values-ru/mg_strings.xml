@@ -110,7 +110,7 @@
     <string name="MercurygramTranslationModeOffline">Офлайн (внешнее приложение)</string>
     <string name="MercurygramTranslationAbout">Облако Telegram отправляет текст на серверы Telegram (которые пересылают его в Google). Альтернативный HTTP маршрутизирует текст через публичный Mozhi-прокси, уважающий приватность и объединяющий несколько движков (DuckDuckGo, LibreTranslate, Google, MyMemory, Reverso) — выберите движок и экземпляр ниже. Офлайн делегирует каждый перевод отдельному FOSS-приложению (Offline Translator, dev.davidv.translator) через привязанную фоновую службу — сообщение никогда не покидает ваше устройство. Форматирование жирным, курсивом и кодом может теряться на офлайн-пути, потому что движок возвращает обычный текст.</string>
     <string name="MercurygramTranslationOfflineSection">Офлайн-переводчик</string>
-    <string name="MercurygramTranslationInstallApp">Установить Offline Translator из F-Droid</string>
+    <string name="MercurygramTranslationInstallApp">Установить Offline Translator</string>
     <string name="MercurygramTranslationOfflineNoApp">Offline Translator (dev.davidv.translator) — эталонный FOSS-провайдер: содержит офлайн-модели Bergamot и предоставляет привязанную фоновую службу, которой Tellurgram беззвучно передаёт каждый перевод. Пока он не установлен, переводы выполняются по тому запасному варианту, который вы разрешите ниже.</string>
     <string name="MercurygramTranslationOfflineProviderReady">Offline Translator установлен. Откройте его один раз, чтобы скачать языковую пару (или пары), с которой и на которую вы хотите переводить.</string>
     <string name="MercurygramTranslationAutoFallback">Авто-фолбэк при ошибке</string>

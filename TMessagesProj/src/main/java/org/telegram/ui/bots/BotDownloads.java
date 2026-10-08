@@ -336,7 +336,7 @@ public class BotDownloads {
             protected String doInBackground(String... strings) {
                 try {
 
-                    HttpURLConnection urlConnection = (HttpURLConnection) new URL(it.belloworld.tellurgram.MgHttps.upgrade(url)).openConnection();
+                    HttpURLConnection urlConnection = (HttpURLConnection) new URL(org.tellurgram.MgHttps.upgrade(url)).openConnection();
                     urlConnection.setRequestMethod("GET");
                     urlConnection.setRequestProperty("Accept-Encoding", "identity");
                     urlConnection.setConnectTimeout(1000);

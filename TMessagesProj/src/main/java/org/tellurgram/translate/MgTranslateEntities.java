@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram.translate;
+package org.tellurgram.translate;
 
 import androidx.annotation.Nullable;
 

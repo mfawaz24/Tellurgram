@@ -5,7 +5,7 @@
 // on a Binder pool thread and must hand off to its own executor before
 // touching ConnectionsManager / settings UI state.
 
-package it.belloworld.tellurgram.plugin.tor;
+package org.tellurgram.plugin.tor;
 
 oneway interface IMgTorCallback {
     // 0..100 with a short status string (e.g. "conn_dir_pt", "handshake").

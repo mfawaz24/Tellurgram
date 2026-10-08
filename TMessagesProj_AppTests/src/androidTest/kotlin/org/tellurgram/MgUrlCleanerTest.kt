@@ -1,4 +1,4 @@
-package it.belloworld.tellurgram
+package org.tellurgram
 
 import android.net.Uri
 import android.text.SpannableStringBuilder

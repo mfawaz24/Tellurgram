@@ -41,7 +41,7 @@ public class HttpPostTask extends AsyncTask<String, Void, String> {
         String urlString = params[0];
 
         try {
-            URL url = new URL(it.belloworld.tellurgram.MgHttps.upgrade(urlString));
+            URL url = new URL(org.tellurgram.MgHttps.upgrade(urlString));
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
             for (Map.Entry<String, String> e : headers.entrySet()) {
