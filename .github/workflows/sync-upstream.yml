@@ -1,8 +1,8 @@
 name: Sync Mercurygram upstream
 
 # Merges new commits from jralo7/Mercurygram into the mg-upstream branch once
-# a day. Bring them into main by merging mg-upstream when ready. A merge
-# conflict fails the job and leaves mg-upstream untouched — resolve locally.
+# a day, then tries to merge mg-upstream into prod. A merge conflict at either
+# step fails the job and leaves that branch untouched — resolve locally.
 #
 # GITHUB_TOKEN cannot push commits that change .github/workflows, which
 # upstream merges often do. Set the SYNC_TOKEN secret to a PAT with the
@@ -45,3 +45,23 @@ jobs:
           git merge --no-edit -m "Merge Mercurygram upstream ${upstream}" FETCH_HEAD
           git push origin HEAD:mg-upstream
           echo "Merged Mercurygram ${upstream} into mg-upstream" >> "$GITHUB_STEP_SUMMARY"
+
+      # Runs even when mg-upstream was already current, so prod catches up
+      # once an earlier conflict has been resolved by hand.
+      - name: Merge mg-upstream into prod
+        run: |
+          set -euo pipefail
+          git checkout -B prod origin/prod
+          if git merge-base --is-ancestor mg-upstream HEAD; then
+            echo "prod already contains mg-upstream" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if ! git merge --no-edit -m "Merge mg-upstream into prod" mg-upstream; then
+            conflicts=$(git diff --name-only --diff-filter=U | sed 's/^/- /')
+            git merge --abort
+            printf 'Merging mg-upstream into prod conflicts; resolve locally:\n%s\n' "$conflicts" \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          git push origin HEAD:prod
+          echo "Merged mg-upstream into prod" >> "$GITHUB_STEP_SUMMARY"
