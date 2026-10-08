@@ -168,11 +168,6 @@ jobs:
           cp "$APK_DIR/afatFdArm64.apk" "$DEST"
           echo "SHA256: $(sha256sum "$DEST" | cut -d' ' -f1)"
           echo "apk_path=${DEST}" >> "$GITHUB_OUTPUT"
-          # Fixed name so releases/latest/download/Tellurgram-arm64-v8a.apk
-          # always points at the newest build. Obtainium's ^Tellurgram-\d
-          # filter skips it.
-          cp "$APK_DIR/afatFdArm64.apk" "$APK_DIR/Tellurgram-arm64-v8a.apk"
-          echo "latest_path=$APK_DIR/Tellurgram-arm64-v8a.apk" >> "$GITHUB_OUTPUT"
 
       - name: Verify signing certificate
         if: steps.build.outputs.signed == 'true'
@@ -206,9 +201,7 @@ jobs:
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           make_latest: true
-          files: |
-            ${{ steps.rename.outputs.apk_path }}
-            ${{ steps.rename.outputs.latest_path }}
+          files: ${{ steps.rename.outputs.apk_path }}
 
       - name: Note unpublished release
         if: github.ref == 'refs/heads/prod' && (github.event_name == 'push' || inputs.build-tag == '') && steps.build.outputs.signed != 'true'
