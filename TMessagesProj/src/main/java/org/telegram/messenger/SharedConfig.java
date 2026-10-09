@@ -727,7 +727,7 @@ public class SharedConfig {
     public static boolean mg_enforceHttps = true;
 
     // Mercurygram: Privacy
-    public static boolean reduceTrackingFingerprint = false;
+    public static boolean reduceTrackingFingerprint = true;
     public static boolean mg_useTor = false;
     public static int mg_torIdleStopMinutes = 5;
     // Anti-censorship transport for the Tor daemon. "Direct" is vanilla Tor (no
@@ -1150,7 +1150,7 @@ public class SharedConfig {
         acceptPreReleaseUpdates = preferences.getBoolean("mg_acceptPreReleaseUpdates", false);
         mgLastPreReleaseTag = preferences.getString("mg_lastPreReleaseTag", "");
         useSystemFont = preferences.getBoolean("mg_useSystemFont", false);
-        reduceTrackingFingerprint = preferences.getBoolean("mg_reduceTrackingFingerprint", false);
+        reduceTrackingFingerprint = preferences.getBoolean("mg_reduceTrackingFingerprint", true);
         mg_useTor = preferences.getBoolean("mg_useTor", false);
         mg_torIdleStopMinutes = preferences.getInt("mg_torIdleStopMinutes", 5);
         mg_torTransportMode = sanitizeMgTorTransportMode(
