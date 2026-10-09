@@ -1,0 +1,35 @@
+name: Prod source guard
+
+# prod only accepts pull requests from this repo's staging or mg-upstream
+# branches. Required status check in the prod branch ruleset.
+# pull_request_target runs this file from prod, so a PR can't edit it away.
+# Nothing from the PR is checked out.
+
+on:
+  pull_request_target:
+    branches: [prod]
+    types: [opened, reopened, synchronize, edited]
+
+permissions: {}
+
+jobs:
+  source-branch:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check PR source
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          BASE_REPO: ${{ github.repository }}
+        run: |
+          if [ "$HEAD_REPO" != "$BASE_REPO" ]; then
+            echo "::error::prod only accepts PRs from $BASE_REPO, not $HEAD_REPO"
+            exit 1
+          fi
+          case "$HEAD_REF" in
+            staging|mg-upstream) echo "Source branch $HEAD_REF is allowed" ;;
+            *)
+              echo "::error::prod only accepts PRs from staging or mg-upstream, not $HEAD_REF"
+              exit 1
+              ;;
+          esac
