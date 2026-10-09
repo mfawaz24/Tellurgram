@@ -1,3 +1,7 @@
+<div align="center">
+
+<img src="./TMessagesProj/src/main/res/mipmap-hdpi/icon_foreground.png" alt="TG logo" title="TG logo" width="80"/>
+
 # Tellurgram
 
 An unofficial de-googled, libre Telegram client for Android, forked from [Mercurygram](https://github.com/jralo7/Mercurygram).
