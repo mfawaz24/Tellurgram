@@ -864,7 +864,7 @@ public class SharedConfig {
     private static final Object localIdSync = new Object();
 
 //    public static int saveToGalleryFlags;
-    public static int mapPreviewType = 2;
+    public static int mapPreviewType = 4;
     public static int searchEngineType = 0;
     public static String searchEngineCustomURLQuery, searchEngineCustomURLAutocomplete;
     public static boolean chatBubbles = Build.VERSION.SDK_INT >= 30;
@@ -1316,7 +1316,7 @@ public class SharedConfig {
 
             preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
             SaveToGallerySettingsHelper.load(preferences);
-            mapPreviewType = preferences.getInt("mapPreviewType", 2);
+            mapPreviewType = preferences.getInt("mapPreviewType", 4);
             searchEngineType = preferences.getInt("searchEngineType", 0);
             raiseToListen = preferences.getBoolean("raise_to_listen", true);
             raiseToSpeak = preferences.getBoolean("raise_to_speak", false);
