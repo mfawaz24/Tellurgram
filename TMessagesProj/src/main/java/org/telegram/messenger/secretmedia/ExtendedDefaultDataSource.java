@@ -198,7 +198,7 @@ public final class ExtendedDefaultDataSource implements DataSource {
         } else if (SCHEME_RAW.equals(scheme)) {
             dataSource = getRawResourceDataSource();
         } else {
-            dataSpec.uri = org.tellurgram.MgHttps.upgrade(uri);
+            dataSpec = dataSpec.buildUpon().setUri(org.tellurgram.MgHttps.upgrade(uri)).build();
             dataSource = baseDataSource;
         }
         // Open the source and return.
