@@ -276,15 +276,6 @@ public class MercurygramSettingsActivity extends UniversalFragment {
             items.add(UItem.asShadow(null));
         }
 
-        String checkSubtitle = SharedConfig.mgLastUpdateCheckTime > 0
-                ? LocaleController.formatString("MercurygramCheckForUpdatesLastChecked",
-                        R.string.MercurygramCheckForUpdatesLastChecked,
-                        LocaleController.formatDateTime(SharedConfig.mgLastUpdateCheckTime / 1000, true))
-                : LocaleController.getString(R.string.MercurygramCheckForUpdatesNever);
-        items.add(UItem.asButton(ID_CHECK_FOR_UPDATES_NOW,
-                LocaleController.getString(R.string.MercurygramCheckForUpdatesNow), checkSubtitle));
-        items.add(UItem.asShadow(null));
-
         items.add(UItem.asHeader(LocaleController.getString(R.string.MercurygramSettingsNotifications)));
         CharSequence pushValue;
         if (SharedConfig.disableUnifiedPush) {
