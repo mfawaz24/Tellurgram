@@ -1,6 +1,6 @@
 name: Sync Mercurygram upstream
 
-# Merges new commits from jralo7/Mercurygram into the mg-upstream branch once
+# Merges new commits from Mercurygram/Mercurygram into the mg-upstream branch once
 # a day. Bring them into main by merging mg-upstream when ready. A merge
 # conflict fails the job and leaves mg-upstream untouched — resolve locally.
 #
@@ -36,7 +36,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git fetch --no-tags https://github.com/jralo7/Mercurygram.git Mercurygram
+          git fetch --no-tags https://github.com/Mercurygram/Mercurygram.git Mercurygram
           upstream=$(git rev-parse --short FETCH_HEAD)
           if git merge-base --is-ancestor FETCH_HEAD HEAD; then
             echo "Already up to date with Mercurygram ${upstream}" | tee -a "$GITHUB_STEP_SUMMARY"

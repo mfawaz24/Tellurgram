@@ -325,7 +325,9 @@ public class MgUpdateChecker {
                 // tag accidentally.
                 String infix = ApplicationLoader.applicationContext.getPackageName()
                         .endsWith(".beta") ? "-debug" : "";
-                String abiApkName = "Mercurygram" + infix + "-" + tagName + "-" + targetAbi + ".apk";
+                // Tellurgram releases are tagged vX.Y.Z.M but name the APK
+                // after the bare tag (Tellurgram-X.Y.Z.M-<abi>.apk).
+                String abiApkName = "Tellurgram" + infix + "-" + stripTagPrefix(tagName) + "-" + targetAbi + ".apk";
                 for (int i = 0; i < assets.length(); i++) {
                     JSONObject asset = assets.getJSONObject(i);
                     String name = asset.getString("name");
@@ -730,8 +732,14 @@ public class MgUpdateChecker {
         return 0;
     }
 
+    // GitHub release tags carry a leading "v"; versionName does not.
+    static String stripTagPrefix(String tag) {
+        return tag != null && tag.startsWith("v") ? tag.substring(1) : tag;
+    }
+
     // Null on malformed input — caller treats as "refuse update".
     private static long[] toVersionVector(String v) {
+        v = stripTagPrefix(v);
         if (v == null || v.isEmpty()) return null;
         String[] p = v.split("\\.", -1);
         if (p.length < 4 || p.length > 5) return null;

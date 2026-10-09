@@ -4,7 +4,7 @@
 
 # Tellurgram
 
-An unofficial de-googled, libre Telegram client for Android, forked from [Mercurygram](https://github.com/jralo7/Mercurygram).
+An unofficial de-googled, libre Telegram client for Android, forked from [Mercurygram](https://github.com/Mercurygram/Mercurygram).
 
 
 </div>
