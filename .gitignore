@@ -24,10 +24,12 @@ TMessagesProj_AppHuawei/afat/
 # produce (15 per ABI) plus the ABI-dependent ffmpeg headers. F-Droid cannot
 # ship binaries it did not build, so we run those same scripts over the pinned
 # submodules and treat everything they write as generated.
-TMessagesProj/jni/prebuild/lib/
-TMessagesProj/jni/prebuild/include/
-TMessagesProj/jni/prebuild/pkgconfig/
-TMessagesProj/jni/prebuild/build/
+TMessagesProj/jni/prebuild/*
+!TMessagesProj/jni/prebuild/*.sh
+!TMessagesProj/jni/prebuild/build_env.txt
+# Pre-rebase native build trees; the sources now live in jni/third_party/.
+TMessagesProj/jni/boringssl/
+TMessagesProj/jni/ffmpeg/
 # Call core wasm module as a C array, built by jni/build_wasm_core.sh.
 TMessagesProj/jni/voip/ReferenceCoreEmbedded.cpp
 API_KEYS
