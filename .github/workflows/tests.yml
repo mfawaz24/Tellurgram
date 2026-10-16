@@ -2,7 +2,11 @@ name: Instrumentation tests
 
 on:
   push:
-    branches: [Mercurygram]
+    # staging pushes only prewarm the x86_64 natives (see `instrumentation`'s
+    # `if`). A cache saved from a pull_request run is scoped to that PR's
+    # merge ref, so the next PR can't read it; one saved on staging, the
+    # default branch, is readable by every PR.
+    branches: [Mercurygram, staging]
   pull_request:
 
 concurrency:
@@ -12,6 +16,8 @@ concurrency:
 jobs:
   prewarm-native:
     uses: ./.github/workflows/_prewarm-native.yml
+    with:
+      abi: x86_64
     secrets:
       APP_ID: ${{ secrets.APP_ID }}
       APP_HASH: ${{ secrets.APP_HASH }}
@@ -19,7 +25,7 @@ jobs:
   instrumentation:
     runs-on: ubuntu-24.04
     needs: prewarm-native
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && github.ref != 'refs/heads/staging' }}
     timeout-minutes: 90
     permissions:
       contents: read
@@ -71,6 +77,9 @@ jobs:
         uses: ./.github/actions/jni-cache-fingerprint
 
       - name: Restore JNI native caches (x86_64 — emulator ABI)
+        # Exact key only, like restore-jni-cache: buildNativeLibsX86_64 skips
+        # any prebuild script whose archives already exist, so a prefix match
+        # would silently link natives from an older fingerprint.
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
@@ -79,9 +88,6 @@ jobs:
             TMessagesProj/jni/td/td/generate/auto
             TMessagesProj/jni/td/tdutils/generate/auto
           key: jni-native-Linux-x86_64-ndk${{ env.NDK_VERSION }}-${{ hashFiles('.jni-cache-fingerprint') }}
-          restore-keys: |
-            jni-native-Linux-x86_64-ndk${{ env.NDK_VERSION }}-
-            jni-native-Linux-x86_64-
 
       - name: Create API_KEYS
         env:
@@ -131,10 +137,14 @@ jobs:
         # mandates the property at configure-time even when we only assemble
         # :TMessagesProj_AppTests (root configures all modules). Synthetic
         # pre-stable placeholder is fine — test APK never ships.
+        #
+        # NATIVE_ABI: the test APK keeps only x86_64 (afat abiFilters), but
+        # TMessagesProj's debug variant would otherwise compile all four
+        # ABIs' natives and throw three away.
         continue-on-error: true
         run: |
           ./gradlew :TMessagesProj_AppTests:api${{ matrix.api-level }}AfatDebugAndroidTest \
-            -PMG_BUILD_TAG=0.0.0.0 --no-daemon --stacktrace
+            -PMG_BUILD_TAG=0.0.0.0 -PNATIVE_ABI=x86_64 --no-daemon --stacktrace
 
       - name: Gate on failure count
         id: gate

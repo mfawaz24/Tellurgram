@@ -148,7 +148,13 @@ def detectSingleFdAbi() {
     }
     return detectedAbis.size() == 1 ? detectedAbis.first() : null
 }
-def singleFdAbi = detectSingleFdAbi()
+// -PNATIVE_ABI=<abi> forces the single-ABI path for builds whose task names
+// carry no per-ABI flavor, e.g. the x86_64-only instrumentation test run.
+def nativeAbiOverride = project.findProperty('NATIVE_ABI')
+if (nativeAbiOverride && !(nativeAbiOverride in ['arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86'])) {
+    throw new GradleException("NATIVE_ABI must be arm64-v8a, armeabi-v7a, x86_64 or x86, got '${nativeAbiOverride}'")
+}
+def singleFdAbi = nativeAbiOverride ?: detectSingleFdAbi()
 
 android {
     compileSdkVersion 36
