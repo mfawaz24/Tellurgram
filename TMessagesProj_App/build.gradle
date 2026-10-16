@@ -42,11 +42,6 @@ android {
         includeInBundle = false
     }
 
-    // Empty for the same reason as :TMessagesProj, see its build.gradle.
-    // Emptying it also removes the merge-vs-native-build race outright, which
-    // the mustRunAfter ordering that used to live here only papered over.
-    sourceSets.main.jniLibs.srcDirs = []
-
     aaptOptions {
         cruncherEnabled = false
     }
@@ -159,22 +154,6 @@ android {
             }
             ext {
                 abiVersionCode = 1
-            }
-            buildConfigField "boolean", "BUNDLE", "true"
-        }
-        bundleAfat_SDK23 {
-            ndk {
-                abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
-            }
-            sourceSets.debug {
-                manifest.srcFile '../TMessagesProj/config/debug/AndroidManifest_SDK23.xml'
-            }
-            sourceSets.release {
-                manifest.srcFile '../TMessagesProj/config/release/AndroidManifest_SDK23.xml'
-            }
-            minSdkVersion 23
-            ext {
-                abiVersionCode = 2
             }
             buildConfigField "boolean", "BUNDLE", "true"
         }

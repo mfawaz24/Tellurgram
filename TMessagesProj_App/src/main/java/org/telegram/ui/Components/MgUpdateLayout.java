@@ -160,7 +160,7 @@ public class MgUpdateLayout extends IUpdateLayout {
                 updateSizeTextView.setText(null, animated);
             } else {
                 updateLayoutIcon.setIcon(MediaActionDrawable.ICON_DOWNLOAD, true, animated);
-                updateTextView.setText("Mercurygram Update", animated);
+                updateTextView.setText("Tellurgram Update", animated);
                 if (info != null) {
                     updateSizeTextView.setText(AndroidUtilities.formatFileSize(info.fileSize), animated);
                 }

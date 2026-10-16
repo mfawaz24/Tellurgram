@@ -1,7 +1,7 @@
 name: Prewarm JNI native build cache
 
-# Reusable workflow called by beta.yml and release.yml. Builds the arm64
-# native libs (boringssl, openh264, opus, libvpx, dav1d, ffmpeg, tlottie,
+# Reusable workflow called by beta.yml, release.yml and tests.yml. Builds the
+# arm64 (or, for tests.yml, x86_64) native libs (boringssl, openh264, opus, libvpx, dav1d, ffmpeg, tlottie,
 # tdlib) once per push and saves them under a deterministic cache key. The
 # shared build-mg composite then restores those archives so the per-APK
 # assemble jobs skip every jni/prebuild script.
@@ -20,6 +20,13 @@ name: Prewarm JNI native build cache
 # back to rebuilding natives inline on cache miss).
 on:
   workflow_call:
+    inputs:
+      # beta.yml and release.yml prewarm arm64-v8a for their APKs;
+      # tests.yml prewarms x86_64, the emulator ABI.
+      abi:
+        description: 'ABI to prewarm (arm64-v8a or x86_64).'
+        type: string
+        required: true
     secrets:
       APP_ID:
         required: true
@@ -36,8 +43,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - abi: arm64-v8a
-            task: buildNativeLibsArm64
+          - abi: ${{ inputs.abi }}
+            task: ${{ inputs.abi == 'x86_64' && 'buildNativeLibsX86_64' || 'buildNativeLibsArm64' }}
 
     steps:
       - name: Checkout

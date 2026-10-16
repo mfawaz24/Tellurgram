@@ -3,8 +3,8 @@
 # write it as voip/ReferenceCoreEmbedded.cpp, the byte array libtmessages.so
 # links in.
 #
-# Upstream commits that file prebuilt; we generate it from the sources next
-# to it instead. Flags, the wasi-sdk release and the object order match
+# Upstream commits that file prebuilt; we generate it from the tgcalls
+# submodule sources instead. Flags, the wasi-sdk release and the object order match
 # upstream's build, so the module is byte-identical to the one upstream
 # ships: the file prefix map reproduces the source path upstream's assert
 # strings carry, and the object order fixes the data section layout.
@@ -14,7 +14,7 @@ set -Eeuo pipefail
 
 SDK="${1:?usage: build_wasm_core.sh <wasi-sdk dir>}"
 JNI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SRC="$JNI_DIR/voip/tgcalls"
+SRC="$JNI_DIR/tgcalls/tgcalls"
 OUT="$JNI_DIR/voip/ReferenceCoreEmbedded.cpp"
 BUILD="$JNI_DIR/prebuild/build/wasm-core"
 

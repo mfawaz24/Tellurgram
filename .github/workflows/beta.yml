@@ -95,6 +95,8 @@ jobs:
   prewarm-native:
     needs: version
     uses: ./.github/workflows/_prewarm-native.yml
+    with:
+      abi: arm64-v8a
     secrets:
       APP_ID: ${{ secrets.APP_ID }}
       APP_HASH: ${{ secrets.APP_HASH }}
