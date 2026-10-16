@@ -18,6 +18,7 @@ import org.telegram.tgnet.NativeByteBuffer
 import org.telegram.tgnet.TLObject
 import org.telegram.tgnet.TLParseException
 import org.telegram.tgnet.model.TlGen_Object
+import org.telegram.tgnet.model.generated.TlGen_MessageEntity
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.memberProperties
@@ -101,6 +102,14 @@ open class BaseSchemeTest {
         }
     }
 
+    // Constructors the current-layer scheme declares but upstream's Java does
+    // not dispatch yet, so any fixture that nests one cannot round-trip.
+    // botVerifierSettings#a12aefff: upstream 13.0 still parses only b0cd6617.
+    // Drop an entry once upstream's TLdeserialize switch learns the magic.
+    private fun isUpstreamMissingMagic(e: TLParseException): Boolean {
+        return e.message?.startsWith("can't parse magic a12aefff ") == true
+    }
+
     // Build a fixture instance, converting the genuine ClassGraph `<clinit>`
     // poisoning into an `Assume`-skip. This MUST wrap the create itself: the
     // `factory<T>` lambdas that reach `AbstractClassResolver` → ClassGraph run
@@ -162,7 +171,7 @@ open class BaseSchemeTest {
                 // the "can't parse magic" message so VectorWrongSize and
                 // other parse failures still surface.
                 val isUnknownMagic = e.message?.startsWith("can't parse magic") == true
-                if (isLegacyLayer != null && isUnknownMagic) {
+                if (isUnknownMagic && (isLegacyLayer != null || isUpstreamMissingMagic(e))) {
                     nestedMagicDropped = e
                     return@forEach
                 }
@@ -315,6 +324,19 @@ open class BaseSchemeTest {
         }
     }
 
+    // Upstream 13.0 runs TlUtils.validateEntities on deserialized text, which
+    // clears the whole entity list when one entity falls outside the text.
+    // Random offsets and lengths almost always do, so the round trip comes
+    // back shorter. Pin every entity to the first character: fixture strings
+    // are UUIDs, never empty, so the range is always valid.
+    @Suppress("DEPRECATION_ERROR")
+    private fun boundMessageEntities(builder: ConfigurationBuilder) {
+        TlGen_MessageEntity::class.sealedSubclasses.forEach { entity ->
+            builder.property(entity, "offset") { 0 }
+            builder.property(entity, "length") { 1 }
+        }
+    }
+
     private fun createConfigs(clazz: KClass<out TlGen_Object>): List<Configuration> {
         return createConfigs(clazz, null)
     }
@@ -323,6 +345,7 @@ open class BaseSchemeTest {
         val nullableFields = clazz.memberProperties.filter { it.returnType.isMarkedNullable }
         val neverNull = ConfigurationBuilder().let {
             it.recursionStrategy(safeRecursionStrategy)
+            boundMessageEntities(it)
             it.nullabilityStrategy(NeverNullStrategy)
             builder?.invoke(it)
             it.build()
@@ -334,6 +357,7 @@ open class BaseSchemeTest {
 
         val randomNull = ConfigurationBuilder().let {
             it.recursionStrategy(safeRecursionStrategy)
+            boundMessageEntities(it)
             it.nullabilityStrategy(RandomlyNullStrategy)
             builder?.invoke(it)
             it.build()
@@ -341,6 +365,7 @@ open class BaseSchemeTest {
 
         val alwaysNull = ConfigurationBuilder().let {
             it.recursionStrategy(safeRecursionStrategy)
+            boundMessageEntities(it)
             it.nullabilityStrategy(AlwaysNullStrategy)
             builder?.invoke(it)
             it.build()
@@ -351,10 +376,10 @@ open class BaseSchemeTest {
         @Suppress("DEPRECATION_ERROR")
         nullableFields.forEach { field ->
             result.add(alwaysNull.copy(
-                properties = mapOf(clazz to mapOf(field.name to { fixture.create(field.returnType, neverNull) }))
+                properties = alwaysNull.properties + mapOf(clazz to mapOf(field.name to { fixture.create(field.returnType, neverNull) }))
             ))
             result.add(randomNull.copy(
-                properties = mapOf(clazz to mapOf(field.name to { fixture.create(field.returnType, neverNull) }))
+                properties = randomNull.properties + mapOf(clazz to mapOf(field.name to { fixture.create(field.returnType, neverNull) }))
             ))
         }
 
