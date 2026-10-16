@@ -16,6 +16,10 @@ idea {
             file('jni/third_party/libyuv'),
             file('jni/third_party/openh264'),
             file('jni/third_party/xiph'),
+            file('jni/third_party/wamr'),
+            file('jni/third_party/libprisma'),
+            file('jni/third_party/boost-regex'),
+            file('jni/tgcalls'),
             file('jni/tlottie'),
             file('jni/voip/webrtc'),
             file('jni/sqlite')
@@ -52,6 +56,7 @@ dependencies {
     // the com.google group id is a naming coincidence. Upstream dropped its
     // vendored copy of these sources in 12.10.0 in favour of the artifact.
     implementation 'com.google.zxing:core:3.5.4'
+    implementation 'com.neovisionaries:nv-websocket-client:2.14'
 
     implementation 'androidx.car.app:app:1.4.0'
     implementation 'androidx.car.app:app-projected:1.4.0'
@@ -150,12 +155,6 @@ android {
     buildToolsVersion '36.0.0'
     ndkVersion "27.2.12479018"
 
-    // Upstream points jniLibs at ./jni/, but no ABI-named subdirs exist there, so it
-    // contributes zero .so while making AGP copy the whole native source tree plus the
-    // in-tree build output (~6 GB of .o/.d) into merged_jni_libs, enough to exhaust the
-    // CI runner's disk. The packaged .so come from externalNativeBuild (cmake/*/obj/<abi>).
-    sourceSets.main.jniLibs.srcDirs = []
-
     externalNativeBuild {
         cmake {
             path 'jni/CMakeLists.txt'
@@ -178,7 +177,6 @@ android {
 
         coreLibraryDesugaringEnabled true
     }
-
 
     defaultConfig {
         minSdkVersion 24
@@ -283,6 +281,10 @@ task patchNativeSources {
                 'TMessagesProj/jni/third_party/xiph/opusfile',
                 'TMessagesProj/jni/third_party/openh264',
                 'TMessagesProj/jni/third_party/libyuv',
+                'TMessagesProj/jni/tgcalls',
+                'TMessagesProj/jni/wallet-engine',
+                'TMessagesProj/jni/third_party/libprisma',
+                'TMessagesProj/jni/third_party/boost-regex',
                 'TMessagesProj/jni/third_party/boringssl',
                 'TMessagesProj/jni/tlottie',
                 'TMessagesProj/jni/td',
@@ -303,7 +305,7 @@ task patchNativeSources {
         }.standardOutput.asText.get().trim()
         new File(ffmpegDir, 'VERSION').text = ffmpegSha + '\n'
 
-        for (script in ['patch_dav1d.sh', 'patch_td.sh']) {
+        for (script in ['patch_dav1d.sh', 'patch_td.sh', 'patch_tgcalls.sh']) {
             exec {
                 workingDir "${projectDir}/jni"
                 commandLine 'bash', script
@@ -333,14 +335,18 @@ def prebuildSteps = [
     ['build_ffmpeg.sh'   , ['libavcodec.a', 'libavformat.a', 'libavutil.a',
                             'libswresample.a', 'libswscale.a']],
     ['build_tlottie.sh'  , ['libtlottie.a']],
+    ['build_wallet_engine.sh', ['libwallet_engine.a']],
     ['build_tdlib.sh'    , ['libtde2e.a', 'libtdutils.a']],
     ['build_wamr.sh'     , ['libiwasm.a']],
+    ['build_prisma.sh'   , ['libprisma.a']],
 ]
 
 // Pinned rustc for jni/prebuild/build_tlottie.sh, installed by jni/setup_rust.sh.
 // A different rustc emits different code for identical sources, so the version
 // is fixed here; the paths it records are already remapped by the script.
 def rustToolchain = '1.97.1'
+// jni/prebuild/build_wallet_engine.sh: the release jni/gram-wallet/rust-toolchain.toml names.
+def walletRustToolchain = '1.96.1'
 def rustupHome    = '/var/tmp/mg-rustup'
 def cargoHome     = '/var/tmp/mg-cargo'
 
@@ -388,24 +394,34 @@ def wasiSdkRoot    = '/var/tmp/mg-wasi-sdk'
 
             prebuildSteps.each { script, archives ->
                 // build_ffmpeg.sh also writes the per-ABI generated headers
-                // CMake compiles against, so a run interrupted between the
-                // archives and the overlay has to repeat.
+                // CMake compiles against, and build_wallet_engine.sh the UniFFI
+                // bindings, so a run interrupted between the archives and
+                // those files has to repeat.
                 def done = archives.every { new File(libDir, it).exists() } &&
                     (script != 'build_ffmpeg.sh' ||
-                        file("${prebuildDir}/include/${abi}/libavutil/avconfig.h").exists())
+                        file("${prebuildDir}/include/${abi}/libavutil/avconfig.h").exists()) &&
+                    (script != 'build_wallet_engine.sh' ||
+                        file("${prebuildDir}/include/wallet-engine/wallet_engine.cpp").exists())
                 if (done) {
                     return
                 }
                 def env = new LinkedHashMap(baseEnv)
-                if (script == 'build_tlottie.sh') {
+                if (script == 'build_tlottie.sh' || script == 'build_wallet_engine.sh') {
+                    def toolchain = script == 'build_tlottie.sh' ? rustToolchain : walletRustToolchain
                     env['RUSTUP_HOME'] = rustupHome
                     env['CARGO_HOME'] = cargoHome
                     env['PATH'] = "${cargoHome}/bin:" + System.getenv('PATH')
-                    env['TLOTTIE_RUST_TOOLCHAIN'] = rustToolchain
+                    if (script == 'build_tlottie.sh') {
+                        env['TLOTTIE_RUST_TOOLCHAIN'] = toolchain
+                    } else {
+                        // Overrides rust-toolchain.toml, whose rustfmt/clippy
+                        // components the build does not need.
+                        env['RUSTUP_TOOLCHAIN'] = toolchain
+                    }
                     exec {
                         workingDir "${projectDir}/jni"
                         environment env
-                        commandLine 'bash', 'setup_rust.sh', rustToolchain
+                        commandLine 'bash', 'setup_rust.sh', toolchain
                     }
                 }
                 exec {
