@@ -16,6 +16,10 @@ idea {
             file('jni/third_party/libyuv'),
             file('jni/third_party/openh264'),
             file('jni/third_party/xiph'),
+            file('jni/third_party/wamr'),
+            file('jni/third_party/libprisma'),
+            file('jni/third_party/boost-regex'),
+            file('jni/tgcalls'),
             file('jni/tlottie'),
             file('jni/voip/webrtc'),
             file('jni/sqlite')
@@ -52,6 +56,7 @@ dependencies {
     // the com.google group id is a naming coincidence. Upstream dropped its
     // vendored copy of these sources in 12.10.0 in favour of the artifact.
     implementation 'com.google.zxing:core:3.5.4'
+    implementation 'com.neovisionaries:nv-websocket-client:2.14'
 
     implementation 'androidx.car.app:app:1.4.0'
     implementation 'androidx.car.app:app-projected:1.4.0'
@@ -150,12 +155,6 @@ android {
     buildToolsVersion '36.0.0'
     ndkVersion "27.2.12479018"
 
-    // Upstream points jniLibs at ./jni/, but no ABI-named subdirs exist there, so it
-    // contributes zero .so while making AGP copy the whole native source tree plus the
-    // in-tree build output (~6 GB of .o/.d) into merged_jni_libs, enough to exhaust the
-    // CI runner's disk. The packaged .so come from externalNativeBuild (cmake/*/obj/<abi>).
-    sourceSets.main.jniLibs.srcDirs = []
-
     externalNativeBuild {
         cmake {
             path 'jni/CMakeLists.txt'
@@ -178,7 +177,6 @@ android {
 
         coreLibraryDesugaringEnabled true
     }
-
 
     defaultConfig {
         minSdkVersion 24
