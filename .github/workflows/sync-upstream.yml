@@ -1,13 +1,16 @@
 name: Sync Mercurygram upstream
 
 # Once a day, points the mg-upstream branch at Mercurygram/Mercurygram's head so
-# it mirrors upstream exactly, then tries to merge mg-upstream into prod. A
-# merge conflict fails the job and leaves prod untouched — resolve locally.
+# it mirrors upstream exactly, then opens a pull request from mg-upstream into
+# prod if prod doesn't contain it yet (prod only accepts pull requests). On a
+# conflict, merge mg-upstream into staging locally, resolve it there and promote
+# staging; GitHub then marks the mg-upstream pull request as merged.
 # mg-upstream is force-updated, so a history rewrite upstream just moves it.
 #
 # GITHUB_TOKEN cannot push commits that change .github/workflows, which
-# upstream commits often do. Set the SYNC_TOKEN secret to a PAT with the
-# `repo` and `workflow` scopes; without it those pushes are rejected.
+# upstream commits often do, and pull requests opened with GITHUB_TOKEN don't
+# start the prod source guard check that prod requires. Set the SYNC_TOKEN
+# secret to a PAT with the `repo` and `workflow` scopes.
 
 on:
   schedule:
@@ -23,6 +26,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout mg-upstream
@@ -48,22 +52,29 @@ jobs:
           git push --force-with-lease="mg-upstream:${previous}" origin HEAD:mg-upstream
           echo "Moved mg-upstream to Mercurygram ${upstream}" >> "$GITHUB_STEP_SUMMARY"
 
-      # Runs even when mg-upstream was already current, so prod catches up
-      # once an earlier conflict has been resolved by hand.
-      - name: Merge mg-upstream into prod
+      # Runs even when mg-upstream was already current, so a pull request closed
+      # without merging is opened again.
+      - name: Open a pull request into prod
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN || github.token }}
         run: |
           set -euo pipefail
-          git checkout -B prod origin/prod
-          if git merge-base --is-ancestor mg-upstream HEAD; then
-            echo "prod already contains mg-upstream" | tee -a "$GITHUB_STEP_SUMMARY"
+          upstream=$(git rev-parse --short mg-upstream)
+          if git merge-base --is-ancestor mg-upstream origin/prod; then
+            echo "prod already contains Mercurygram ${upstream}" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          if ! git merge --no-edit -m "Merge mg-upstream into prod" mg-upstream; then
-            conflicts=$(git diff --name-only --diff-filter=U | sed 's/^/- /')
-            git merge --abort
-            printf 'Merging mg-upstream into prod conflicts; resolve locally:\n%s\n' "$conflicts" \
-              | tee -a "$GITHUB_STEP_SUMMARY"
-            exit 1
+          existing=$(gh pr list --base prod --head mg-upstream --state open --json url --jq '.[0].url')
+          if [ -n "$existing" ]; then
+            echo "Pull request into prod already open: ${existing}" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
-          git push origin HEAD:prod
-          echo "Merged mg-upstream into prod" >> "$GITHUB_STEP_SUMMARY"
+          if git merge-tree --write-tree --name-only origin/prod mg-upstream > merge.out; then
+            note="Merges cleanly."
+          else
+            note=$(printf 'Conflicts; merge mg-upstream into staging locally, resolve there and promote staging:\n\n%s' \
+              "$(sed -n '2,/^$/p' merge.out | sed '/^$/d; s/^/- /')")
+          fi
+          url=$(gh pr create --base prod --head mg-upstream \
+            --title "Merge Mercurygram ${upstream} into prod" --body "$note")
+          echo "Opened ${url}" | tee -a "$GITHUB_STEP_SUMMARY"
