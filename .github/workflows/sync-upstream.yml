@@ -1,11 +1,12 @@
 name: Sync Mercurygram upstream
 
-# Merges new commits from Mercurygram/Mercurygram into the mg-upstream branch once
-# a day, then tries to merge mg-upstream into prod. A merge conflict at either
-# step fails the job and leaves that branch untouched — resolve locally.
+# Once a day, points the mg-upstream branch at Mercurygram/Mercurygram's head so
+# it mirrors upstream exactly, then tries to merge mg-upstream into prod. A
+# merge conflict fails the job and leaves prod untouched — resolve locally.
+# mg-upstream is force-updated, so a history rewrite upstream just moves it.
 #
 # GITHUB_TOKEN cannot push commits that change .github/workflows, which
-# upstream merges often do. Set the SYNC_TOKEN secret to a PAT with the
+# upstream commits often do. Set the SYNC_TOKEN secret to a PAT with the
 # `repo` and `workflow` scopes; without it those pushes are rejected.
 
 on:
@@ -31,20 +32,21 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.SYNC_TOKEN || github.token }}
 
-      - name: Merge Mercurygram
+      - name: Mirror Mercurygram
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git fetch --no-tags https://github.com/Mercurygram/Mercurygram.git Mercurygram
           upstream=$(git rev-parse --short FETCH_HEAD)
-          if git merge-base --is-ancestor FETCH_HEAD HEAD; then
-            echo "Already up to date with Mercurygram ${upstream}" | tee -a "$GITHUB_STEP_SUMMARY"
+          previous=$(git rev-parse HEAD)
+          if [ "$previous" = "$(git rev-parse FETCH_HEAD)" ]; then
+            echo "mg-upstream already mirrors Mercurygram ${upstream}" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          git merge --no-edit -m "Merge Mercurygram upstream ${upstream}" FETCH_HEAD
-          git push origin HEAD:mg-upstream
-          echo "Merged Mercurygram ${upstream} into mg-upstream" >> "$GITHUB_STEP_SUMMARY"
+          git reset --hard FETCH_HEAD
+          git push --force-with-lease="mg-upstream:${previous}" origin HEAD:mg-upstream
+          echo "Moved mg-upstream to Mercurygram ${upstream}" >> "$GITHUB_STEP_SUMMARY"
 
       # Runs even when mg-upstream was already current, so prod catches up
       # once an earlier conflict has been resolved by hand.
