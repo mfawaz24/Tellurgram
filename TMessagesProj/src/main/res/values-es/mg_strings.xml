@@ -86,10 +86,10 @@
     <string name="MercurygramTorTransport">Anticensura</string>
     <string name="MercurygramTorTransportDirect">Conexión directa</string>
     <string name="MercurygramTorTransportSnowflake">Snowflake</string>
-    <string name="MercurygramTorTransportObfs4">Puentes obfs4</string>
-    <string name="MercurygramTorTransportAbout">Cuando una red bloquea Tor directamente (como en Rusia e Irán), elige Snowflake para enrutar el protocolo de enlace de Tor a través de un repetidor con domain fronting y así poder conectar, sin configuración. O elige puentes obfs4 si tienes líneas de puente de @GetBridgesBot. La conexión directa es la más rápida donde Tor no está bloqueado.</string>
-    <string name="MercurygramTorObfs4BridgesHint">Pega líneas de puente obfs4, una por línea. Consíguelas en @GetBridgesBot en Telegram.</string>
-    <string name="MercurygramTorObfs4BridgesInvalid">No se encontró ningún puente obfs4 válido. Cada línea debe empezar por \"obfs4\". Consigue puentes en @GetBridgesBot en Telegram.</string>
+    <string name="MercurygramTorTransportBridges">Puentes (obfs4, WebTunnel)</string>
+    <string name="MercurygramTorTransportAbout">Cuando una red bloquea Tor directamente (como en Rusia e Irán), elige Snowflake para enrutar el protocolo de enlace de Tor a través de un repetidor con domain fronting y así poder conectar, sin configuración. O elige Puentes si tienes líneas de puente obfs4 o WebTunnel de @GetBridgesBot o bridges.torproject.org. WebTunnel parece tráfico HTTPS normal y suele ser el más difícil de bloquear. La conexión directa es la más rápida donde Tor no está bloqueado.</string>
+    <string name="MercurygramTorBridgesHint">Pega líneas de puente obfs4 o webtunnel, una por línea. Consíguelas en @GetBridgesBot en Telegram o en bridges.torproject.org.</string>
+    <string name="MercurygramTorBridgesInvalid">No se encontró ningún puente válido. Cada línea debe empezar por \"obfs4\" o \"webtunnel\". Consigue puentes en @GetBridgesBot en Telegram o en bridges.torproject.org.</string>
     <string name="MercurygramTorActiveProxyLocked">Desactiva Tor para usar otro proxy.</string>
     <string name="MercurygramTorInstallPlugin">Instalar complemento Tor</string>
     <string name="MercurygramTorPluginDownloading">Descargando complemento Tor…</string>
@@ -150,9 +150,12 @@
     <string name="MercurygramTranscribeOfflineFileUnavailable">Transcripción en el dispositivo: archivo de audio no disponible. Intenta reproducir el mensaje primero.</string>
     <string name="MercurygramTranscribeOfflineDecodeFailed">Transcripción en el dispositivo: no se pudo decodificar el audio.</string>
     <string name="MercurygramTranscribeOfflineFailed">La transcripción en el dispositivo falló.</string>
-    <string name="MercurygramEmojiTitle">Paquete de emojis personalizado</string>
-    <string name="MercurygramEmojiRowAbout">Carga tus propias imágenes de emojis en lugar del conjunto integrado.</string>
+    <string name="MercurygramEmojiTitle">Emoji</string>
+    <string name="MercurygramEmojiRowAbout">Usa la fuente de emojis del sistema o carga tus propias imágenes de emojis en lugar del conjunto integrado.</string>
     <string name="MercurygramEmojiRowDisabled">Desactivado</string>
+    <string name="MercurygramEmojiRowSystem">Emojis del sistema</string>
+    <string name="MercurygramEmojiUseSystem">Usar emojis del sistema</string>
+    <string name="MercurygramEmojiUseSystemInfo">Dibuja los emojis con la fuente de emojis del teléfono. Los emojis que falten en la fuente usan el conjunto integrado.</string>
     <string name="MercurygramEmojiEnable">Usar paquete de emojis personalizado</string>
     <string name="MercurygramEmojiEnableInfo">Mostrar emojis de un paquete importado en lugar del conjunto integrado. Cualquier emoji que falte en el paquete usa el integrado.</string>
     <string name="MercurygramEmojiImport">Importar paquete desde archivo</string>
@@ -162,7 +165,7 @@
     <string name="MercurygramEmojiNotInstalled">Ningún paquete instalado</string>
     <string name="MercurygramEmojiImported">Paquete de emojis importado.</string>
     <string name="MercurygramEmojiImportFailed">No se pudo importar el paquete de emojis.</string>
-    <string name="MercurygramEmojiAbout">Elige un .zip con imágenes de emojis, o un APK oficial de Telegram para extraer sus emojis. El paquete es tu propio archivo, se almacena en tu dispositivo y nunca se comparte. Los emojis que falten usan el conjunto integrado.</string>
+    <string name="MercurygramEmojiAbout">Elige un .zip con imágenes de emojis, un APK oficial de Telegram para extraer sus emojis, o un archivo emoji.pack. El paquete es tu propio archivo, se almacena en tu dispositivo y nunca se comparte. Los emojis que falten usan el conjunto integrado.</string>
     <string name="MercurygramTranslationAlternativeSection">Backend HTTP alternativo</string>
     <string name="MercurygramTranslationAlternativeEngine">Motor</string>
     <string name="MercurygramTranslationAlternativeInstance">Instancia</string>
@@ -175,6 +178,9 @@
     <string name="MercurygramTranslationAlternativeEngineGoogle">Google (vía Mozhi)</string>
     <string name="MercurygramTranslationAlternativeEngineYandex">Yandex</string>
     <string name="MercurygramTranslationPoweredBy">Las traducciones son proporcionadas por\n**%1$s**.</string>
+    <string name="MercurygramTranslationChatsSection">Chats</string>
+    <string name="MercurygramHideTranslateBar">Ocultar barra de traducción</string>
+    <string name="MercurygramHideTranslateBarAbout">No mostrar nunca la barra ‘Traducir al…’ en la parte superior de los chats. Aún puedes traducir un chat desde su menú.</string>
     <string name="MercurygramCreateMention">Mencionar</string>
     <string name="MercurygramMentionUserIdHint">ID de usuario</string>
     <string name="MercurygramMentionChoose">Elegir contacto</string>
@@ -193,6 +199,7 @@
     <string name="MercurygramUnifiedPush">UnifiedPush</string>
     <string name="UnifiedPushDistributor">Distribuidor de UnifiedPush</string>
     <string name="UnifiedPushDistributorWaiting">%1$s (esperando el endpoint)</string>
+    <string name="UnifiedPushDistributorFailed">%1$s (registro fallido: %2$s)</string>
     <string name="UnifiedPushNoDistributors">No hay ninguna app distribuidora de UnifiedPush instalada. Instala una para recibir notificaciones push.</string>
     <string name="MercurygramEmbeddedFcm">Google FCM (integrado)</string>
     <string name="MercurygramEmbeddedFcmWarning">Entrega las notificaciones a través de los Servicios de Google Play de este dispositivo, firmadas por la pasarela de Tellurgram. La app no incluye ninguna biblioteca de Google, pero Google sabe cuándo te llega una notificación y los Servicios de Play deben seguir instalados. Cualquier otro distribuidor deja a Google completamente fuera.</string>
@@ -220,6 +227,8 @@
     <string name="MercurygramPushDiagnostics">Diagnóstico de notificaciones</string>
     <string name="MercurygramPushDiagnosticsNever">Ningún push recibido</string>
     <string name="HiddenAccounts">Cuentas ocultas</string>
+    <string name="MercurygramAccountOrder">Reordenar cuentas</string>
+    <string name="MercurygramAccountOrderInfo">Arrastra las cuentas para cambiar su orden en el selector de cuentas y en los ajustes.</string>
     <string name="HiddenAccountsOptions">Opciones</string>
     <string name="HiddenAccountsStealthMode">Modo sigiloso</string>
     <string name="HiddenAccountsStealthModeRequiresPasscodeOff">Desactiva el código de acceso de Telegram antes de activar el modo sigiloso.</string>

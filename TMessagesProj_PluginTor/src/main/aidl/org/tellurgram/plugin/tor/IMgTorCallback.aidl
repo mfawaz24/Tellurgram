@@ -24,4 +24,13 @@ oneway interface IMgTorCallback {
     // Unrecoverable error during start or bootstrap (e.g. control-port
     // auth failure, native crash). Main app should surface this in settings.
     void onError(String reason);
+
+    // :tor is about to kill itself to get a fresh process (tor can run only
+    // once per process). The coming disconnect is expected: rebind at once,
+    // without backoff or abortive-bind counting. restart true = the rebind
+    // should start tor in the fresh process; false = tor was stopped, rebind
+    // idle. Appended last, and the interface is oneway, so this is not an
+    // AIDL break: an old main ignores the unknown transaction and an old
+    // plugin never sends it.
+    void onRecycling(boolean restart);
 }

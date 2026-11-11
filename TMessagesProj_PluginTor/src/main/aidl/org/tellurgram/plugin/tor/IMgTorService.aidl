@@ -70,8 +70,8 @@ interface IMgTorService {
     // Anti-censorship transport selection. Forwarded from main's
     // SharedConfig.mg_torTransportMode, pushed before start() (same "push
     // scalars then start" pattern as setIdleStopMinutes).
-    //   transportMode: 0=direct (vanilla Tor), 1=snowflake, 2=obfs4 (lyrebird).
-    //   bridgeLines: newline-separated obfs4 bridge lines (mode 2 only), else null.
+    //   transportMode: 0=direct (vanilla Tor), 1=snowflake, 2=obfs4/webtunnel bridges (lyrebird).
+    //   bridgeLines: newline-separated obfs4/webtunnel bridge lines (mode 2 only), else null.
     // Read once when the next start() assembles its argv; the main side
     // restarts Tor when the user changes transport so the new argv takes effect.
     //

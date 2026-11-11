@@ -316,9 +316,26 @@ public class SharedConfig {
 
     public static void toggleMgUseCustomEmojiPack() {
         mg_useCustomEmojiPack = !mg_useCustomEmojiPack;
+        // The system font and a custom pack are alternative glyph sources.
+        if (mg_useCustomEmojiPack) {
+            mg_useSystemEmoji = false;
+        }
+        saveMgEmojiSource();
+    }
+
+    public static void toggleMgUseSystemEmoji() {
+        mg_useSystemEmoji = !mg_useSystemEmoji;
+        if (mg_useSystemEmoji) {
+            mg_useCustomEmojiPack = false;
+        }
+        saveMgEmojiSource();
+    }
+
+    private static void saveMgEmojiSource() {
         ApplicationLoader.applicationContext.getSharedPreferences("userconfing", Context.MODE_PRIVATE)
                 .edit()
                 .putBoolean("mg_useCustomEmojiPack", mg_useCustomEmojiPack)
+                .putBoolean("mg_useSystemEmoji", mg_useSystemEmoji)
                 .apply();
         // Drop cached glyph bitmaps so already-rendered spans repaint from the
         // newly-selected source on the next frame.
@@ -435,7 +452,7 @@ public class SharedConfig {
     // prefs edit or a future-version downgrade can't push an out-of-range mode
     // to the plugin (falls back to Direct).
     public static int sanitizeMgTorTransportMode(int mode) {
-        return (mode < MG_TOR_TRANSPORT_DIRECT || mode > MG_TOR_TRANSPORT_OBFS4)
+        return (mode < MG_TOR_TRANSPORT_DIRECT || mode > MG_TOR_TRANSPORT_BRIDGES)
                 ? MG_TOR_TRANSPORT_DIRECT : mode;
     }
 
@@ -457,13 +474,13 @@ public class SharedConfig {
         }
     }
 
-    // Persist the obfs4 bridge blob. Stored verbatim (the plugin validates each
-    // line). Only the obfs4 transport consumes these, so a live daemon relaunch
-    // is needed only when obfs4 is the ACTIVE mode; editing the field under
+    // Persist the bridge blob. Stored verbatim (the plugin validates each
+    // line). Only the bridges transport consumes these, so a live daemon relaunch
+    // is needed only when bridges is the ACTIVE mode; editing the field under
     // Direct/Snowflake (or pre-filling bridges before the switch) must not drop
     // MTProto onto the blocking stub for a value the running daemon isn't using.
-    // When switching INTO obfs4 the settings screen sets the lines first (no-op
-    // here) then setMgTorTransportMode(OBFS4), which drives the single relaunch
+    // When switching INTO bridges the settings screen sets the lines first (no-op
+    // here) then setMgTorTransportMode(BRIDGES), which drives the single relaunch
     // that picks up both.
     public static void setMgTorBridgeLines(String lines) {
         if (lines == null) lines = "";
@@ -473,7 +490,7 @@ public class SharedConfig {
                 .edit()
                 .putString("mg_torBridgeLines", lines)
                 .apply();
-        if (mg_torTransportMode != MG_TOR_TRANSPORT_OBFS4) return;
+        if (mg_torTransportMode != MG_TOR_TRANSPORT_BRIDGES) return;
         try {
             org.tellurgram.tor.MgTorClient.getInstance().applyTransportChange();
         } catch (Throwable t) {
@@ -718,6 +735,13 @@ public class SharedConfig {
     // the pack is missing. Global because the emoji bitmap cache (Emoji.emojiBmp)
     // is a process-wide static, same as useSystemFont/useSystemEmoji.
     public static boolean mg_useCustomEmojiPack = false;
+    // Mercurygram: when on, glyphs are rasterized from the system emoji font
+    // (org.tellurgram.emoji.MgSystemEmoji) into the same bitmap
+    // cache, falling back per-glyph to the bundled set. Separate from the
+    // dormant upstream useSystemEmoji, which only skips span replacement and
+    // leaves keyboard, reactions and big emoji on the bundled set. Global for
+    // the same process-wide cache reason as mg_useCustomEmojiPack.
+    public static boolean mg_useSystemEmoji = false;
     // Mercurygram: never register the proximity sensor (calls, voice playback,
     // raise-to-listen). Global: device hardware, not an account property.
     public static boolean mg_disableProximitySensor = false;
@@ -733,17 +757,18 @@ public class SharedConfig {
     // Anti-censorship transport for the Tor daemon. "Direct" is vanilla Tor (no
     // bridges), which is DPI-blocked in Russia/Iran/etc. "Snowflake" routes the
     // Tor handshake through domain-fronted WebRTC so it bootstraps behind those
-    // blocks. "obfs4" routes it through user-supplied obfs4 bridges (obtained
-    // out-of-band, e.g. Telegram's @GetBridgesBot). These int values are a wire
+    // blocks. "Bridges" routes it through user-supplied obfs4 or webtunnel
+    // bridges (obtained out-of-band, e.g. Telegram's @GetBridgesBot or
+    // bridges.torproject.org). These int values are a wire
     // contract with the plugin; keep in sync with MgTorController.TRANSPORT_* on
     // the plugin side.
     public static final int MG_TOR_TRANSPORT_DIRECT = 0;
     public static final int MG_TOR_TRANSPORT_SNOWFLAKE = 1;
-    public static final int MG_TOR_TRANSPORT_OBFS4 = 2;
+    public static final int MG_TOR_TRANSPORT_BRIDGES = 2;
     public static int mg_torTransportMode = MG_TOR_TRANSPORT_DIRECT;
-    // Newline-separated obfs4 bridge lines used when mg_torTransportMode ==
-    // MG_TOR_TRANSPORT_OBFS4. Empty for direct/snowflake. Pushed verbatim to the
-    // plugin, which parses/validates each line (MgTorController.parseObfs4Bridges).
+    // Newline-separated obfs4/webtunnel bridge lines used when mg_torTransportMode
+    // == MG_TOR_TRANSPORT_BRIDGES. Empty for direct/snowflake. Pushed verbatim to the
+    // plugin, which parses/validates each line (MgTorController.parseBridges).
     public static String mg_torBridgeLines = "";
 
     // Mercurygram: Translation engine selection. "default" defers to
@@ -902,8 +927,11 @@ public class SharedConfig {
     public static boolean saveStreamMedia = true;
     public static boolean pauseMusicOnRecord = false;
     public static boolean pauseMusicOnMedia = false;
+    public static boolean compactMode = false;
     public static boolean noiseSupression;
     public static boolean debugWebView;
+    /** Experimental: a widget frame unchanged for a third of a second is drawn from a compositing layer. */
+    public static boolean widgetStaticLayers = true;
     public static boolean sortContactsByName;
     public static boolean sortFilesByName;
     public static boolean shuffleMusic;
@@ -925,7 +953,6 @@ public class SharedConfig {
     public static int emojiInteractionsHintCount;
     public static int dayNightThemeSwitchHintCount;
     public static int callEncryptionHintDisplayedCount;
-    public static boolean shadowsInSections;
     public static boolean debugViewMetrics;
     public static boolean photoHighQualityDefault;
     public static boolean photoLiveDefault;
@@ -1090,6 +1117,7 @@ public class SharedConfig {
         editor.putString("mg_transcribeModel", mg_transcribeModel);
         editor.putBoolean("mg_transcribeVad", mg_transcribeVad);
         editor.putBoolean("mg_useCustomEmojiPack", mg_useCustomEmojiPack);
+        editor.putBoolean("mg_useSystemEmoji", mg_useSystemEmoji);
         editor.putBoolean("mg_disableProximitySensor", mg_disableProximitySensor);
         editor.putString("mg_webPushPrivateKey", webPushPrivateKey != null ? Base64.encodeToString(webPushPrivateKey, Base64.DEFAULT) : "");
         editor.putString("mg_webPushPublicKey", webPushPublicKey != null ? Base64.encodeToString(webPushPublicKey, Base64.DEFAULT) : "");
@@ -1168,6 +1196,7 @@ public class SharedConfig {
         mg_transcribeModel = preferences.getString("mg_transcribeModel", "tiny-q8_0");
         mg_transcribeVad = preferences.getBoolean("mg_transcribeVad", true);
         mg_useCustomEmojiPack = preferences.getBoolean("mg_useCustomEmojiPack", false);
+        mg_useSystemEmoji = preferences.getBoolean("mg_useSystemEmoji", false);
         mg_disableProximitySensor = preferences.getBoolean("mg_disableProximitySensor", false);
         migratePerAccountSettingsV1(preferences);
         migrateTranscribeLangToPerAccount(preferences);
@@ -1186,6 +1215,13 @@ public class SharedConfig {
         mgUpdateApkPath = preferences.getString("mg_updateApkPath", null);
         mgDismissedPendingTag = preferences.getString("mg_dismissedPendingTag", null);
         mgDismissedPluginPromptTag = preferences.getString("mg_dismissedPluginPromptTag", null);
+
+    }
+
+    // Must run only after loadConfig() has read every key: clearing saves the
+    // whole config, and a save mid-load persists still-default fields (e.g. an
+    // empty passcodeSalt next to the real hash, locking the user out).
+    private static void mgClearStalePendingUpdate() {
         if (mgPendingUpdate != null) {
             try {
                 org.tellurgram.MgUpdateInfo info = org.tellurgram.MgUpdateInfo.fromJson(mgPendingUpdate);
@@ -1395,6 +1431,8 @@ public class SharedConfig {
             saveStreamMedia = preferences.getBoolean("saveStreamMedia", true);
             pauseMusicOnRecord = preferences.getBoolean("pauseMusicOnRecord", true);
             pauseMusicOnMedia = preferences.getBoolean("pauseMusicOnMedia", false);
+            // compact mode is still in development: private beta only
+            compactMode = preferences.getBoolean("compactMode", false);
             forceDisableTabletMode = preferences.getBoolean("forceDisableTabletMode", false);
             streamAllVideo = preferences.getBoolean("streamAllVideo", BuildVars.DEBUG_VERSION);
             streamMkv = preferences.getBoolean("streamMkv", false);
@@ -1411,6 +1449,7 @@ public class SharedConfig {
             distanceSystemType = preferences.getInt("distanceSystemType", 0);
             keepMedia = preferences.getInt("keep_media", CacheByChatsController.KEEP_MEDIA_ONE_MONTH);
             debugWebView = preferences.getBoolean("debugWebView", false);
+            widgetStaticLayers = preferences.getBoolean("widgetStaticLayers", true);
             lastKeepMediaCheckTime = preferences.getInt("lastKeepMediaCheckTime", 0);
             lastLogsCheckTime = preferences.getInt("lastLogsCheckTime", 0);
             searchMessagesAsListUsed = preferences.getBoolean("searchMessagesAsListUsed", false);
@@ -1449,7 +1488,6 @@ public class SharedConfig {
             multipleReactionsPromoShowed = preferences.getBoolean("multipleReactionsPromoShowed", false);
             callEncryptionHintDisplayedCount = preferences.getInt("callEncryptionHintDisplayedCount", 0);
             debugVideoQualities = preferences.getBoolean("debugVideoQualities", false);
-            shadowsInSections = preferences.getBoolean("shadowsInSections", false);
             debugViewMetrics = preferences.getBoolean("debugViewMetrics", false);
             photoHighQualityDefault = preferences.getBoolean("photoHighQualityDefault", false);
             photoLiveDefault = preferences.getBoolean("photoLiveDefault", false);
@@ -1460,6 +1498,7 @@ public class SharedConfig {
             showNotificationsForAllAccounts = preferences.getBoolean("AllAccounts", true);
 
             configLoaded = true;
+            mgClearStalePendingUpdate();
         }
     }
 
@@ -2023,6 +2062,11 @@ public class SharedConfig {
         editor.apply();
     }
 
+    public static void toggleWidgetStaticLayers() {
+        widgetStaticLayers = !widgetStaticLayers;
+        MessagesController.getGlobalMainSettings().edit().putBoolean("widgetStaticLayers", widgetStaticLayers).apply();
+    }
+
     public static void toggleDebugWebView() {
         debugWebView = !debugWebView;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -2312,6 +2356,19 @@ public class SharedConfig {
         SharedPreferences preferences = MessagesController.getGlobalMainSettings();
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("pauseMusicOnMedia", pauseMusicOnMedia);
+        editor.apply();
+    }
+
+    /** Compact mode of a dialog: the app's setting, and agent bot chats are always compact. */
+    public static boolean isCompactMode(int currentAccount, long dialogId) {
+        return compactMode || dialogId > 0 && AppGlobalConfig.getInstance(currentAccount).agentBotIds.contains(dialogId);
+    }
+
+    public static void toggleCompactMode() {
+        compactMode = !compactMode;
+        SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("compactMode", compactMode);
         editor.apply();
     }
 

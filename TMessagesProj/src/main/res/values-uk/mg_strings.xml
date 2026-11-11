@@ -86,10 +86,10 @@
     <string name="MercurygramTorTransport">Обхід цензури</string>
     <string name="MercurygramTorTransportDirect">Пряме з\'єднання</string>
     <string name="MercurygramTorTransportSnowflake">Snowflake</string>
-    <string name="MercurygramTorTransportObfs4">Мости obfs4</string>
-    <string name="MercurygramTorTransportAbout">Там, де мережа блокує Tor напряму (як у Росії та Ірані), виберіть Snowflake, щоб без налаштування спрямувати рукостискання Tor через ретранслятор із доменним фронтингом і все одно підключитися. Або виберіть мости obfs4, якщо у вас є рядки мостів від @GetBridgesBot. Пряме з\'єднання швидше там, де Tor не заблоковано.</string>
-    <string name="MercurygramTorObfs4BridgesHint">Вставте рядки мостів obfs4, по одному в рядку. Отримайте їх у @GetBridgesBot у Telegram.</string>
-    <string name="MercurygramTorObfs4BridgesInvalid">Дійсний міст obfs4 не знайдено. Кожен рядок має починатися з \"obfs4\". Отримайте мости у @GetBridgesBot у Telegram.</string>
+    <string name="MercurygramTorTransportBridges">Мости (obfs4, WebTunnel)</string>
+    <string name="MercurygramTorTransportAbout">Там, де мережа блокує Tor напряму (як у Росії та Ірані), виберіть Snowflake, щоб без налаштування спрямувати рукостискання Tor через ретранслятор із доменним фронтингом і все одно підключитися. Або виберіть мости, якщо у вас є рядки мостів obfs4 або WebTunnel від @GetBridgesBot чи з bridges.torproject.org. WebTunnel виглядає як звичайний HTTPS-трафік, і його зазвичай найважче заблокувати. Пряме з\'єднання швидше там, де Tor не заблоковано.</string>
+    <string name="MercurygramTorBridgesHint">Вставте рядки мостів obfs4 або webtunnel, по одному в рядку. Отримайте їх у @GetBridgesBot у Telegram або на bridges.torproject.org.</string>
+    <string name="MercurygramTorBridgesInvalid">Дійсний міст не знайдено. Кожен рядок має починатися з \"obfs4\" або \"webtunnel\". Отримайте мости у @GetBridgesBot у Telegram або на bridges.torproject.org.</string>
     <string name="MercurygramTorActiveProxyLocked">Вимкніть Tor, щоб використовувати інший проксі.</string>
     <string name="MercurygramTorInstallPlugin">Встановити плагін Tor</string>
     <string name="MercurygramTorPluginDownloading">Завантаження плагіна Tor…</string>
@@ -150,9 +150,12 @@
     <string name="MercurygramTranscribeOfflineFileUnavailable">Розшифрування на пристрої: аудіофайл недоступний. Спершу спробуйте відтворити повідомлення.</string>
     <string name="MercurygramTranscribeOfflineDecodeFailed">Розшифрування на пристрої: не вдалося декодувати аудіо.</string>
     <string name="MercurygramTranscribeOfflineFailed">Розшифрування на пристрої не вдалося.</string>
-    <string name="MercurygramEmojiTitle">Власний набір емодзі</string>
-    <string name="MercurygramEmojiRowAbout">Завантажте власні зображення емодзі замість вбудованого набору.</string>
+    <string name="MercurygramEmojiTitle">Емодзі</string>
+    <string name="MercurygramEmojiRowAbout">Використовуйте системний шрифт емодзі або завантажте власні зображення замість вбудованого набору.</string>
     <string name="MercurygramEmojiRowDisabled">Вимк.</string>
+    <string name="MercurygramEmojiRowSystem">Системні емодзі</string>
+    <string name="MercurygramEmojiUseSystem">Системні емодзі</string>
+    <string name="MercurygramEmojiUseSystemInfo">Малювати емодзі системним шрифтом телефону. Відсутні у шрифті емодзі беруться з вбудованого набору.</string>
     <string name="MercurygramEmojiEnable">Використовувати власний набір емодзі</string>
     <string name="MercurygramEmojiEnableInfo">Показувати емодзі з імпортованого набору замість вбудованого. Відсутні в наборі емодзі беруться з вбудованого.</string>
     <string name="MercurygramEmojiImport">Імпорт набору з файлу</string>
@@ -162,7 +165,7 @@
     <string name="MercurygramEmojiNotInstalled">Набір не встановлено</string>
     <string name="MercurygramEmojiImported">Набір емодзі імпортовано.</string>
     <string name="MercurygramEmojiImportFailed">Не вдалося імпортувати набір емодзі.</string>
-    <string name="MercurygramEmojiAbout">Виберіть .zip із зображеннями емодзі або офіційний APK Telegram, щоб видобути з нього емодзі. Набір — це ваш власний файл, він зберігається на пристрої й ніколи не передається. Відсутні емодзі беруться з вбудованого набору.</string>
+    <string name="MercurygramEmojiAbout">Виберіть .zip із зображеннями емодзі, офіційний APK Telegram, щоб видобути з нього емодзі, або файл emoji.pack. Набір — це ваш власний файл, він зберігається на пристрої й ніколи не передається. Відсутні емодзі беруться з вбудованого набору.</string>
     <string name="MercurygramTranslationAlternativeSection">Альтернативний HTTP-бекенд</string>
     <string name="MercurygramTranslationAlternativeEngine">Рушій</string>
     <string name="MercurygramTranslationAlternativeInstance">Екземпляр</string>
@@ -175,6 +178,9 @@
     <string name="MercurygramTranslationAlternativeEngineGoogle">Google (через Mozhi)</string>
     <string name="MercurygramTranslationAlternativeEngineYandex">Yandex</string>
     <string name="MercurygramTranslationPoweredBy">Переклади виконує\n**%1$s**.</string>
+    <string name="MercurygramTranslationChatsSection">Чати</string>
+    <string name="MercurygramHideTranslateBar">Приховати панель перекладу</string>
+    <string name="MercurygramHideTranslateBarAbout">Ніколи не показувати панель «Перекласти…» вгорі чатів. Чат усе одно можна перекласти з його меню.</string>
     <string name="MercurygramCreateMention">Згадати</string>
     <string name="MercurygramMentionUserIdHint">ID користувача</string>
     <string name="MercurygramMentionChoose">Вибрати контакт</string>
@@ -193,6 +199,7 @@
     <string name="MercurygramUnifiedPush">UnifiedPush</string>
     <string name="UnifiedPushDistributor">Дистриб\'ютор UnifiedPush</string>
     <string name="UnifiedPushDistributorWaiting">%1$s (очікування endpoint)</string>
+    <string name="UnifiedPushDistributorFailed">%1$s (помилка реєстрації: %2$s)</string>
     <string name="UnifiedPushNoDistributors">Не встановлено жодного застосунку-розповсюджувача UnifiedPush. Встановіть його, щоб отримувати push-сповіщення.</string>
     <string name="MercurygramEmbeddedFcm">Google FCM (вбудований)</string>
     <string name="MercurygramEmbeddedFcmWarning">Доставляє сповіщення через сервіси Google Play на цьому пристрої, підписуючи їх шлюзом Tellurgram. Застосунок не містить жодної бібліотеки Google, але Google дізнається, коли вам надіслано сповіщення, а сервіси Play мають лишатися встановленими. Будь-який інший дистриб\'ютор повністю виключає Google із ланцюжка.</string>
@@ -220,6 +227,8 @@
     <string name="MercurygramPushDiagnostics">Діагностика сповіщень</string>
     <string name="MercurygramPushDiagnosticsNever">Push ще не надходив</string>
     <string name="HiddenAccounts">Приховані акаунти</string>
+    <string name="MercurygramAccountOrder">Порядок акаунтів</string>
+    <string name="MercurygramAccountOrderInfo">Перетягуйте акаунти, щоб змінити їхній порядок у перемикачі акаунтів і налаштуваннях.</string>
     <string name="HiddenAccountsOptions">Параметри</string>
     <string name="HiddenAccountsStealthMode">Прихований режим</string>
     <string name="HiddenAccountsStealthModeRequiresPasscodeOff">Вимкніть код доступу Telegram перед увімкненням прихованого режиму.</string>

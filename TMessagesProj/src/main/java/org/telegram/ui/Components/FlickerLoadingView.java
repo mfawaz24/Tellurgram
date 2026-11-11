@@ -20,6 +20,7 @@ import org.telegram.messenger.SharedConfig;
 import org.telegram.ui.ActionBar.Theme;
 
 import java.util.Random;
+import java.util.HashSet;
 
 public class FlickerLoadingView extends View implements Theme.Colorable {
 
@@ -973,6 +974,11 @@ public class FlickerLoadingView extends View implements Theme.Colorable {
             paint.setShader(gradient);
         }
     }
+    @Override
+    public void addColorKeys(HashSet<Integer> colors) {
+        colors.add(colorKey1);
+        colors.add(colorKey2);
+    }
 
     private float checkRtl(float x) {
         if (LocaleController.isRTL) {
@@ -991,7 +997,7 @@ public class FlickerLoadingView extends View implements Theme.Colorable {
     private int getCellHeight(int width) {
         switch (getViewType()) {
             case DIALOG_CELL_TYPE:
-                return dp((SharedConfig.useThreeLinesLayout ? 78 : 72) + 1);
+                return dp((SharedConfig.useThreeLinesLayout ? 78 : 72) + 1) + org.tellurgram.MgDialogTextScale.rowExtra(SharedConfig.useThreeLinesLayout);
             case TOPIC_CELL_TYPE:
                 return dp((SharedConfig.useThreeLinesLayout ? 76 : 64) + 1);
             case DIALOG_TYPE:

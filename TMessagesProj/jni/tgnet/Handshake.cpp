@@ -42,6 +42,7 @@ Handshake::Handshake(Datacenter *datacenter, HandshakeType type, HandshakeDelega
 }
 
 Handshake::~Handshake() {
+    *alive = false;
     cleanupHandshake();
 }
 
@@ -866,7 +867,8 @@ void Handshake::processHandshakeResponse_serverDHParamsAnswer(TLObject *message,
             handshakeServerSalt = nullptr;
 
             if (handshakeType == HandshakeTypePerm) {
-                ConnectionsManager::getInstance(currentDatacenter->instanceNum).scheduleTask([&] {
+                ConnectionsManager::getInstance(currentDatacenter->instanceNum).scheduleTask([&, alive = alive] {
+                    if (!*alive) return;
                     ByteArray *authKey = handshakeAuthKey;
                     handshakeAuthKey = nullptr;
                     delegate->onHandshakeComplete(this, authKeyTempPendingId, authKey, timeDifference);
@@ -913,13 +915,15 @@ void Handshake::processHandshakeResponse_serverDHParamsAnswer(TLObject *message,
                         // climb. See ConnectionsManager::onTempKeyBindFailedRecover()
                         // for the two-strike rule.
                         ConnectionsManager::getInstance(currentDatacenter->instanceNum).onTempKeyBindSucceeded();
-                        ConnectionsManager::getInstance(currentDatacenter->instanceNum).scheduleTask([&] {
+                        ConnectionsManager::getInstance(currentDatacenter->instanceNum).scheduleTask([&, alive = alive] {
+                            if (!*alive) return;
                             ByteArray *authKey = authKeyTempPending;
                             authKeyTempPending = nullptr;
                             delegate->onHandshakeComplete(this, authKeyTempPendingId, authKey, timeDifference);
                         });
                     } else if (error == nullptr || error->code != 400 || error->text.find("ENCRYPTED_MESSAGE_INVALID") == std::string::npos) {
-                        ConnectionsManager::getInstance(currentDatacenter->instanceNum).scheduleTask([&] {
+                        ConnectionsManager::getInstance(currentDatacenter->instanceNum).scheduleTask([&, alive = alive] {
+                            if (!*alive) return;
                             beginHandshake(true);
                         });
                     }

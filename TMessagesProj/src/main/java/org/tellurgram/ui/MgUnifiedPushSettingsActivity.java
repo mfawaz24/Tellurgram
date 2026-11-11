@@ -117,9 +117,14 @@ public class MgUnifiedPushSettingsActivity extends UniversalFragment {
             status = LocaleController.getString(R.string.UnifiedPushNoDistributors);
         } else if (acked == null && saved != null) {
             // Picked, but no endpoint came back yet (or ever): staying silent here hides a
-            // stuck registration behind what looks like a done setting.
-            status = LocaleController.formatString("UnifiedPushDistributorWaiting",
-                    R.string.UnifiedPushDistributorWaiting, MgEmbeddedFcmDistributor.label(saved));
+            // stuck registration behind what looks like a done setting. A known refusal says
+            // more than "waiting": it is the only part of a report that names a cause.
+            String failure = UnifiedPushReceiver.getLastRegistrationFailure();
+            status = failure != null
+                    ? LocaleController.formatString("UnifiedPushDistributorFailed",
+                            R.string.UnifiedPushDistributorFailed, MgEmbeddedFcmDistributor.label(saved), failure)
+                    : LocaleController.formatString("UnifiedPushDistributorWaiting",
+                            R.string.UnifiedPushDistributorWaiting, MgEmbeddedFcmDistributor.label(saved));
         }
         items.add(UItem.asShadow(status));
 

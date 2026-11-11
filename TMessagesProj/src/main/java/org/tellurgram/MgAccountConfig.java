@@ -30,6 +30,7 @@ public class MgAccountConfig {
     public boolean blockAiServers = true;
     public boolean disableAiEditor = true;
     public boolean disableAiSummary = true;
+    public boolean hideTranslateBar = false;
     public boolean disableInstantView = false;
     public boolean disableLinkPreviews = false;
     public boolean preferSecretChats = true;
@@ -91,6 +92,7 @@ public class MgAccountConfig {
         editor.putBoolean("blockAiServers", blockAiServers);
         editor.putBoolean("disableAiEditor", disableAiEditor);
         editor.putBoolean("disableAiSummary", disableAiSummary);
+        editor.putBoolean("hideTranslateBar", hideTranslateBar);
         editor.putBoolean("disableInstantView", disableInstantView);
         editor.putBoolean("disableLinkPreviews", disableLinkPreviews);
         editor.putBoolean("preferSecretChats", preferSecretChats);
@@ -121,6 +123,7 @@ public class MgAccountConfig {
         blockAiServers = preferences.getBoolean("blockAiServers", true);
         disableAiEditor = preferences.getBoolean("disableAiEditor", true);
         disableAiSummary = preferences.getBoolean("disableAiSummary", true);
+        hideTranslateBar = preferences.getBoolean("hideTranslateBar", false);
         disableInstantView = preferences.getBoolean("disableInstantView", false);
         disableLinkPreviews = preferences.getBoolean("disableLinkPreviews", false);
         preferSecretChats = preferences.getBoolean("preferSecretChats", true);
@@ -167,6 +170,7 @@ public class MgAccountConfig {
         blockAiServers = true;
         disableAiEditor = true;
         disableAiSummary = true;
+        hideTranslateBar = false;
         disableInstantView = false;
         disableLinkPreviews = false;
         preferSecretChats = true;

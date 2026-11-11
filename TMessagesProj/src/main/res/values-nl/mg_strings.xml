@@ -86,10 +86,10 @@
     <string name="MercurygramTorTransport">Anticensuur</string>
     <string name="MercurygramTorTransportDirect">Directe verbinding</string>
     <string name="MercurygramTorTransportSnowflake">Snowflake</string>
-    <string name="MercurygramTorTransportObfs4">obfs4-bridges</string>
-    <string name="MercurygramTorTransportAbout">Waar een netwerk Tor rechtstreeks blokkeert (zoals in Rusland en Iran), kies Snowflake om de Tor-handshake zonder configuratie via een domain-fronted relay te leiden zodat er toch verbinding gemaakt kan worden. Of kies obfs4-bridges als je bridge-regels van @GetBridgesBot hebt. Een directe verbinding is het snelst waar Tor niet geblokkeerd is.</string>
-    <string name="MercurygramTorObfs4BridgesHint">Plak obfs4-bridge-regels, één per regel. Haal ze op bij @GetBridgesBot op Telegram.</string>
-    <string name="MercurygramTorObfs4BridgesInvalid">Geen geldige obfs4-bridge gevonden. Elke regel moet met \"obfs4\" beginnen. Haal bridges op bij @GetBridgesBot op Telegram.</string>
+    <string name="MercurygramTorTransportBridges">Bridges (obfs4, WebTunnel)</string>
+    <string name="MercurygramTorTransportAbout">Waar een netwerk Tor rechtstreeks blokkeert (zoals in Rusland en Iran), kies Snowflake om de Tor-handshake zonder configuratie via een domain-fronted relay te leiden zodat er toch verbinding gemaakt kan worden. Of kies Bridges als je obfs4- of WebTunnel-bridge-regels van @GetBridgesBot of bridges.torproject.org hebt. WebTunnel lijkt op gewoon HTTPS-verkeer en is vaak het moeilijkst te blokkeren. Een directe verbinding is het snelst waar Tor niet geblokkeerd is.</string>
+    <string name="MercurygramTorBridgesHint">Plak obfs4- of webtunnel-bridge-regels, één per regel. Haal ze op bij @GetBridgesBot op Telegram of bridges.torproject.org.</string>
+    <string name="MercurygramTorBridgesInvalid">Geen geldige bridge gevonden. Elke regel moet met \"obfs4\" of \"webtunnel\" beginnen. Haal bridges op bij @GetBridgesBot op Telegram of bridges.torproject.org.</string>
     <string name="MercurygramTorActiveProxyLocked">Schakel Tor uit om een andere proxy te gebruiken.</string>
     <string name="MercurygramTorInstallPlugin">Tor-plug-in installeren</string>
     <string name="MercurygramTorPluginDownloading">Tor-plug-in downloaden…</string>
@@ -150,9 +150,12 @@
     <string name="MercurygramTranscribeOfflineFileUnavailable">Transcriptie op apparaat: audiobestand niet beschikbaar. Probeer eerst het bericht af te spelen.</string>
     <string name="MercurygramTranscribeOfflineDecodeFailed">Transcriptie op apparaat: kon de audio niet decoderen.</string>
     <string name="MercurygramTranscribeOfflineFailed">Transcriptie op apparaat mislukt.</string>
-    <string name="MercurygramEmojiTitle">Aangepast emojipakket</string>
-    <string name="MercurygramEmojiRowAbout">Laad je eigen emoji-afbeeldingen in plaats van de ingebouwde set.</string>
+    <string name="MercurygramEmojiTitle">Emoji</string>
+    <string name="MercurygramEmojiRowAbout">Gebruik het emojilettertype van het systeem of laad je eigen emoji-afbeeldingen in plaats van de ingebouwde set.</string>
     <string name="MercurygramEmojiRowDisabled">Uit</string>
+    <string name="MercurygramEmojiRowSystem">Systeememoji</string>
+    <string name="MercurygramEmojiUseSystem">Systeememoji gebruiken</string>
+    <string name="MercurygramEmojiUseSystemInfo">Teken emoji met het emojilettertype van je telefoon. Emoji die het lettertype mist, komen uit de ingebouwde set.</string>
     <string name="MercurygramEmojiEnable">Aangepast emojipakket gebruiken</string>
     <string name="MercurygramEmojiEnableInfo">Toon emoji uit een geïmporteerd pakket in plaats van de ingebouwde set. Ontbrekende emoji in het pakket vallen terug op de ingebouwde.</string>
     <string name="MercurygramEmojiImport">Pakket uit bestand importeren</string>
@@ -162,7 +165,7 @@
     <string name="MercurygramEmojiNotInstalled">Geen pakket geïnstalleerd</string>
     <string name="MercurygramEmojiImported">Emojipakket geïmporteerd.</string>
     <string name="MercurygramEmojiImportFailed">Kon emojipakket niet importeren.</string>
-    <string name="MercurygramEmojiAbout">Kies een .zip met emoji-afbeeldingen, of een officiële Telegram-APK om de emoji eruit te halen. Het pakket is je eigen bestand, opgeslagen op je apparaat en wordt nooit gedeeld. Ontbrekende emoji vallen terug op de ingebouwde set.</string>
+    <string name="MercurygramEmojiAbout">Kies een .zip met emoji-afbeeldingen, een officiële Telegram-APK om de emoji eruit te halen, of een emoji.pack-bestand. Het pakket is je eigen bestand, opgeslagen op je apparaat en wordt nooit gedeeld. Ontbrekende emoji vallen terug op de ingebouwde set.</string>
     <string name="MercurygramTranslationAlternativeSection">Alternatieve HTTP-backend</string>
     <string name="MercurygramTranslationAlternativeEngine">Engine</string>
     <string name="MercurygramTranslationAlternativeInstance">Instantie</string>
@@ -175,6 +178,9 @@
     <string name="MercurygramTranslationAlternativeEngineGoogle">Google (via Mozhi)</string>
     <string name="MercurygramTranslationAlternativeEngineYandex">Yandex</string>
     <string name="MercurygramTranslationPoweredBy">Vertalingen worden verzorgd door\n**%1$s**.</string>
+    <string name="MercurygramTranslationChatsSection">Chats</string>
+    <string name="MercurygramHideTranslateBar">Vertaalbalk verbergen</string>
+    <string name="MercurygramHideTranslateBarAbout">Toon nooit de balk ‘Vertalen naar…’ bovenaan chats. Je kunt een chat nog steeds vertalen via het menu.</string>
     <string name="MercurygramCreateMention">Vermelden</string>
     <string name="MercurygramMentionUserIdHint">Gebruikers-ID</string>
     <string name="MercurygramMentionChoose">Contact kiezen</string>
@@ -193,6 +199,7 @@
     <string name="MercurygramUnifiedPush">UnifiedPush</string>
     <string name="UnifiedPushDistributor">UnifiedPush-distributeur</string>
     <string name="UnifiedPushDistributorWaiting">%1$s (wacht op endpoint)</string>
+    <string name="UnifiedPushDistributorFailed">%1$s (registratie mislukt: %2$s)</string>
     <string name="UnifiedPushNoDistributors">Er is geen UnifiedPush-distributor-app geïnstalleerd. Installeer er een om pushmeldingen te ontvangen.</string>
     <string name="MercurygramEmbeddedFcm">Google FCM (ingebouwd)</string>
     <string name="MercurygramEmbeddedFcmWarning">Levert meldingen via de Google Play-services op dit toestel, ondertekend door de Tellurgram-gateway. De app bevat geen enkele Google-bibliotheek, maar Google weet wanneer er een melding naar je gaat en Play-services moet geïnstalleerd blijven. Elke andere distributeur houdt Google volledig buiten het pad.</string>
@@ -220,6 +227,8 @@
     <string name="MercurygramPushDiagnostics">Meldingsdiagnose</string>
     <string name="MercurygramPushDiagnosticsNever">Nog geen push ontvangen</string>
     <string name="HiddenAccounts">Verborgen accounts</string>
+    <string name="MercurygramAccountOrder">Accounts herschikken</string>
+    <string name="MercurygramAccountOrderInfo">Sleep accounts om hun volgorde in de accountwisselaar en de instellingen te wijzigen.</string>
     <string name="HiddenAccountsOptions">Opties</string>
     <string name="HiddenAccountsStealthMode">Stealth-modus</string>
     <string name="HiddenAccountsStealthModeRequiresPasscodeOff">Schakel de Telegram-toegangscode uit voordat je de stealth-modus inschakelt.</string>

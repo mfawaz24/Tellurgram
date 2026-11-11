@@ -24,8 +24,6 @@ import android.text.TextUtils;
 import android.util.SparseIntArray;
 
 import androidx.collection.LongSparseArray;
-import androidx.core.content.ContextCompat;
-
 import org.tellurgram.location.MgBackgroundLocationGate;
 
 import org.telegram.SQLite.SQLiteCursor;
@@ -480,6 +478,7 @@ public class LocationController extends BaseController implements NotificationCe
     protected void update() {
         UserConfig userConfig = getUserConfig();
         if (!sharingLocations.isEmpty()) {
+            boolean expired = false;
             for (int a = 0; a < sharingLocations.size(); a++) {
                 final SharingLocationInfo info = sharingLocations.get(a);
                 int currentTime = getConnectionsManager().getCurrentTime();
@@ -496,7 +495,11 @@ public class LocationController extends BaseController implements NotificationCe
                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.liveLocationsChanged);
                     });
                     a--;
+                    expired = true;
                 }
+            }
+            if (expired && sharingLocations.isEmpty()) {
+                stop(true);
             }
         }
         if (started) {
@@ -521,10 +524,11 @@ public class LocationController extends BaseController implements NotificationCe
         if (!shouldStopGps()) {
             return false;
         }
-        if (Math.abs(lastLocationSendTime - SystemClock.elapsedRealtime()) >= SEND_NEW_LOCATION_TIME) {
-            return true;
+        if (Math.abs(lastLocationSendTime - SystemClock.elapsedRealtime()) < SEND_NEW_LOCATION_TIME) {
+            return false;
         }
-        return false;
+        // wait for a fix taken after the provider was started, update() sends anyway after LOCATION_ACQUIRE_TIME
+        return lastKnownLocation != null && lastKnownLocation.getElapsedRealtimeNanos() / 1000000 >= lastLocationStartTime;
     }
 
     public void cleanup() {
@@ -779,29 +783,40 @@ public class LocationController extends BaseController implements NotificationCe
         try {
             MgBackgroundLocationGate.setSharingActive(true);
             if (PermissionRequest.hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION) || PermissionRequest.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // [MG] a service started while the app is in the background gets no location without
-                // ACCESS_BACKGROUND_LOCATION, so a boot restore would run and report nothing
-                if (!MgBackgroundLocationGate.canStartService()) {
-                    MgBackgroundLocationGate.deferService(ApplicationLoader.applicationContext);
-                    return;
-                }
-                ContextCompat.startForegroundService(ApplicationLoader.applicationContext, new Intent(ApplicationLoader.applicationContext, LocationSharingService.class));
+                ApplicationLoader.applicationContext.startService(new Intent(ApplicationLoader.applicationContext, LocationSharingService.class));
+            } else {
+                LocationSharingService.showPausedNotification();
             }
         } catch (Throwable e) {
+            // not allowed from background, onAppResumed restarts it once the app is visible
             FileLog.e(e);
-        }
-    }
-
-    // [MG] the app is on screen now, so the deferred boot restore can have its service
-    public void resumeDeferredSharing() {
-        if (!sharingLocationsUI.isEmpty()) {
-            startService();
+            LocationSharingService.showPausedNotification();
         }
     }
 
     private void stopService() {
+        if (getLocationsCount() > 0) {
+            // other accounts are still sharing
+            return;
+        }
+        LocationSharingService.hidePausedNotification();
         MgBackgroundLocationGate.setSharingActive(false);
         ApplicationLoader.applicationContext.stopService(new Intent(ApplicationLoader.applicationContext, LocationSharingService.class));
+    }
+
+    // startService fails silently in background (after a process restart or a service timeout), so the sharing
+    // would stay in UI without updates and expiration checks; restart the service once the app is visible
+    public static void onAppResumed() {
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            if (!UserConfig.getInstance(a).isClientActivated()) {
+                continue;
+            }
+            final LocationController controller = getInstance(a);
+            if (!controller.sharingLocationsUI.isEmpty()) {
+                controller.startService();
+                return;
+            }
+        }
     }
 
     public void removeAllLocationSharings() {
@@ -1357,7 +1372,7 @@ public class LocationController extends BaseController implements NotificationCe
                     cityLocation.geo._long = location.getLongitude();
                     cityLocation.query_id = -1;
                     cityLocation.title = city;
-                    cityLocation.icon = onlyCountry ? "https://ss3.4sqi.net/img/categories_v2/building/government_capitolbuilding_64.png" : "https://ss3.4sqi.net/img/categories_v2/travel/hotel_64.png";
+                    cityLocation.icon = onlyCountry ? "country" : "city";
                     cityLocation.emoji = countryCodeToEmoji(countryCode);
                     cityLocation.address = onlyCountry ? LocaleController.getString(R.string.Country) : LocaleController.getString(R.string.PassportCity);
 

@@ -4,12 +4,13 @@
 # jni/<abi>/libobfs4proxy.so so AGP extracts it into nativeLibraryDir (the only
 # dir Android lets an app exec from). The Tor daemon (run in-process via
 # tor_run_main) forks/execs it through
-# `--ClientTransportPlugin "obfs4 exec <nativeLibDir>/libobfs4proxy.so"`.
+# `--ClientTransportPlugin "obfs4,webtunnel exec <nativeLibDir>/libobfs4proxy.so"`.
 #
-# lyrebird registers the obfs4 transport (plus obfs2/obfs3/scramblesuit/meek);
-# Mercurygram only wires the obfs4 name in the Tor argv. Unlike Snowflake
-# (zero-config), obfs4 needs user-supplied bridge lines, obtained out-of-band
-# (e.g. Telegram's @GetBridgesBot) and pasted in the settings screen.
+# lyrebird registers the obfs4 and webtunnel transports (plus
+# obfs2/obfs3/scramblesuit/meek/snowflake); Mercurygram only wires the obfs4
+# and webtunnel names in the Tor argv. Unlike Snowflake (zero-config), both
+# need user-supplied bridge lines, obtained out-of-band (e.g. Telegram's
+# @GetBridgesBot or bridges.torproject.org) and pasted in the settings screen.
 #
 # lyrebird is pure Go; this cross-compiles ./cmd/lyrebird from the
 # jni/lyrebird submodule with the NDK clang as the CGO C compiler. Output lands

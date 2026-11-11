@@ -86,10 +86,10 @@
     <string name="MercurygramTorTransport">مقاومة الرقابة</string>
     <string name="MercurygramTorTransportDirect">اتصال مباشر</string>
     <string name="MercurygramTorTransportSnowflake">Snowflake</string>
-    <string name="MercurygramTorTransportObfs4">جسور obfs4</string>
-    <string name="MercurygramTorTransportAbout">عندما تحجب الشبكة تور مباشرة (كما في روسيا وإيران)، اختر Snowflake لتمرير مصافحة تور عبر مُرحّل مموّه بالنطاق حتى تتمكن من الاتصال دون أي إعداد. أو اختر جسور obfs4 إذا كانت لديك أسطر جسور من @GetBridgesBot. الاتصال المباشر أسرع حيث لا يكون تور محجوبًا.</string>
-    <string name="MercurygramTorObfs4BridgesHint">الصق أسطر جسور obfs4، سطرًا واحدًا لكل جسر. احصل عليها من @GetBridgesBot على تيليجرام.</string>
-    <string name="MercurygramTorObfs4BridgesInvalid">لم يُعثر على جسر obfs4 صالح. يجب أن يبدأ كل سطر بـ \"obfs4\". احصل على الجسور من @GetBridgesBot على تيليجرام.</string>
+    <string name="MercurygramTorTransportBridges">الجسور (obfs4، WebTunnel)</string>
+    <string name="MercurygramTorTransportAbout">عندما تحجب الشبكة تور مباشرة (كما في روسيا وإيران)، اختر Snowflake لتمرير مصافحة تور عبر مُرحّل مموّه بالنطاق حتى تتمكن من الاتصال دون أي إعداد. أو اختر الجسور إذا كانت لديك أسطر جسور obfs4 أو WebTunnel من @GetBridgesBot أو bridges.torproject.org. يبدو WebTunnel كحركة HTTPS عادية وغالبًا ما يكون الأصعب حجبًا. الاتصال المباشر أسرع حيث لا يكون تور محجوبًا.</string>
+    <string name="MercurygramTorBridgesHint">الصق أسطر جسور obfs4 أو webtunnel، سطرًا واحدًا لكل جسر. احصل عليها من @GetBridgesBot على تيليجرام أو من bridges.torproject.org.</string>
+    <string name="MercurygramTorBridgesInvalid">لم يُعثر على جسر صالح. يجب أن يبدأ كل سطر بـ \"obfs4\" أو \"webtunnel\". احصل على الجسور من @GetBridgesBot على تيليجرام أو من bridges.torproject.org.</string>
     <string name="MercurygramTorActiveProxyLocked">أوقف تشغيل Tor لاستخدام بروكسي مختلف.</string>
     <string name="MercurygramTorInstallPlugin">تثبيت إضافة Tor</string>
     <string name="MercurygramTorPluginDownloading">جارٍ تنزيل إضافة Tor…</string>
@@ -150,9 +150,12 @@
     <string name="MercurygramTranscribeOfflineFileUnavailable">التفريغ على الجهاز: الملف الصوتي غير متوفر. جرّب تشغيل الرسالة أولًا.</string>
     <string name="MercurygramTranscribeOfflineDecodeFailed">التفريغ على الجهاز: تعذّر فك ترميز الصوت.</string>
     <string name="MercurygramTranscribeOfflineFailed">فشل التفريغ على الجهاز.</string>
-    <string name="MercurygramEmojiTitle">حزمة رموز تعبيرية مخصصة</string>
-    <string name="MercurygramEmojiRowAbout">حمّل صور الرموز التعبيرية الخاصة بك بدلاً من المجموعة المدمجة.</string>
+    <string name="MercurygramEmojiTitle">الرموز التعبيرية</string>
+    <string name="MercurygramEmojiRowAbout">استخدم خط الرموز التعبيرية في النظام أو حمّل صورك الخاصة بدلاً من المجموعة المدمجة.</string>
     <string name="MercurygramEmojiRowDisabled">مُعطّل</string>
+    <string name="MercurygramEmojiRowSystem">رموز النظام التعبيرية</string>
+    <string name="MercurygramEmojiUseSystem">استخدام رموز النظام التعبيرية</string>
+    <string name="MercurygramEmojiUseSystemInfo">ارسم الرموز التعبيرية بخط الهاتف. الرموز غير الموجودة في الخط تُعرض من المجموعة المدمجة.</string>
     <string name="MercurygramEmojiEnable">استخدام حزمة رموز تعبيرية مخصصة</string>
     <string name="MercurygramEmojiEnableInfo">عرض الرموز التعبيرية من حزمة مستوردة بدلاً من المجموعة المدمجة. أي رمز تعبيري غير موجود في الحزمة يعود إلى المدمج.</string>
     <string name="MercurygramEmojiImport">استيراد حزمة من ملف</string>
@@ -162,7 +165,7 @@
     <string name="MercurygramEmojiNotInstalled">لا توجد حزمة مُثبّتة</string>
     <string name="MercurygramEmojiImported">تم استيراد حزمة الرموز التعبيرية.</string>
     <string name="MercurygramEmojiImportFailed">تعذّر استيراد حزمة الرموز التعبيرية.</string>
-    <string name="MercurygramEmojiAbout">اختر ملف ‎.zip‎ يحتوي على صور الرموز التعبيرية، أو حزمة APK رسمية من تيليجرام لاستخراج رموزها. الحزمة ملفك الخاص، مُخزّنة على جهازك ولا تُشارَك أبدًا. الرموز التعبيرية المفقودة تعود إلى المجموعة المدمجة.</string>
+    <string name="MercurygramEmojiAbout">اختر ملف ‎.zip‎ يحتوي على صور الرموز التعبيرية، أو حزمة APK رسمية من تيليجرام لاستخراج رموزها، أو ملف ‎emoji.pack‎. الحزمة ملفك الخاص، مُخزّنة على جهازك ولا تُشارَك أبدًا. الرموز التعبيرية المفقودة تعود إلى المجموعة المدمجة.</string>
     <string name="MercurygramTranslationAlternativeSection">خلفية HTTP بديلة</string>
     <string name="MercurygramTranslationAlternativeEngine">المحرك</string>
     <string name="MercurygramTranslationAlternativeInstance">النسخة</string>
@@ -175,6 +178,9 @@
     <string name="MercurygramTranslationAlternativeEngineGoogle">Google (عبر Mozhi)</string>
     <string name="MercurygramTranslationAlternativeEngineYandex">Yandex</string>
     <string name="MercurygramTranslationPoweredBy">الترجمات مدعومة بواسطة\n**%1$s**.</string>
+    <string name="MercurygramTranslationChatsSection">الدردشات</string>
+    <string name="MercurygramHideTranslateBar">إخفاء شريط الترجمة</string>
+    <string name="MercurygramHideTranslateBarAbout">لا تعرض أبدًا شريط «ترجمة إلى…» أعلى الدردشات. لا يزال بإمكانك ترجمة الدردشة من قائمتها.</string>
     <string name="MercurygramCreateMention">إشارة</string>
     <string name="MercurygramMentionUserIdHint">معرّف المستخدم</string>
     <string name="MercurygramMentionChoose">اختيار جهة اتصال</string>
@@ -193,6 +199,7 @@
     <string name="MercurygramUnifiedPush">UnifiedPush</string>
     <string name="UnifiedPushDistributor">موزّع UnifiedPush</string>
     <string name="UnifiedPushDistributorWaiting">‏%1$s (بانتظار نقطة النهاية)</string>
+    <string name="UnifiedPushDistributorFailed">‏%1$s (فشل التسجيل: %2$s)</string>
     <string name="UnifiedPushNoDistributors">لا يوجد تطبيق موزّع UnifiedPush مثبّت. ثبّت واحداً لتلقي الإشعارات الفورية.</string>
     <string name="MercurygramEmbeddedFcm">Google FCM (مدمج)</string>
     <string name="MercurygramEmbeddedFcmWarning">يوصل الإشعارات عبر خدمات Google Play على هذا الجهاز، مستخدماً بوابة Tellurgram لتوقيعها. لا يتضمن التطبيق أي مكتبة من Google، لكن Google تعرف متى يُرسل إليك إشعار ويجب أن تبقى خدمات Play مثبتة. أي موزّع آخر يُبقي Google خارج المسار تماماً.</string>
@@ -220,6 +227,8 @@
     <string name="MercurygramPushDiagnostics">تشخيص الإشعارات</string>
     <string name="MercurygramPushDiagnosticsNever">لم يصل أي إشعار فوري بعد</string>
     <string name="HiddenAccounts">الحسابات المخفية</string>
+    <string name="MercurygramAccountOrder">إعادة ترتيب الحسابات</string>
+    <string name="MercurygramAccountOrderInfo">اسحب الحسابات لتغيير ترتيبها في مبدّل الحسابات وفي الإعدادات.</string>
     <string name="HiddenAccountsOptions">الخيارات</string>
     <string name="HiddenAccountsStealthMode">الوضع الخفي</string>
     <string name="HiddenAccountsStealthModeRequiresPasscodeOff">عطّل رمز مرور Telegram قبل تفعيل الوضع الخفي.</string>

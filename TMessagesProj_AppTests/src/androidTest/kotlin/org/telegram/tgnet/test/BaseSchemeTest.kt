@@ -104,10 +104,11 @@ open class BaseSchemeTest {
 
     // Constructors the current-layer scheme declares but upstream's Java does
     // not dispatch yet, so any fixture that nests one cannot round-trip.
-    // botVerifierSettings#a12aefff: upstream 13.0 still parses only b0cd6617.
-    // Drop an entry once upstream's TLdeserialize switch learns the magic.
+    // updateTranscribedAudioFile#734c2e7b: in layer 233, no Java class in
+    // upstream 13.2.1. Drop an entry once upstream's TLdeserialize switch
+    // learns the magic.
     private fun isUpstreamMissingMagic(e: TLParseException): Boolean {
-        return e.message?.startsWith("can't parse magic a12aefff ") == true
+        return e.message?.startsWith("can't parse magic 734c2e7b ") == true
     }
 
     // Build a fixture instance, converting the genuine ClassGraph `<clinit>`

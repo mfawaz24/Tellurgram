@@ -39,6 +39,11 @@ runs:
           TMessagesProj/jni/patch_*.sh
           TMessagesProj/jni/setup_rust.sh
         )
+        # In-tree sources of the wallet and prisma archives (adapter crate,
+        # Cargo.lock, rust-toolchain.toml, prisma CMake project), plus the
+        # submodule patches the build scripts apply (ours and upstream's).
+        mapfile -t scripts_extra < <(git ls-files TMessagesProj/jni/gram-wallet TMessagesProj/jni/prisma TMessagesProj/jni/patches TMessagesProj/jni/prebuild/patches)
+        scripts+=("${scripts_extra[@]}")
 
         # Host toolchain versions. nasm + gperf emit bytes that end up
         # embedded in our .a outputs (libvpx/dav1d SIMD assembly, boringssl

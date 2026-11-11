@@ -41,9 +41,9 @@ configurations.all {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
     implementation 'androidx.core:core:1.16.0'
-    implementation 'androidx.media:media:1.7.0'
+    implementation 'androidx.media:media:1.8.0'
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'androidx.exifinterface:exifinterface:1.3.6'
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
@@ -70,6 +70,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'com.google.guava:guava:31.1-android'
 
+    // Pinned: firebase-pnv alone would pull credentials 1.5.0 (passkeys were built on 1.6.0-alpha04).
     implementation "androidx.credentials:credentials:1.6.0-alpha04"
 
     implementation "io.noties.markwon:core:4.6.2"
@@ -90,27 +91,16 @@ dependencies {
 
 //    implementation 'com.google.mlkit:translate:17.0.3'
 
-    constraints {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
-            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
-        }
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
-            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
-        }
-    }
-
-    // Pinned to 3.0.x: 3.1.0 bumped kotlin-stdlib to 2.2.20 (3.2.0+ to 2.3.0), which exceeds
-    // what R8 8.6.27 (AGP 8.6.x) can parse. Lift when upgrading AGP to 8.7+ (needs Gradle 8.9+).
-    // 3.0.10 is the last of that line and fixes push delivery here: the connector binds our
-    // PushService to hand over an event and unbinds on a fixed timer; 3.0.9 gave it 1s, which
-    // the cold start of this app regularly loses, and a bind that never connects leaves the
-    // connector's internal event queue stuck for the whole process (no endpoint, no messages).
-    // 3.0.10 raises that window to 5s and keeps kotlin-stdlib 2.0.21, so the R8 pin still holds.
-    implementation 'org.unifiedpush.android:connector:3.0.10'
-    // Pinned to 3.0.0 for the same reason: 3.1.0 requires kotlin-stdlib 2.3.0.
-    implementation 'org.unifiedpush.android:embedded-fcm-distributor:3.0.0'
-    // kotlin-stdlib 2.0.20 via okhttp/okio — safe with R8 8.6.27. Re-check on major version bumps.
-    implementation 'org.maplibre.gl:android-sdk:13.0.1'
+    // 3.0.10 or later: 3.0.9 and older bind our PushService to hand over an event and unbind
+    // after 1s, which the cold start of this app regularly loses, and a bind that never
+    // connects leaves the connector's internal event queue stuck for the whole process (no
+    // endpoint, no messages).
+    implementation 'org.unifiedpush.android:connector:3.3.5'
+    // 3.1.0 or later: 3.0.0 asks Play Services for a token with the legacy
+    // com.google.iid.TOKEN_REQUEST broadcast, which current Play Services never answers, so
+    // a new registration waits for an endpoint forever.
+    implementation 'org.unifiedpush.android:embedded-fcm-distributor:3.1.0'
+    implementation 'org.maplibre.gl:android-sdk:13.7.1'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
@@ -296,21 +286,6 @@ task patchNativeSources {
                 'TMessagesProj/jni/td',
                 'TMessagesProj/jni/whisper'
         }
-        // ffbuild/version.sh bakes FFMPEG_VERSION into libavutil, preferring a
-        // VERSION file in the source root over `git describe`. Left to git the
-        // string depends on whether the clone carries tags and on git's
-        // auto-scaled abbreviation length, so the same pin can produce
-        // "n8.1.2-30-g45f1910444" or "45f1910444" depending on how the
-        // submodule was fetched. Pinning it to the full submodule SHA makes the
-        // archives byte-identical across shallow and full checkouts, which
-        // reproducible builds need. Upstream never hit this: it builds
-        // from a checkout that has tags.
-        def ffmpegDir = file("${projectDir}/jni/third_party/ffmpeg")
-        def ffmpegSha = providers.exec {
-            commandLine 'git', '-C', ffmpegDir.toString(), 'rev-parse', 'HEAD'
-        }.standardOutput.asText.get().trim()
-        new File(ffmpegDir, 'VERSION').text = ffmpegSha + '\n'
-
         for (script in ['patch_dav1d.sh', 'patch_td.sh', 'patch_tgcalls.sh']) {
             exec {
                 workingDir "${projectDir}/jni"
@@ -344,7 +319,6 @@ def prebuildSteps = [
     ['build_wallet_engine.sh', ['libwallet_engine.a']],
     ['build_tdlib.sh'    , ['libtde2e.a', 'libtdutils.a']],
     ['build_wamr.sh'     , ['libiwasm.a']],
-    ['build_prisma.sh'   , ['libprisma.a']],
 ]
 
 // Pinned rustc for jni/prebuild/build_tlottie.sh, installed by jni/setup_rust.sh.
@@ -412,6 +386,18 @@ def wasiSdkRoot    = '/var/tmp/mg-wasi-sdk'
                     return
                 }
                 def env = new LinkedHashMap(baseEnv)
+                if (script == 'build_ffmpeg.sh') {
+                    // build_ffmpeg.sh stamps FFMPEG_VERSION with `git describe`
+                    // of the submodule, whose output depends on whether the
+                    // clone carries tags and on git's auto-scaled abbreviation
+                    // length, so the same pin can give "n8.1.2-30-g45f1910444"
+                    // or "45f1910444" depending on how it was fetched. With no
+                    // usable git dir the script falls back to the submodule's
+                    // RELEASE file, which is the same in every checkout.
+                    // F-Droid reproducibility needs that; upstream builds from
+                    // a checkout that has tags.
+                    env['GIT_DIR'] = '/nonexistent'
+                }
                 if (script == 'build_tlottie.sh' || script == 'build_wallet_engine.sh') {
                     def toolchain = script == 'build_tlottie.sh' ? rustToolchain : walletRustToolchain
                     env['RUSTUP_HOME'] = rustupHome
@@ -469,5 +455,43 @@ afterEvaluate {
     }.configureEach { task ->
         def matched = abiToTask.find { abi, _ -> task.name.contains(abi) }
         task.dependsOn tasks.named(matched ? matched.value : fallbackTask)
+    }
+}
+
+// The widget sandbox's QuickJS bytecode (assets/WidgetSandbox/WidgetJS/*.qbc),
+// which upstream commits prebuilt, is compiled from the committed bundles by
+// jni/build_widget_bytecode.sh with a host qjsc built from the vendored
+// QuickJS, and checked against manifest.txt there.
+abstract class WidgetBytecodeTask extends DefaultTask {
+    @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
+    abstract ConfigurableFileCollection getSources()
+
+    @Internal
+    abstract RegularFileProperty getScript()
+
+    @OutputDirectory
+    abstract DirectoryProperty getOutputDir()
+
+    @TaskAction
+    void build() {
+        project.exec {
+            commandLine 'bash', script.get().asFile.path, outputDir.get().asFile.path
+        }
+    }
+}
+
+def widgetBytecode = tasks.register('buildWidgetBytecode', WidgetBytecodeTask) {
+    script = file('jni/build_widget_bytecode.sh')
+    sources.from(script,
+        'jni/twidget/widget-sandbox/packages/ios/Sources/CQuickJS',
+        'jni/twidget/widget-sandbox/packages/tools/qjsc',
+        'src/main/assets/WidgetSandbox')
+    outputDir = layout.buildDirectory.dir('generated/widget-bytecode')
+}
+
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.sources.assets?.addGeneratedSourceDirectory(widgetBytecode, { it.outputDir })
     }
 }

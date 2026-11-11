@@ -91,7 +91,7 @@
 	ignore = all
 [submodule "TMessagesProj_PluginTor/jni/tor"]
 	path = TMessagesProj_PluginTor/jni/tor
-	url = https://github.com/guardianproject/tor.git
+	url = https://gitlab.torproject.org/tpo/core/tor.git
 	shallow = true
 	ignore = all
 [submodule "TMessagesProj_PluginTor/jni/openssl"]
