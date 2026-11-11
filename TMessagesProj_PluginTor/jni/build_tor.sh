@@ -24,7 +24,7 @@
 #   - On Android, tor's check for `getentropy` / `arc4random_buf` may
 #     misdetect when sysroot's headers are present but the symbol isn't yet
 #     in API 21. If so, add `--disable-getentropy --disable-rand-procps`.
-#   - The output is `src/libtor.a` (current 0.4.8) but past releases put it
+#   - The output is `src/libtor.a` (current 0.4.9) but past releases put it
 #     under `src/feature/api/libtor.a`. Adjust the install rule accordingly.
 #
 # Requires: NDK env var (same as build_boringssl.sh). Run after build_boringssl.sh

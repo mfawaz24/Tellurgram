@@ -91,6 +91,10 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        // embedded-fcm-distributor 3.1.0 pulls kotlin-stdlib 2.3.0, newer metadata than the
+        // 2.1.0 compiler of the upstream kotlin-gradle-plugin accepts. The app itself has no
+        // Kotlin sources, so only this test module needs it. Drop once the plugin reaches 2.2+.
+        freeCompilerArgs += ["-Xskip-metadata-version-check"]
     }
 
     androidResources {
@@ -193,7 +197,7 @@ android {
         externalNativeBuild {
             cmake {
                 version '3.22.1'
-                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-21' //, '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-23' //, '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
                 targets 'tmessages.49'
             }
         }

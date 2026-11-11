@@ -140,7 +140,18 @@ public final class MgTorClient {
     // RELEASE-VERIFY: if APP_VERSION_CODE changes before this merges, recompute
     // to (new APP_VERSION_CODE * 100) so a feature-less same-name plugin can't
     // slip under the floor.
-    private static final int  MIN_PLUGIN_MG_VERSION_CODE = 691600;
+    //
+    // Bumped to 718302 (13.0.3.2): plugins up to 13.0.3.1 (718301) embed tor
+    // 0.4.8, which lacks the Desc=3 / Microdesc=3 protocols the consensus now
+    // lists as required for clients, so tor exits right after reading it and
+    // the plugin can never bootstrap. 13.0.3.2 is the first build on tor 0.4.9.
+    //
+    // Bumped to 729101 (13.2.1.1): plugins up to 13.0.3.2 (718302) restart tor
+    // inside the same :tor process, and the second tor run frees the worker
+    // thread pool while its workers still use it (use-after-free). Those
+    // plugins also drop webtunnel bridge lines, so a webtunnel-only bridge
+    // config fails with "no bridge lines configured".
+    private static final int  MIN_PLUGIN_MG_VERSION_CODE = 729101;
     private static final long REBIND_BACKOFF_INITIAL_MS = 1_000L;
     private static final long REBIND_BACKOFF_CAP_MS     = 60_000L;
     private static final int  BLOCKING_STUB_PORT        = 1;
@@ -154,6 +165,12 @@ public final class MgTorClient {
     // (1+2+4+8+16 s) — a healthy reconnect cycles below this; a true
     // crash loop reliably exceeds it.
     private static final int  MAX_ABORTIVE_BINDS        = 5;
+    // Bounded auto-restart after tor exits unexpectedly while a client is
+    // active (OOM, hostile co-resident SIGNAL SHUTDOWN, bad bridge line).
+    // The plugin can't respawn tor in process, so main owns the restart and
+    // its cap: main outlives every :tor process, so a recycle can't reset it.
+    private static final long UNEXPECTED_RESTART_DELAY_MS = 5_000L;
+    private static final int  MAX_UNEXPECTED_RESTARTS     = 3;
 
     private static final MgTorClient INSTANCE = new MgTorClient();
 
@@ -215,6 +232,21 @@ public final class MgTorClient {
     // MAX_ABORTIVE_BINDS to break the loop.
     private volatile int consecutiveAbortiveBinds;
 
+    // Set by remoteCallback.onRecycling: the plugin is about to kill :tor to
+    // get a fresh process, so the next disconnect is expected. That
+    // disconnect rebinds at once and does not count toward
+    // MAX_ABORTIVE_BINDS. Cleared in handleConnected so a stale flag can't
+    // excuse a later real crash. recycleRestart carries the callback's
+    // restart flag: true = start tor in the fresh process, false = tor was
+    // stopped, rebind idle.
+    private boolean recycleExpected;
+    private boolean recycleRestart;
+
+    // Unexpected tor exits without a READY in between (see
+    // MAX_UNEXPECTED_RESTARTS). Worker thread only. Reset on onReady and on
+    // userInitiatedStart (toggle off+on is the documented recovery).
+    private int unexpectedExitCount;
+
     // Port of the loopback endpoint Tor currently owns: BLOCKING_STUB_PORT
     // before/between bootstraps, the live SOCKS port once tor is up, -1 when
     // Tor owns nothing. Set immediately before every Tor-owned
@@ -268,11 +300,7 @@ public final class MgTorClient {
                 SharedConfig.publishMgInternalTorProxy(owned);
                 // persistProxyPortToDisk repaints the proxy screen for us.
                 persistProxyPortToDisk(owned);
-                Context ctx = appContext != null ? appContext : ApplicationLoader.applicationContext;
-                if (ctx == null) return;
-                Toast.makeText(ctx,
-                        LocaleController.getString(R.string.MercurygramTorActiveProxyLocked),
-                        Toast.LENGTH_LONG).show();
+                showLongToast(R.string.MercurygramTorActiveProxyLocked);
             } catch (Throwable t) { FileLog.e(t); }
         });
     }
@@ -376,13 +404,15 @@ public final class MgTorClient {
     // the looper starts processing messages, no race with Toast's looper
     // requirement.
     private static void notifyTorPluginMissing() {
+        showLongToast(R.string.MercurygramTorPluginMissing);
+    }
+
+    private static void showLongToast(int resId) {
         AndroidUtilities.runOnUIThread(() -> {
             try {
                 Context ctx = appContext != null ? appContext : ApplicationLoader.applicationContext;
                 if (ctx == null) return;
-                Toast.makeText(ctx,
-                        LocaleController.getString(R.string.MercurygramTorPluginMissing),
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, LocaleController.getString(resId), Toast.LENGTH_LONG).show();
             } catch (Throwable t) { FileLog.e(t); }
         });
     }
@@ -885,6 +915,7 @@ public final class MgTorClient {
             // would otherwise burn Android 14+ FGS-start quota on every
             // wake while the plugin is still broken.
             consecutiveAbortiveBinds = 0;
+            unexpectedExitCount = 0;
             pendingStart = true;
             // Already bound from a prior cold-start init? Drive the AIDL start
             // directly; otherwise scheduleBind which consumes pendingStart in
@@ -895,14 +926,7 @@ public final class MgTorClient {
             // toggle), so its internal promoteForeground call can directly
             // Service.startForeground without a pre-opened FGS-start grace
             // window.
-            IMgTorService s = service;
-            if (s != null && bound) {
-                pushTransportConfig(s);
-                try { s.start(); pendingStart = false; }
-                catch (RemoteException e) { FileLog.e(e); }
-            } else {
-                scheduleBind(0L);
-            }
+            if (!startOnBoundService()) scheduleBind(0L);
             // TODO(mg-tor-plugin): if plugin not installed, surface PLUGIN_NOT_INSTALLED for the install row.
         });
     }
@@ -919,21 +943,26 @@ public final class MgTorClient {
             // is recoverable on user intent.
             if (consecutiveAbortiveBinds >= MAX_ABORTIVE_BINDS) return;
             pendingStart = true;
-            IMgTorService s = service;
-            if (s != null && bound) {
-                // Bind-only: no startForegroundService re-issue needed.
-                // Push fallback runs inside a UnifiedPush BroadcastReceiver
-                // window (~10 s), which Android treats as a foreground
-                // process state for the duration; the plugin process is
-                // therefore BOUND_TOP and Service.startForeground inside
-                // binder.start is allowed without prior precursor.
-                pushTransportConfig(s);
-                try { s.start(); pendingStart = false; }
-                catch (RemoteException e) { FileLog.e(e); }
-            } else {
-                scheduleBind(0L);
-            }
+            // Bind-only: no startForegroundService re-issue needed.
+            // Push fallback runs inside a UnifiedPush BroadcastReceiver
+            // window (~10 s), which Android treats as a foreground
+            // process state for the duration; the plugin process is
+            // therefore BOUND_TOP and Service.startForeground inside
+            // binder.start is allowed without prior precursor.
+            if (!startOnBoundService()) scheduleBind(0L);
         });
+    }
+
+    // Push the transport config and call start() on the bound plugin.
+    // Returns false when not bound, so the caller can bind instead.
+    // Worker thread only.
+    private boolean startOnBoundService() {
+        IMgTorService s = service;
+        if (s == null || !bound) return false;
+        pushTransportConfig(s);
+        try { s.start(); pendingStart = false; }
+        catch (RemoteException e) { FileLog.e(e); }
+        return true;
     }
 
     /**
@@ -1009,7 +1038,7 @@ public final class MgTorClient {
 
     /**
      * Push the current anti-censorship transport selection
-     * ({@link SharedConfig#mg_torTransportMode} plus the obfs4
+     * ({@link SharedConfig#mg_torTransportMode} plus the obfs4/webtunnel
      * {@link SharedConfig#mg_torBridgeLines}) over AIDL. The plugin reads it only when it next assembles
      * its start() argv, so this is pushed right before every start() and on
      * every bind. A live transport change while Tor is running needs a daemon
@@ -1394,6 +1423,7 @@ public final class MgTorClient {
                 }
                 bindRequested = false;
                 lastPushedPausedCount = Integer.MIN_VALUE;
+                if (handleExpectedRecycle()) return;
                 if (++consecutiveAbortiveBinds >= MAX_ABORTIVE_BINDS) {
                     // Crash loop: a healthy plugin reinstall fires
                     // PACKAGE_REPLACED → registerPluginInstallReceiver
@@ -1429,6 +1459,7 @@ public final class MgTorClient {
                 bound = false;
                 bindRequested = false;
                 lastPushedPausedCount = Integer.MIN_VALUE;
+                if (handleExpectedRecycle()) return;
                 if (++consecutiveAbortiveBinds >= MAX_ABORTIVE_BINDS) {
                     pendingStart = false;
                     updateState(State.ERROR);
@@ -1477,7 +1508,28 @@ public final class MgTorClient {
         }
     };
 
+    // Disconnect after remoteCallback.onRecycling: the plugin killed :tor on
+    // purpose. Rebind at once without counting an abortive bind. Start tor
+    // in the fresh process only for a start-recycle: a stop-recycle (failed
+    // bootstrap, stop that did not reach tor) rebinds idle, so a failure
+    // that repeats in the fresh process cannot loop. Returns false when no
+    // recycle was announced. Worker thread only.
+    private boolean handleExpectedRecycle() {
+        if (!recycleExpected) return false;
+        recycleExpected = false;
+        boolean restart = recycleRestart;
+        recycleRestart = false;
+        currentBackoffMs = REBIND_BACKOFF_INITIAL_MS;
+        if (SharedConfig.mg_useTor) {
+            if (restart) pendingStart = true;
+            scheduleBind(0L);
+        }
+        return true;
+    }
+
     private void handleConnected(IBinder binder) {
+        recycleExpected = false;
+        recycleRestart = false;
         IMgTorService svc = IMgTorService.Stub.asInterface(binder);
         if (svc == null) { updateState(State.ERROR); return; }
         // Race guard: a user toggle-off (or any other teardown path) can
@@ -1767,6 +1819,7 @@ public final class MgTorClient {
                 // doesn't push us toward MAX_ABORTIVE_BINDS on a healthy
                 // lifecycle.
                 consecutiveAbortiveBinds = 0;
+                unexpectedExitCount = 0;
                 updateState(State.READY);
                 dispatchReady(port);
                 publishLiveProxy(port);
@@ -1806,6 +1859,8 @@ public final class MgTorClient {
                         // config and calls start() on the still-bound service.
                         if (restartForTransport) {
                             userInitiatedStart();
+                        } else if ("unexpected exit".equals(reason)) {
+                            handleUnexpectedExit();
                         }
                     } else {
                         SharedConfig.clearMgInternalTorProxy();
@@ -1823,26 +1878,37 @@ public final class MgTorClient {
         @Override public void onError(String reason) {
             workerHandler.post(() -> {
                 updateState(State.ERROR);
-                // Plugin signals the respawn cap with a stable English
-                // literal; render the localized toast on the main side so
-                // the user knows to toggle Tor off+on to retry. Without
-                // this, MTProto sits wedged on the blocking stub with no
-                // visible feedback after 3 consecutive native crashes.
-                if (reason != null && reason.startsWith("respawn gave up")) {
-                    AndroidUtilities.runOnUIThread(() -> {
-                        try {
-                            Context ctx = appContext != null ? appContext : ApplicationLoader.applicationContext;
-                            if (ctx == null) return;
-                            Toast.makeText(ctx,
-                                    LocaleController.getString(R.string.MercurygramTorRespawnGaveUp),
-                                    Toast.LENGTH_LONG).show();
-                        } catch (Throwable t) { FileLog.e(t); }
-                    });
-                }
                 dispatchError(reason);
             });
         }
+        @Override public void onRecycling(boolean restart) {
+            workerHandler.post(() -> {
+                recycleExpected = true;
+                recycleRestart = restart;
+            });
+        }
     };
+
+    // tor exited on its own while Tor is still on. Worker thread only, called
+    // from onStopped after the blocking stub is re-pinned. While every client
+    // is paused, do nothing: the resume path restarts tor through
+    // onClientPausedChanged(0). Otherwise restart after a delay, up to
+    // MAX_UNEXPECTED_RESTARTS times without a READY in between, then give up
+    // with a toast so MTProto doesn't sit wedged on the stub silently.
+    private void handleUnexpectedExit() {
+        if (computeAggregatePaused() > 0) return;
+        if (++unexpectedExitCount > MAX_UNEXPECTED_RESTARTS) {
+            showLongToast(R.string.MercurygramTorRespawnGaveUp);
+            return;
+        }
+        workerHandler.postDelayed(() -> {
+            if (!SharedConfig.mg_useTor) return;
+            if (state != State.BOUND_IDLE && state != State.ERROR) return;
+            // The plugin recycles :tor on this start, and the rebind starts
+            // tor in the fresh process.
+            startOnBoundService();
+        }, UNEXPECTED_RESTART_DELAY_MS);
+    }
 
     /** Swap the blocking stub for the live SOCKS port and push it to ConnectionsManager. */
     private void publishLiveProxy(int port) {

@@ -93,6 +93,7 @@ import org.telegram.tgnet.tl.TL_account;
 import org.telegram.tgnet.tl.TL_iv;
 import org.telegram.tgnet.tl.TL_stories;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.ActionBar.ThemeBind;
 import org.telegram.ui.Adapters.DialogsAdapter;
 import org.telegram.ui.AvatarSpan;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
@@ -148,6 +149,7 @@ import java.util.Objects;
 import java.util.Stack;
 
 import me.vkryl.android.animator.BoolAnimator;
+import java.util.HashSet;
 
 public class DialogCell extends BaseCell implements StoriesListPlaceProvider.AvatarOverlaysView, Theme.Colorable {
 
@@ -349,6 +351,50 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
 
     @Override
     public void updateColors() {
+        try {
+            // only bound cells on screen (as the former DialogsActivity delegate did): pooled / unbound cells are rebuilt on bind
+            if (!isAttachedToWindow() || currentDialogId == 0 && customDialog == null) {
+                return;
+            }
+            update(0);
+        } catch (Exception e) {
+            FileLog.e(e);
+        }
+    }
+
+    @Override
+    public void addColorKeys(HashSet<Integer> colors) {
+        colors.add(Theme.key_chats_nameArchived);
+        colors.add(Theme.key_chats_message_threeLines);
+        colors.add(Theme.key_chats_message);
+        colors.add(Theme.key_chats_attachMessage);
+        colors.add(Theme.key_chats_name);
+        colors.add(Theme.key_chats_draft);
+        colors.add(Theme.key_chats_actionMessage);
+        colors.add(Theme.key_chats_nameMessage);
+        colors.add(Theme.key_windowBackgroundWhiteGrayText);
+        colors.add(Theme.key_windowBackgroundWhite);
+        colors.add(Theme.key_checkboxCheck);
+        colors.add(Theme.key_chats_archivePinBackground);
+        colors.add(Theme.key_chats_archiveBackground);
+        colors.add(Theme.key_dialogSwipeRemove);
+        colors.add(Theme.key_chats_pinnedOverlay);
+        colors.add(Theme.key_chats_secretName);
+        colors.add(Theme.key_chats_nameMessageArchived_threeLines);
+        colors.add(Theme.key_chats_nameMessage_threeLines);
+        colors.add(Theme.key_chats_nameMessageArchived);
+        colors.add(Theme.key_chats_messageArchived);
+        colors.add(Theme.key_chats_verifiedBackground);
+        colors.add(Theme.key_featuredStickers_addButton);
+        colors.add(Theme.key_featuredStickers_buttonText);
+        colors.add(Theme.key_chats_unreadCounterMuted);
+        colors.add(Theme.key_chats_unreadCounter);
+        colors.add(Theme.key_premiumGradient1);
+        colors.add(Theme.key_premiumGradient2);
+        colors.add(Theme.key_chats_onlineCircle);
+        colors.add(Theme.key_topics_unreadCounterMuted);
+        colors.add(Theme.key_topics_unreadCounter);
+        colors.add(Theme.key_chats_unreadCounterText);
     }
 
     private CommunityArrowDrawable communityArrowDrawable;
@@ -996,7 +1042,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             );
         }
         if (isTopic) {
-            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), dp((useForceThreeLines || SharedConfig.useThreeLinesLayout ? heightThreeLines : heightDefault) + (hasTags() && (!(useForceThreeLines || SharedConfig.useThreeLinesLayout) || isForumCell()) ? (isForumCell() ? addForumHeightForTags : addHeightForTags) : 0)) + (useSeparator ? 1 : 0));
+            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), dp((useForceThreeLines || SharedConfig.useThreeLinesLayout ? heightThreeLines : heightDefault) + (hasTags() && (!(useForceThreeLines || SharedConfig.useThreeLinesLayout) || isForumCell()) ? (isForumCell() ? addForumHeightForTags : addHeightForTags) : 0)) + org.tellurgram.MgDialogTextScale.rowExtra(useForceThreeLines || SharedConfig.useThreeLinesLayout) + (useSeparator ? 1 : 0));
             checkTwoLinesForName();
         }
 
@@ -1008,7 +1054,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private int computeHeight() {
         int height;
         if (isForumCell() && !isTransitionSupport && !collapsed) {
-            height = dp(useForceThreeLines || SharedConfig.useThreeLinesLayout ? 86 : 91);
+            height = dp(useForceThreeLines || SharedConfig.useThreeLinesLayout ? 86 : 91) + org.tellurgram.MgDialogTextScale.rowExtra(useForceThreeLines || SharedConfig.useThreeLinesLayout);
             if (useSeparator) {
                 height += 1;
             }
@@ -1022,7 +1068,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     }
 
     private int getCollapsedHeight() {
-        int height = dp(useForceThreeLines || SharedConfig.useThreeLinesLayout ? heightThreeLines : heightDefault);
+        int height = dp(useForceThreeLines || SharedConfig.useThreeLinesLayout ? heightThreeLines : heightDefault) + org.tellurgram.MgDialogTextScale.rowExtra(useForceThreeLines || SharedConfig.useThreeLinesLayout);
         if (useSeparator || true) {
             height += 1;
         }
@@ -1249,15 +1295,15 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         }
 
         if (useForceThreeLines || SharedConfig.useThreeLinesLayout || true) {
-            Theme.dialogs_namePaint[0].setTextSize(dp(17));
-            Theme.dialogs_nameEncryptedPaint[0].setTextSize(dp(17));
-            Theme.dialogs_messagePaint[0].setTextSize(dp(16));
-            Theme.dialogs_messagePrintingPaint[0].setTextSize(dp(16));
+            Theme.dialogs_namePaint[0].setTextSize(org.tellurgram.MgDialogTextScale.text(17));
+            Theme.dialogs_nameEncryptedPaint[0].setTextSize(org.tellurgram.MgDialogTextScale.text(17));
+            Theme.dialogs_messagePaint[0].setTextSize(org.tellurgram.MgDialogTextScale.text(16));
+            Theme.dialogs_messagePrintingPaint[0].setTextSize(org.tellurgram.MgDialogTextScale.text(16));
 
-            Theme.dialogs_namePaint[1].setTextSize(dp(16));
-            Theme.dialogs_nameEncryptedPaint[1].setTextSize(dp(16));
-            Theme.dialogs_messagePaint[1].setTextSize(dp(15));
-            Theme.dialogs_messagePrintingPaint[1].setTextSize(dp(15));
+            Theme.dialogs_namePaint[1].setTextSize(org.tellurgram.MgDialogTextScale.text(16));
+            Theme.dialogs_nameEncryptedPaint[1].setTextSize(org.tellurgram.MgDialogTextScale.text(16));
+            Theme.dialogs_messagePaint[1].setTextSize(org.tellurgram.MgDialogTextScale.text(15));
+            Theme.dialogs_messagePrintingPaint[1].setTextSize(org.tellurgram.MgDialogTextScale.text(15));
 
             Theme.dialogs_messagePaint[1].setColor(Theme.dialogs_messagePaint[1].linkColor = Theme.getColor(Theme.key_chats_message_threeLines, resourcesProvider));
             paintIndex = 1;
@@ -2423,17 +2469,18 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         animatedEmojiStackName = AnimatedEmojiSpan.update(AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, this, animatedEmojiStackName, nameLayout);
 
 
+        int mgNameExtra = org.tellurgram.MgDialogTextScale.nameExtra();
         int messageWidth;
         int avatarLeft;
         int avatarTop;
         int thumbLeft;
         if (useForceThreeLines || SharedConfig.useThreeLinesLayout) {
             avatarTop = dp(11);
-            messageNameTop = dp(32);
+            messageNameTop = dp(32) + mgNameExtra;
             timeTop = dp(13);
-            errorTop = dp(42.33f);
-            pinTop = dp(43);
-            countTop = dp(42.33f);
+            errorTop = dp(42.33f) + mgNameExtra;
+            pinTop = dp(43) + mgNameExtra;
+            countTop = dp(42.33f) + mgNameExtra;
             checkDrawTop = dp(13);
             messageWidth = getMeasuredWidth() - dp(messagePaddingStart + 21);
 
@@ -2448,15 +2495,15 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             }
             storyParams.originalAvatarRect.set(avatarLeft, avatarTop, avatarLeft + dp(56), avatarTop + dp(56));
             for (int i = 0; i < thumbImage.length; ++i) {
-                thumbImage[i].setImageCoords(thumbLeft + (thumbSize + 2) * i, avatarTop + dp(31) + (twoLinesForName ? dp(20) : 0) - (!(useForceThreeLines || SharedConfig.useThreeLinesLayout) && tags != null && !tags.isEmpty() ? dp(9) : 0), dp(18), dp(18));
+                thumbImage[i].setImageCoords(thumbLeft + (thumbSize + 2) * i, avatarTop + dp(31) + mgNameExtra + (twoLinesForName ? dp(20) : 0) - (!(useForceThreeLines || SharedConfig.useThreeLinesLayout) && tags != null && !tags.isEmpty() ? dp(9) : 0), dp(18), dp(18));
             }
         } else {
             avatarTop = dp(9);
-            messageNameTop = dp(31);
+            messageNameTop = dp(31) + mgNameExtra;
             timeTop = dp(16);
-            errorTop = dp(38);
-            pinTop = dp(39);
-            countTop = isTopic ? dp(35f) : dp(38f);
+            errorTop = dp(38) + mgNameExtra;
+            pinTop = dp(39) + mgNameExtra;
+            countTop = (isTopic ? dp(35f) : dp(38f)) + mgNameExtra;
             checkDrawTop = dp(17);
             messageWidth = getMeasuredWidth() - dp(messagePaddingStart + 20 - (LocaleController.isRTL ? 0 : 12));
 
@@ -2471,7 +2518,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             }
             storyParams.originalAvatarRect.set(avatarLeft, avatarTop, avatarLeft + dp(52), avatarTop + dp(52));
             for (int i = 0; i < thumbImage.length; ++i) {
-                thumbImage[i].setImageCoords(thumbLeft + (thumbSize + 2) * i, avatarTop + dp(30) + (twoLinesForName ? dp(20) : 0) - (!(useForceThreeLines || SharedConfig.useThreeLinesLayout) && tags != null && !tags.isEmpty() ? dp(9) : 0), dp(thumbSize), dp(thumbSize));
+                thumbImage[i].setImageCoords(thumbLeft + (thumbSize + 2) * i, avatarTop + dp(30) + mgNameExtra + (twoLinesForName ? dp(20) : 0) - (!(useForceThreeLines || SharedConfig.useThreeLinesLayout) && tags != null && !tags.isEmpty() ? dp(9) : 0), dp(thumbSize), dp(thumbSize));
             }
         }
         if (LocaleController.isRTL) {
@@ -2684,12 +2731,12 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             }
         }
         messageWidth = Math.max(dp(12), messageWidth);
-        buttonTop = dp(useForceThreeLines || SharedConfig.useThreeLinesLayout ? 58 : 62);
+        buttonTop = dp(useForceThreeLines || SharedConfig.useThreeLinesLayout ? 58 : 62) + org.tellurgram.MgDialogTextScale.rowExtra(useForceThreeLines || SharedConfig.useThreeLinesLayout);
         if ((!(useForceThreeLines || SharedConfig.useThreeLinesLayout) || isForumCell()) && hasTags()) {
             buttonTop -= dp(isForumCell() ? 10 : 12);
         }
         if (isForumCell()) {
-            messageTop = dp(useForceThreeLines || SharedConfig.useThreeLinesLayout ? 34 : 39);
+            messageTop = dp(useForceThreeLines || SharedConfig.useThreeLinesLayout ? 34 : 39) + mgNameExtra;
             for (int i = 0; i < thumbImage.length; ++i) {
                 thumbImage[i].setImageY(buttonTop);
             }
@@ -2705,21 +2752,21 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             } catch (Exception e) {
                 FileLog.e(e);
             }
-            messageTop = dp(32 + 19);
+            messageTop = dp(32 + 19) + mgNameExtra + org.tellurgram.MgDialogTextScale.senderExtra();
             int yoff = nameIsEllipsized && isTopic ? dp(20) : 0;
             for (int i = 0; i < thumbImage.length; ++i) {
-                thumbImage[i].setImageY(avatarTop + yoff + dp(40));
+                thumbImage[i].setImageY(avatarTop + yoff + dp(40) + mgNameExtra + org.tellurgram.MgDialogTextScale.senderExtra());
             }
         } else {
             messageNameLayout = null;
             if (useForceThreeLines || SharedConfig.useThreeLinesLayout) {
-                messageTop = dp(32);
+                messageTop = dp(32) + mgNameExtra;
                 int yoff = nameIsEllipsized && isTopic ? dp(20) : 0;
                 for (int i = 0; i < thumbImage.length; ++i) {
-                    thumbImage[i].setImageY(avatarTop + yoff + dp(21));
+                    thumbImage[i].setImageY(avatarTop + yoff + dp(21) + mgNameExtra);
                 }
             } else {
-                messageTop = dp(39);
+                messageTop = dp(39) + mgNameExtra;
             }
         }
 

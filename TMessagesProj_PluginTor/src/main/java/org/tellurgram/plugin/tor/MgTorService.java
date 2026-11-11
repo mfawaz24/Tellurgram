@@ -95,6 +95,11 @@ public class MgTorService extends Service {
             public void onError(String reason) {
                 broadcast(cb -> cb.onError(reason), "onError");
             }
+
+            @Override
+            public void onRecycling(boolean restart) {
+                broadcast(cb -> cb.onRecycling(restart), "onRecycling");
+            }
         };
         // Register the bridge BEFORE init: controller.init synchronously
         // dispatches onError("native library unavailable") when
@@ -258,6 +263,14 @@ public class MgTorService extends Service {
             // anything else (STOPPED, STARTING, BOOTSTRAPPING, STOPPING) the
             // post-start daemon will be bootstrapping again so the
             // "Bootstrapping" string is accurate.
+            // A start in a process where tor already ran only kills :tor
+            // (see MgTorController.willRecycleOnStart). Promoting here would
+            // flash a "Bootstrapping" notification from the doomed process;
+            // the fresh process promotes itself on its own start().
+            if (controller.willRecycleOnStart()) {
+                controller.userInitiatedStart();
+                return;
+            }
             final boolean bootstrapping =
                     controller.getState() != MgTorController.State.READY;
             // Swallow ForegroundServiceStartNotAllowedException and friends:

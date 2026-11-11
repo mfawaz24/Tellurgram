@@ -72,6 +72,7 @@ public class MercurygramSettingsActivity extends UniversalFragment {
     private static final int ID_REMOVE_ADS = 66;
     private static final int ID_ENFORCE_HTTPS = 67;
     private static final int ID_BLOCK_AI_SERVERS = 68;
+    private static final int ID_ACCOUNT_ORDER = 69;
 
     @Override
     protected CharSequence getTitle() {
@@ -89,6 +90,10 @@ public class MercurygramSettingsActivity extends UniversalFragment {
             }
             String value = hiddenCount > 0 ? Integer.toString(hiddenCount) : LocaleController.getString(R.string.PasswordOff);
             items.add(UItem.asButton(ID_HIDDEN_ACCOUNTS, R.drawable.msg2_secret, LocaleController.getString(R.string.HiddenAccounts), value));
+            items.add(UItem.asShadow(null));
+        }
+        if (HiddenAccountHelper.getVisibleAccountsCount() > 1) {
+            items.add(UItem.asButton(ID_ACCOUNT_ORDER, R.drawable.tabs_reorder, LocaleController.getString(R.string.MercurygramAccountOrder)));
             items.add(UItem.asShadow(null));
         }
 
@@ -299,6 +304,9 @@ public class MercurygramSettingsActivity extends UniversalFragment {
             case ID_HIDDEN_ACCOUNTS:
                 presentFragment(new HiddenAccountsActivity());
                 break;
+            case ID_ACCOUNT_ORDER:
+                presentFragment(new MgAccountOrderActivity());
+                break;
             case ID_MESSAGE_DETAILS_MENU:
                 getUserConfig().mg.messageDetailsMenu = !getUserConfig().mg.messageDetailsMenu;
                 getUserConfig().saveConfig(false);
@@ -458,11 +466,15 @@ public class MercurygramSettingsActivity extends UniversalFragment {
         }
     }
 
-    // Subtitle for the Custom-emoji-pack row: "Off" when disabled; the installed
+    // Subtitle for the Emoji row: "System emoji" when the system font is on;
+    // otherwise "Off" when the pack is disabled; the installed
     // glyph count when a pack is loaded; "No pack installed" when the toggle is
     // on but nothing is imported — every glyph still falls back to the bundled
     // set, so the row must not imply custom emoji are active.
     private static String emojiPackShortLabel() {
+        if (SharedConfig.mg_useSystemEmoji) {
+            return LocaleController.getString(R.string.MercurygramEmojiRowSystem);
+        }
         if (!SharedConfig.mg_useCustomEmojiPack) {
             return LocaleController.getString(R.string.MercurygramEmojiRowDisabled);
         }

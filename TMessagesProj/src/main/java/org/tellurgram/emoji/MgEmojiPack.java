@@ -9,10 +9,12 @@ import android.util.SparseIntArray;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.Emoji;
+import org.telegram.messenger.EmojiPack;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.Utilities;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -50,6 +52,12 @@ import java.util.zip.ZipInputStream;
  * background. A loose .zip of already-ARGB PNGs ships no {@code metadata.bin},
  * so the mask step auto-skips and the glyphs are used verbatim.
  *
+ * Telegram 12.10.2+ dropped that layout: every glyph lives in one EPK3
+ * {@code assets/emoji.pack}. The importer extracts it from an APK or zip, or
+ * takes a bare {@code emoji.pack} picked directly (detected by its magic), and
+ * renders it with the same {@link EmojiPack} reader as the bundled set. Loose
+ * PNGs, when present too, win over the pack.
+ *
  * Lookup is lenient + per-glyph: a missing glyph falls back to the bundled
  * asset, so a partial pack — or a layer mismatch after an upstream rebase
  * shifts the EmojiData index map — just renders a few built-in glyphs instead
@@ -77,6 +85,13 @@ public final class MgEmojiPack {
     // Guard a crafted zip from exhausting storage: cap per-file size and count.
     private static final long MAX_ENTRY_BYTES = 2L * 1024 * 1024;
     private static final int MAX_ENTRIES = 20000;
+    // Telegram 12.10.2+ ships every glyph in one EPK3 file, assets/emoji.pack
+    // (3.5 MB in 13.x), read by the same EmojiPack class as the bundled set.
+    // It gets its own, larger cap.
+    private static final Pattern PACK_ENTRY = Pattern.compile("(^|/)emoji\\.pack$");
+    private static final String PACK_FILE = "emoji.pack";
+    private static final long MAX_PACK_BYTES = 64L * 1024 * 1024;
+    private static final int EPK3_MAGIC = 0x334B5045;
 
     public interface ProgressCallback {
         void onProgress(int done);
@@ -100,6 +115,11 @@ public final class MgEmojiPack {
     // Reset to null alongside cachedCount on remove / import-complete / failed import.
     private static volatile SparseIntArray maskMap;
 
+    // Imported packDir/emoji.pack, opened lazily. packChecked avoids retrying a
+    // missing or damaged file on every glyph. Reset with the mask map.
+    private static volatile EmojiPack importedPack;
+    private static volatile boolean packChecked;
+
     public static int installedCount() {
         int c = cachedCount;
         if (c >= 0) {
@@ -110,15 +130,77 @@ public final class MgEmojiPack {
             return cachedCount = 0;
         }
         File[] files = dir.listFiles((d, name) -> EMOJI_ENTRY.matcher(name).matches());
-        return cachedCount = (files == null ? 0 : files.length);
+        c = files == null ? 0 : files.length;
+        if (c == 0) {
+            c = packEmojiCount(new File(dir, PACK_FILE));
+        }
+        return cachedCount = c;
+    }
+
+    // Emoji record count from an EPK3 header (offset 20), 0 when unreadable.
+    private static int packEmojiCount(File f) {
+        if (!f.isFile()) {
+            return 0;
+        }
+        byte[] header = new byte[24];
+        try (InputStream is = new FileInputStream(f)) {
+            int total = 0;
+            int read;
+            while (total < header.length && (read = is.read(header, total, header.length - total)) != -1) {
+                total += read;
+            }
+            if (total < header.length) {
+                return 0;
+            }
+            ByteBuffer bb = ByteBuffer.wrap(header).order(ByteOrder.LITTLE_ENDIAN);
+            return bb.getInt(0) == EPK3_MAGIC ? Math.max(0, bb.getInt(20)) : 0;
+        } catch (Throwable e) {
+            FileLog.e(e);
+            return 0;
+        }
+    }
+
+    private static EmojiPack importedPack() {
+        if (packChecked) {
+            return importedPack;
+        }
+        synchronized (MgEmojiPack.class) {
+            if (!packChecked) {
+                File f = new File(packDir(), PACK_FILE);
+                if (f.isFile()) {
+                    try {
+                        importedPack = EmojiPack.open(f);
+                    } catch (Throwable e) {
+                        FileLog.e(e);
+                    }
+                }
+                packChecked = true;
+            }
+            return importedPack;
+        }
+    }
+
+    private static void invalidatePack() {
+        synchronized (MgEmojiPack.class) {
+            importedPack = null;
+            packChecked = false;
+        }
     }
 
     /**
-     * Routed from {@link Emoji#loadEmoji}. When the custom pack is enabled and
-     * this glyph exists in it, decode that file; otherwise return null and let
-     * the caller read the bundled glyph out of assets/emoji.pack.
+     * Routed from {@link Emoji#loadEmoji}. When system emoji are enabled and
+     * the system font has this glyph, render it ({@link MgSystemEmoji}); when
+     * the custom pack is enabled and this glyph exists in it, decode that file;
+     * otherwise return null and let the caller read the bundled glyph out of
+     * assets/emoji.pack.
      */
     public static Bitmap loadEmojiBitmap(int page, int page2) {
+        if (SharedConfig.mg_useSystemEmoji) {
+            Bitmap bitmap = MgSystemEmoji.render(page, page2);
+            if (bitmap != null) {
+                return bitmap;
+            }
+        }
         if (SharedConfig.mg_useCustomEmojiPack) {
             try {
                 File f = new File(packDir(), page + "_" + page2 + ".png");
@@ -132,6 +214,13 @@ public final class MgEmojiPack {
                     Bitmap bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(), opts);
                     if (bitmap != null) {
                         return applyMask(bitmap, page, page2, sample);
+                    }
+                }
+                EmojiPack pack = importedPack();
+                if (pack != null) {
+                    Bitmap bitmap = pack.getEmoji(page, page2);
+                    if (bitmap != null) {
+                        return bitmap;
                     }
                 }
             } catch (Throwable e) {
@@ -237,6 +326,7 @@ public final class MgEmojiPack {
 
     private static void invalidateMaskMap() {
         maskMap = null;
+        invalidatePack();
     }
 
     public static void remove() {
@@ -261,16 +351,31 @@ public final class MgEmojiPack {
                 int count = 0;
                 int auxCount = 0;
                 File masksDir = new File(tmp, MASKS_SUBDIR);
-                try (InputStream is = context.getContentResolver().openInputStream(uri)) {
-                    if (is == null) {
+                File packFile = new File(tmp, PACK_FILE);
+                boolean hasPack = false;
+                try (InputStream raw = context.getContentResolver().openInputStream(uri)) {
+                    if (raw == null) {
                         deleteRecursive(tmp);
                         postError(callback, "can't open file");
                         return;
                     }
-                    ZipInputStream zis = new ZipInputStream(is);
                     byte[] buf = new byte[16 * 1024];
+                    BufferedInputStream is = new BufferedInputStream(raw);
+                    is.mark(4);
+                    byte[] magic = new byte[4];
+                    int got = 0;
+                    int r;
+                    while (got < 4 && (r = is.read(magic, got, 4 - got)) != -1) {
+                        got += r;
+                    }
+                    is.reset();
+                    if (got == 4 && ByteBuffer.wrap(magic).order(ByteOrder.LITTLE_ENDIAN).getInt() == EPK3_MAGIC) {
+                        // A bare emoji.pack picked directly.
+                        hasPack = copyCapped(is, packFile, buf, MAX_PACK_BYTES);
+                    }
+                    ZipInputStream zis = hasPack ? null : new ZipInputStream(is);
                     ZipEntry entry;
-                    while ((entry = zis.getNextEntry()) != null) {
+                    while (zis != null && (entry = zis.getNextEntry()) != null) {
                         if (entry.isDirectory()) {
                             continue;
                         }
@@ -285,7 +390,12 @@ public final class MgEmojiPack {
                         File out;
                         boolean isGlyph;
                         Matcher mm;
-                        if (EMOJI_ENTRY.matcher(base).matches()) {
+                        if (PACK_ENTRY.matcher(name).find()) {
+                            if (!hasPack) {
+                                hasPack = copyCapped(zis, packFile, buf, MAX_PACK_BYTES);
+                            }
+                            continue;
+                        } else if (EMOJI_ENTRY.matcher(base).matches()) {
                             out = new File(tmp, base);
                             isGlyph = true;
                         } else if ((mm = MASK_ENTRY.matcher(name)).find()) {
@@ -333,6 +443,20 @@ public final class MgEmojiPack {
                         }
                     }
                 }
+                if (hasPack) {
+                    // Reject a damaged or unsupported pack before installing it.
+                    try {
+                        EmojiPack.open(packFile);
+                    } catch (Throwable e) {
+                        FileLog.e(e);
+                        deleteRecursive(tmp);
+                        postError(callback, "unsupported emoji.pack");
+                        return;
+                    }
+                    if (count == 0) {
+                        count = packEmojiCount(packFile);
+                    }
+                }
                 if (count == 0) {
                     deleteRecursive(tmp);
                     postError(callback, "no emoji found");
@@ -359,6 +483,26 @@ public final class MgEmojiPack {
                 postError(callback, e.getMessage());
             }
         });
+    }
+
+    // Copy in to out; false (and out deleted) when it exceeds max bytes.
+    private static boolean copyCapped(InputStream in, File out, byte[] buf, long max) throws Exception {
+        long written = 0;
+        try (OutputStream os = new FileOutputStream(out)) {
+            int n;
+            while ((n = in.read(buf)) != -1) {
+                written += n;
+                if (written > max) {
+                    break;
+                }
+                os.write(buf, 0, n);
+            }
+        }
+        if (written > max || written == 0) {
+            out.delete();
+            return false;
+        }
+        return true;
     }
 
     // metadata.bin is capped at MAX_ENTRY_BYTES at import time, so its on-disk

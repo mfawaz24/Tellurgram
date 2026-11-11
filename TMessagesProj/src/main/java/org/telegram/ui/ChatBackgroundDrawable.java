@@ -256,7 +256,6 @@ public class ChatBackgroundDrawable extends Drawable {
     }
 
     public void onDetachedFromWindow(View view) {
-        // inverted check kept the view in the list, so the drawable was never released
         attachedViews.remove(view);
         if (isAttached() && !attached) {
             attached = true;

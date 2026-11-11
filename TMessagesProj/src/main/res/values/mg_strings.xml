@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="HiddenAccounts">Hidden Accounts</string>
+    <string name="MercurygramAccountOrder">Reorder accounts</string>
+    <string name="MercurygramAccountOrderInfo">Drag accounts to change their order in the account switcher and settings.</string>
     <string name="HiddenAccountsOptions">Options</string>
     <string name="HiddenAccountsStealthMode">Stealth mode</string>
     <string name="HiddenAccountsStealthModeRequiresPasscodeOff">Turn off Telegram passcode before enabling stealth mode.</string>
@@ -46,6 +48,7 @@
     <string name="MercurygramUnifiedPush">UnifiedPush</string>
     <string name="UnifiedPushDistributor">UnifiedPush Distributor</string>
     <string name="UnifiedPushDistributorWaiting">%1$s (waiting for endpoint)</string>
+    <string name="UnifiedPushDistributorFailed">%1$s (registration failed: %2$s)</string>
     <string name="UnifiedPushNoDistributors">No UnifiedPush distributor app is installed. Install one to receive push notifications.</string>
     <string name="MercurygramEmbeddedFcm">Google FCM (built in)</string>
     <string name="MercurygramEmbeddedFcmWarning">Delivers notifications through Google Play Services on this device, using the Mercurygram gateway to sign them. No Google library is bundled in the app, but Google learns when a notification is sent to you and Play Services must stay installed. Any other distributor keeps Google out of the path entirely.</string>
@@ -158,10 +161,10 @@
     <string name="MercurygramTorTransport">Anti-censorship</string>
     <string name="MercurygramTorTransportDirect">Direct connection</string>
     <string name="MercurygramTorTransportSnowflake">Snowflake</string>
-    <string name="MercurygramTorTransportObfs4">obfs4 bridges</string>
-    <string name="MercurygramTorTransportAbout">Where a network blocks Tor directly (as in Russia and Iran), pick Snowflake to route the Tor handshake through a domain-fronted relay so it can still connect, with no setup. Or pick obfs4 bridges if you have bridge lines from @GetBridgesBot. Direct connection is fastest where Tor is not blocked.</string>
-    <string name="MercurygramTorObfs4BridgesHint">Paste obfs4 bridge lines, one per line. Get them from @GetBridgesBot on Telegram.</string>
-    <string name="MercurygramTorObfs4BridgesInvalid">No valid obfs4 bridge found. Each line must start with \"obfs4\". Get bridges from @GetBridgesBot on Telegram.</string>
+    <string name="MercurygramTorTransportBridges">Bridges (obfs4, WebTunnel)</string>
+    <string name="MercurygramTorTransportAbout">Where a network blocks Tor directly (as in Russia and Iran), pick Snowflake to route the Tor handshake through a domain-fronted relay so it can still connect, with no setup. Or pick Bridges if you have obfs4 or WebTunnel bridge lines from @GetBridgesBot or bridges.torproject.org. WebTunnel looks like ordinary HTTPS traffic and is often the hardest to block. Direct connection is fastest where Tor is not blocked.</string>
+    <string name="MercurygramTorBridgesHint">Paste obfs4 or webtunnel bridge lines, one per line. Get them from @GetBridgesBot on Telegram or bridges.torproject.org.</string>
+    <string name="MercurygramTorBridgesInvalid">No valid bridge found. Each line must start with \"obfs4\" or \"webtunnel\". Get bridges from @GetBridgesBot on Telegram or bridges.torproject.org.</string>
     <string name="MercurygramTorActiveProxyLocked">Turn Tor off to use a different proxy.</string>
     <string name="MercurygramTorInstallPlugin">Install Tor plugin</string>
     <string name="MercurygramTorPluginDownloading">Downloading Tor plugin…</string>
@@ -222,9 +225,12 @@
     <string name="MercurygramTranscribeOfflineFileUnavailable">On-device transcription: audio file not available. Try playing the message first.</string>
     <string name="MercurygramTranscribeOfflineDecodeFailed">On-device transcription: could not decode the audio.</string>
     <string name="MercurygramTranscribeOfflineFailed">On-device transcription failed.</string>
-    <string name="MercurygramEmojiTitle">Custom emoji pack</string>
-    <string name="MercurygramEmojiRowAbout">Load your own emoji images instead of the built-in set.</string>
+    <string name="MercurygramEmojiTitle">Emoji</string>
+    <string name="MercurygramEmojiRowAbout">Use the system emoji font or load your own emoji images instead of the built-in set.</string>
     <string name="MercurygramEmojiRowDisabled">Off</string>
+    <string name="MercurygramEmojiRowSystem">System emoji</string>
+    <string name="MercurygramEmojiUseSystem">Use system emoji</string>
+    <string name="MercurygramEmojiUseSystemInfo">Draw emoji with your phone\'s emoji font. Emoji the font lacks fall back to the built-in set.</string>
     <string name="MercurygramEmojiEnable">Use custom emoji pack</string>
     <string name="MercurygramEmojiEnableInfo">Render emoji from an imported pack instead of the built-in set. Any emoji the pack is missing falls back to the built-in one.</string>
     <string name="MercurygramEmojiImport">Import pack from file</string>
@@ -234,7 +240,7 @@
     <string name="MercurygramEmojiNotInstalled">No pack installed</string>
     <string name="MercurygramEmojiImported">Emoji pack imported.</string>
     <string name="MercurygramEmojiImportFailed">Couldn\'t import emoji pack.</string>
-    <string name="MercurygramEmojiAbout">Pick a .zip of emoji images, or an official Telegram APK to extract its emoji from. The pack is your own file, stored on your device and never shared. Missing emoji fall back to the built-in set.</string>
+    <string name="MercurygramEmojiAbout">Pick a .zip of emoji images, an official Telegram APK to extract its emoji from, or an emoji.pack file. The pack is your own file, stored on your device and never shared. Missing emoji fall back to the built-in set.</string>
     <string name="MercurygramTranslationAlternativeSection">Alternative HTTP backend</string>
     <string name="MercurygramTranslationAlternativeEngine">Engine</string>
     <string name="MercurygramTranslationAlternativeInstance">Instance</string>
@@ -247,6 +253,9 @@
     <string name="MercurygramTranslationAlternativeEngineGoogle">Google (via Mozhi)</string>
     <string name="MercurygramTranslationAlternativeEngineYandex">Yandex</string>
     <string name="MercurygramTranslationPoweredBy">Translations are powered by\n**%1$s**.</string>
+    <string name="MercurygramTranslationChatsSection">Chats</string>
+    <string name="MercurygramHideTranslateBar">Hide translation bar</string>
+    <string name="MercurygramHideTranslateBarAbout">Never show the ‘Translate to…’ bar at the top of chats. You can still translate a chat from its menu.</string>
     <string name="MercurygramCreateMention">Mention</string>
     <string name="MercurygramMentionUserIdHint">User ID</string>
     <string name="MercurygramMentionChoose">Choose contact</string>

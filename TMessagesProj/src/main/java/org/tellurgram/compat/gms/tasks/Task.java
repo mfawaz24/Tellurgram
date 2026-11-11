@@ -9,6 +9,10 @@ public abstract class Task<TResult> {
 
     public Task<TResult> addOnFailureListener(Consumer<Exception> listener) { return this; }
 
+    public Task<TResult> addOnSuccessListener(Object executor, Consumer<TResult> listener) { return this; }
+
+    public Task<TResult> addOnFailureListener(Object executor, Consumer<Exception> listener) { return this; }
+
     public Task<TResult> addOnCompleteListener(Consumer<Task<TResult>> listener) { return this; }
 
     public Task<TResult> addOnCompleteListener(Object activity, Consumer<Task<TResult>> listener) { return this; }

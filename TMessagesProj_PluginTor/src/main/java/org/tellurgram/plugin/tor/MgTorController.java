@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.Process;
 import android.util.Log;
 
 import java.io.File;
@@ -15,7 +16,9 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 // MG: lifecycle controller for the embedded tor daemon. Single instance.
@@ -52,13 +55,24 @@ public final class MgTorController {
 
     private static final String TAG = "MgTor";
     private static final long IDLE_TICK_MS = 30_000L;
-    // Bounded auto-respawn on unexpected daemon exit (OOM, native crash,
-    // hostile co-resident SIGNAL SHUTDOWN). The 5 s back-off matches
-    // daemon.join's ceiling so a fresh start cycle never collides with a
-    // teardown still draining. The 3-strike cap breaks an OOM-loop on
-    // memory-starved devices.
-    private static final long RESPAWN_BACKOFF_MS = 5_000L;
-    private static final int MAX_UNEXPECTED_RESPAWNS = 3;
+    // Delay before the :tor process kills itself to recycle (see start()),
+    // so the in-flight AIDL start() transaction returns to the client first.
+    private static final long RECYCLE_KILL_DELAY_MS = 200L;
+
+    // tor_run_main() is only safe once per process. tor 0.4.9's
+    // workqueue.c keeps function-static counters (n_worker_threads_running,
+    // control_lock_owner) that are never reset when tor exits. On a second
+    // run no worker pre-locks the pool control lock, so
+    // threadpool_stop_threads() returns at once and threadpool_free_()
+    // frees the pool while worker threads still touch it: a destroyed-mutex
+    // FORTIFY abort or a NULL deref in worker_thread_main. Set right before
+    // the native run; start() recycles the whole :tor process instead of
+    // running tor a second time.
+    private static volatile boolean nativeRunConsumed;
+    // Set once recycleProcess has scheduled the kill. A start() landing in
+    // that window (e.g. a transport switch right after a stop-recycle) must
+    // re-announce the recycle with restart=true, or the rebind comes up idle.
+    private static volatile boolean recyclePending;
 
     public enum State { STOPPED, STARTING, BOOTSTRAPPING, READY, STOPPING }
 
@@ -71,6 +85,11 @@ public final class MgTorController {
         void onReady(int socksPort);
         void onStopped(int exitCode, String reason);
         void onError(String reason);
+        // :tor is about to kill itself to get a fresh process (see
+        // recycleProcess). The client treats the coming disconnect as
+        // expected and rebinds at once, starting tor again only when
+        // restart is true.
+        void onRecycling(boolean restart);
     }
 
     private static volatile MgTorController instance;
@@ -161,11 +180,15 @@ public final class MgTorController {
     // SharedConfig.MG_TOR_TRANSPORT_* on the main side.
     public static final int TRANSPORT_DIRECT = 0;     // vanilla Tor, no bridges
     public static final int TRANSPORT_SNOWFLAKE = 1;  // domain-fronted WebRTC
-    public static final int TRANSPORT_OBFS4 = 2;      // lyrebird obfs4 bridges
+    public static final int TRANSPORT_BRIDGES = 2;    // lyrebird obfs4/webtunnel bridges
     private volatile int transportMode = TRANSPORT_DIRECT;
-    // obfs4 user-supplied bridge lines (newline-separated); unused for
-    // direct/snowflake. Parsed by parseObfs4Bridges when start() assembles argv.
+    // User-supplied obfs4/webtunnel bridge lines (newline-separated); unused
+    // for direct/snowflake. Parsed by parseBridges when start() assembles argv.
     private volatile String bridgeLines;
+    // Transports lyrebird serves for TRANSPORT_BRIDGES: both the accepted
+    // bridge-line prefixes (parseBridges) and the ClientTransportPlugin names.
+    // MgTorSettingsActivity.normalizeBridges on the main side mirrors this set.
+    private static final String[] PT_TRANSPORTS = {"obfs4", "webtunnel"};
 
     // Stock Snowflake rendezvous bridges. Broker URL, domain-front CDNs, STUN
     // set and uTLS profile all ride in the Bridge line (modern Snowflake keeps
@@ -217,9 +240,6 @@ public final class MgTorController {
     // tear tor down on the next tick or never tear it down.
     private volatile long idleSinceMs = -1L;
     private int lastBootstrapPercent;
-    // Number of back-to-back unexpected daemon exits without a successful
-    // bootstrap in between. Reset on every onBootstrapReady.
-    private int unexpectedRespawnCount;
 
     private MgTorController() {}
 
@@ -253,7 +273,7 @@ public final class MgTorController {
     // (the main side restarts Tor when the user switches transport). Stored
     // unconditionally; direct mode leaves the argv untouched.
     public void setTransportConfig(int mode, String bridgeLines) {
-        this.transportMode = (mode < TRANSPORT_DIRECT || mode > TRANSPORT_OBFS4)
+        this.transportMode = (mode < TRANSPORT_DIRECT || mode > TRANSPORT_BRIDGES)
                 ? TRANSPORT_DIRECT : mode;
         this.bridgeLines = bridgeLines;
     }
@@ -269,13 +289,17 @@ public final class MgTorController {
     // aggregate. If we later need per-client state (multiple bound apps),
     // revisit this signature.
     public void onClientPausedChanged(int pausedClientCount) {
+        int prev = this.pausedClientCount;
         this.pausedClientCount = Math.max(0, pausedClientCount);
         if (this.pausedClientCount == 0) {
             cancelIdleStop();
-            if (state == State.STOPPED) {
-                // Client just came back to foreground; if the previous
-                // session gave up on respawn, reset the budget so this
-                // user-driven event isn't silenced.
+            // Start only on a paused-to-active edge. A fresh :tor starts at
+            // 0, so the re-push main sends on every bind is not a resume:
+            // starting there would turn a stop-recycle (failed bootstrap)
+            // into an endless restart while the app is in the foreground.
+            // Binds that want tor running use pendingStart + svc.start().
+            if (prev > 0 && state == State.STOPPED) {
+                // Client just came back to foreground: bring tor back up.
                 postWorker(this::userInitiatedStart);
             }
         } else {
@@ -285,8 +309,6 @@ public final class MgTorController {
 
     // Called from MgTorService when an incoming push needs MTProto routed
     // through tor. Idempotent — if tor is already up, returns immediately.
-    // Routes via userInitiatedStart so a prior session's gave-up state (3
-    // OOM-loops) doesn't silently swallow incoming push wake-ups.
     public void requestStartForPushFallback() {
         cancelIdleStop();
         if (state == State.STOPPED) {
@@ -295,21 +317,22 @@ public final class MgTorController {
     }
 
     // User-initiated start path (toggle on, client resume, push wake-up).
-    // The respawn cap is NOT reset here: every AIDL start() — including
-    // push fallback and app-resume — routes through this method, and an
-    // unconditional reset would defeat the cap (a flapping daemon could
-    // burn battery indefinitely as push wake-ups keep clearing the budget).
-    // The cap auto-resets on every successful onBootstrapReady, so the
-    // happy path is unaffected; once MAX_UNEXPECTED_RESPAWNS is hit, the
-    // user must toggle off (clearing the cached state via main) and back
-    // on, OR wait for the next process restart, before auto-respawn kicks
-    // in again.
     public void userInitiatedStart() {
         start();
     }
 
     public void start() {
         synchronized (lifecycleLock) {
+            if (willRecycleOnStart()) {
+                // tor already ran in this process and cannot run again
+                // safely (see nativeRunConsumed). Kill :tor so the client's
+                // onServiceDisconnected rebinds a fresh process and repeats
+                // the start there. Killing lazily here, not when tor exits,
+                // keeps idle-stop working: an idle-stopped process stays
+                // alive and is not respawned into a running tor.
+                recycleProcess("tor already ran in this process", true);
+                return;
+            }
             if (state != State.STOPPED) return;
             state = State.STARTING;
             // Reset visible state under the same lock as the STARTING flip
@@ -405,29 +428,32 @@ public final class MgTorController {
             for (String bridge : SNOWFLAKE_BRIDGES) {
                 argv.add("--Bridge"); argv.add(bridge);
             }
-        } else if (transportMode == TRANSPORT_OBFS4) {
+        } else if (transportMode == TRANSPORT_BRIDGES) {
             File pt = new File(ctx.getApplicationInfo().nativeLibraryDir, "libobfs4proxy.so");
             if (!pt.exists()) {
                 // Same packaging-regression guard as snowflake above.
-                failStart("obfs4 transport binary missing: " + pt.getAbsolutePath());
+                failStart("bridge transport binary missing: " + pt.getAbsolutePath());
                 return;
             }
-            // Unlike snowflake, obfs4 has no stock bridges: each obfs4 bridge
-            // carries a per-bridge cert/iat-mode, obtained out-of-band by the
-            // user (e.g. Telegram's @GetBridgesBot) and pushed over AIDL. With
+            // Unlike snowflake, there are no stock bridges: each obfs4 bridge
+            // carries a per-bridge cert/iat-mode and each webtunnel bridge its
+            // own HTTPS url, obtained out-of-band by the user (e.g. Telegram's
+            // @GetBridgesBot or bridges.torproject.org) and pushed over AIDL. With
             // no lines there is nothing to connect to, so fail loudly rather
             // than start a UseBridges daemon that can never build a circuit.
-            List<String> bridges = parseObfs4Bridges(bridgeLines);
+            List<String> bridges = parseBridges(bridgeLines);
             if (bridges.isEmpty()) {
-                failStart("obfs4 selected but no bridge lines configured");
+                failStart("bridges selected but no bridge lines configured");
                 return;
             }
             argv.add("--UseBridges"); argv.add("1");
             argv.add("--ClientTransportPlugin");
-            // lyrebird registers the obfs4 transport; Tor sets the TOR_PT_*
-            // env (incl. the managed state dir under DataDirectory) when it
-            // execs the managed proxy, so no extra args are needed here.
-            argv.add("obfs4 exec " + pt.getAbsolutePath());
+            // lyrebird serves both obfs4 and webtunnel from one binary, so one
+            // managed proxy is registered for both names (mixed bridge sets
+            // share it). Tor sets the TOR_PT_* env (incl. the requested
+            // transport list and the managed state dir under DataDirectory)
+            // when it execs the managed proxy, so no extra args are needed here.
+            argv.add(String.join(",", PT_TRANSPORTS) + " exec " + pt.getAbsolutePath());
             for (String bridge : bridges) {
                 argv.add("--Bridge"); argv.add(bridge);
             }
@@ -449,6 +475,7 @@ public final class MgTorController {
             // exitCode=0 ("clean shutdown") to AIDL listeners.
             int rc = -1;
             try {
+                nativeRunConsumed = true;
                 rc = MgTorNative.run(argvArr);
                 Log.d(TAG, "native exit rc=" + rc);
             } catch (Throwable t) {
@@ -549,7 +576,7 @@ public final class MgTorController {
             b.cancel();
             bootstrap = null;
         }
-        // tor 0.4.8's public C API has no async shutdown hook. Drive shutdown
+        // tor 0.4.9's public C API has no async shutdown hook. Drive shutdown
         // by sending "SIGNAL SHUTDOWN" over the already-authenticated control
         // port; tor's event loop catches it and tor_run_main() returns.
         sendControlShutdown(snapshotControlPort, snapshotCookieFile);
@@ -567,7 +594,45 @@ public final class MgTorController {
                 // Thread.currentThread().isInterrupted().
                 Thread.currentThread().interrupt();
             }
+            if (daemon.isAlive()) {
+                // SIGNAL SHUTDOWN never reached tor: the control port was
+                // not bound yet, or the cookie was missing. tor has no other
+                // in-process stop, so recycle :tor. Otherwise tor keeps
+                // running and state stays STOPPING, which makes every later
+                // start()/stop() a no-op.
+                recycleProcess("stop did not take effect", false);
+            }
         }
+    }
+
+    // True when the next start() kills :tor instead of starting tor (see
+    // nativeRunConsumed, recyclePending). MgTorService uses it to skip the
+    // foreground promotion of a process that is about to die.
+    public boolean willRecycleOnStart() {
+        return recyclePending || (state == State.STOPPED && nativeRunConsumed);
+    }
+
+    // Kill :tor so the client rebinds a fresh process. onRecycling goes out
+    // first so the client treats the disconnect as expected (no backoff, no
+    // abortive-bind count). Both run on the main looper, so the callback is
+    // queued before the kill, and the delay lets the in-flight AIDL call
+    // return to the client. A stop-recycle (restart false) sends onStopped
+    // first, in the same runnable, so the client re-pins the blocking stub
+    // (or restores the user proxy) before the live SOCKS port dies; oneway
+    // calls to one binder keep their order.
+    private void recycleProcess(String why, boolean restart) {
+        Log.i(TAG, why + ", recycling :tor");
+        recyclePending = true;
+        runOnMainThread(() -> {
+            for (Listener l : listeners) {
+                if (!restart) {
+                    try { l.onStopped(-1, "stopped"); } catch (Throwable t) { Log.e(TAG, "listener.onStopped", t); }
+                }
+                try { l.onRecycling(restart); } catch (Throwable t) { Log.e(TAG, "listener.onRecycling", t); }
+            }
+        });
+        mainHandler.postDelayed(() -> Process.killProcess(Process.myPid()),
+                RECYCLE_KILL_DELAY_MS);
     }
 
     private static void sendControlShutdown(int port, File cookieFile) {
@@ -609,26 +674,42 @@ public final class MgTorController {
         }
     }
 
-    // Split the newline-separated obfs4 bridge blob pushed over AIDL into
-    // individual "--Bridge" argv values. Blank lines are dropped; a leading
-    // "Bridge " keyword (some sources, incl. @GetBridgesBot, prefix each line
-    // that way for torrc paste) is stripped so the value starts at the
-    // transport name. Lines that don't name the obfs4 transport are skipped so
-    // a stray comment or a differently-typed bridge can't wedge the daemon.
-    // Final validation of cert/iat-mode is left to lyrebird at connect time.
-    private static List<String> parseObfs4Bridges(String blob) {
+    // Split the newline-separated bridge blob pushed over AIDL into
+    // individual "--Bridge" argv values. Tokens are split on any whitespace,
+    // as Tor's own bridge-line parser does, and rejoined with single spaces.
+    // Blank lines are dropped; a leading "Bridge" keyword (some sources, incl.
+    // @GetBridgesBot, prefix each line that way for torrc paste) is stripped so
+    // the value starts at the transport name. Lines that don't name one of
+    // PT_TRANSPORTS are skipped so a stray comment or an unsupported bridge
+    // type can't wedge the daemon, and a webtunnel line without its url=
+    // argument (e.g. a wrapped paste) is skipped too. Final validation of
+    // obfs4 cert/iat-mode is left to lyrebird at connect time.
+    private static List<String> parseBridges(String blob) {
         List<String> out = new ArrayList<>();
         if (blob == null) return out;
         for (String raw : blob.split("\\r?\\n")) {
-            String line = raw.trim();
-            if (line.isEmpty()) continue;
-            if (line.regionMatches(true, 0, "Bridge ", 0, 7)) {
-                line = line.substring(7).trim();
-            }
-            if (!line.regionMatches(true, 0, "obfs4 ", 0, 6)) continue;
-            out.add(line);
+            String[] t = raw.trim().split("\\s+");
+            int i = t[0].equalsIgnoreCase("Bridge") ? 1 : 0;
+            // Need a transport name plus at least the bridge address.
+            if (t.length - i < 2) continue;
+            // Tor compares a bridge's transport name with the
+            // ClientTransportPlugin names via strcmp, so lowercase it: an
+            // "OBFS4" or "WebTunnel" line would otherwise match no managed
+            // proxy and never connect.
+            String transport = t[i].toLowerCase(Locale.ROOT);
+            if (!Arrays.asList(PT_TRANSPORTS).contains(transport)) continue;
+            if (transport.equals("webtunnel") && !hasUrlArg(t, i + 1)) continue;
+            t[i] = transport;
+            out.add(String.join(" ", Arrays.copyOfRange(t, i, t.length)));
         }
         return out;
+    }
+
+    private static boolean hasUrlArg(String[] t, int from) {
+        for (int k = from; k < t.length; k++) {
+            if (t[k].startsWith("url=")) return true;
+        }
+        return false;
     }
 
     private void onDaemonExited(int exitCode) {
@@ -652,30 +733,16 @@ public final class MgTorController {
         });
 
         // Planned stop: nothing more to do. State is STOPPED, ready for the
-        // next user/resume/push trigger to start fresh.
+        // next user/resume/push trigger, which recycles :tor (see start()).
         if (!wasUnexpected) return;
-        // No clients active: existing onClientPausedChanged restart path will
-        // fire on the next resume — no need to wake the daemon while nobody
-        // is around.
-        // TODO(plugin-extract): the legacy main-side path also re-pinned the
-        // blocking proxy stub here so MTProto couldn't fall through to direct
-        // traffic on a crash. That invariant now lives on the main side in
-        // MgTorClient (which observes onStopped above and re-pins its own
-        // stub). Verify MgTorClient covers this when it lands.
-        if (pausedClientCount > 0) return;
-        unexpectedRespawnCount++;
-        if (unexpectedRespawnCount > MAX_UNEXPECTED_RESPAWNS) {
-            // TODO(plugin-extract): legacy code showed a Toast here via
-            // LocaleController. Surface the gave-up state via Listener.onError
-            // instead and let MgTorClient render the user-visible toast on the
-            // main side.
-            dispatchError("respawn gave up after " + MAX_UNEXPECTED_RESPAWNS + " crashes");
-            return;
-        }
-        postWorkerDelayed(() -> {
-            if (state != State.STOPPED) return;
-            try { start(); } catch (Throwable t) { Log.e(TAG, "respawn start", t); }
-        }, RESPAWN_BACKOFF_MS);
+        // No in-process respawn: tor cannot run twice in one process (see
+        // nativeRunConsumed). Report the exit and let the client decide; a
+        // later start() recycles :tor into a fresh process. Native crashes
+        // kill the process outright and are covered by the client's rebind
+        // with its abortive-bind cap. MgTorClient re-pins its blocking
+        // proxy stub on onStopped, so MTProto can't fall through to direct
+        // traffic meanwhile.
+        dispatchError("tor exited unexpectedly (rc=" + exitCode + ")");
     }
 
     private void onBootstrapReady() {
@@ -683,9 +750,6 @@ public final class MgTorController {
             if (state != State.BOOTSTRAPPING) return;
             state = State.READY;
         }
-        // Reaching READY clears the crash budget: only sequential failures
-        // without a successful bootstrap should consume the cap.
-        unexpectedRespawnCount = 0;
         final int port = socksPort;
         runOnMainThread(() -> {
             // Re-check on the main thread: stop() can land between the state
@@ -795,10 +859,6 @@ public final class MgTorController {
 
     private void postWorker(Runnable r) {
         workerHandler().post(r);
-    }
-
-    private void postWorkerDelayed(Runnable r, long delayMs) {
-        workerHandler().postDelayed(r, delayMs);
     }
 
     private static int pickFreeLoopbackPort() throws IOException {

@@ -53,7 +53,7 @@ configurations.all {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
     implementation 'androidx.core:core:1.16.0'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
@@ -106,7 +106,8 @@ android {
             // (-s -w); block AGP's post-package strip so it ships our exact
             // reproducible bytes and its Go runtime isn't corrupted.
             keepDebugSymbols += '**/libsnowflake.so'
-            // libobfs4proxy.so is the lyrebird Go executable (obfs4 transport);
+            // libobfs4proxy.so is the lyrebird Go executable (obfs4 and
+            // webtunnel transports);
             // same treatment as libsnowflake.so.
             keepDebugSymbols += '**/libobfs4proxy.so'
         }

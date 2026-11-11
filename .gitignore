@@ -32,6 +32,8 @@ TMessagesProj/jni/boringssl/
 TMessagesProj/jni/ffmpeg/
 # Call core wasm module as a C array, built by jni/build_wasm_core.sh.
 TMessagesProj/jni/voip/ReferenceCoreEmbedded.cpp
+# Widget sandbox QuickJS bytecode, built by jni/build_widget_bytecode.sh.
+TMessagesProj/src/main/assets/WidgetSandbox/WidgetJS/*.qbc
 API_KEYS
 .env
 # Written at the repo root by .github/actions/jni-cache-fingerprint, hashed

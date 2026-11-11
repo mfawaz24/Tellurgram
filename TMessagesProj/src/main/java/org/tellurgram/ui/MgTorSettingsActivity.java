@@ -10,6 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.view.inputmethod.EditorInfoCompat;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
@@ -24,6 +26,8 @@ import org.telegram.ui.Components.UniversalAdapter;
 import org.telegram.ui.Components.UniversalFragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.tellurgram.MgUpdateChecker;
@@ -186,16 +190,12 @@ public class MgTorSettingsActivity extends UniversalFragment {
                             org.tellurgram.tor.MgTorClient.snapshotCurrentProxy();
                             SharedConfig.toggleMgUseTor();
                             // userInitiatedStart routes through the plugin's
-                            // start() path. The plugin deliberately does NOT
-                            // reset unexpectedRespawnCount on a user toggle —
-                            // a flapping daemon could otherwise burn battery
-                            // as resume / push wake-ups keep clearing the
-                            // budget. The cap auto-resets on a successful
-                            // onBootstrapReady, so a prior session that hit
-                            // "respawn gave up" still gets one fresh attempt
-                            // per toggle-on (state==STOPPED → start runs
-                            // once); a re-crash trips the cap again until
-                            // the plugin process is reclaimed.
+                            // start() path. The plugin never runs tor twice in
+                            // one :tor process: if tor already ran there, start()
+                            // kills :tor and the rebind repeats the start in a
+                            // fresh process. MgTorClient owns the restart cap
+                            // for unexpected tor exits and resets it here, so
+                            // toggling off and on retries after a give-up.
                             Utilities.globalQueue.postRunnable(() ->
                                     org.tellurgram.tor.MgTorClient.getInstance().userInitiatedStart());
                             refreshList();
@@ -433,7 +433,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
         final int[] choices = {
                 SharedConfig.MG_TOR_TRANSPORT_DIRECT,
                 SharedConfig.MG_TOR_TRANSPORT_SNOWFLAKE,
-                SharedConfig.MG_TOR_TRANSPORT_OBFS4,
+                SharedConfig.MG_TOR_TRANSPORT_BRIDGES,
         };
         AtomicReference<Dialog> dialogRef = new AtomicReference<>();
         LinearLayout linearLayout = new LinearLayout(context);
@@ -451,13 +451,13 @@ public class MgTorSettingsActivity extends UniversalFragment {
             cell.setOnClickListener(v -> {
                 Dialog d = dialogRef.get();
                 if (d != null) d.dismiss();
-                if (mode == SharedConfig.MG_TOR_TRANSPORT_OBFS4) {
-                    // obfs4 has no stock bridges: the user must paste bridge
+                if (mode == SharedConfig.MG_TOR_TRANSPORT_BRIDGES) {
+                    // Bridges have no stock lines: the user must paste bridge
                     // lines. The dialog commits both the lines and the mode
-                    // switch on OK, so picking obfs4 with no lines can't leave a
-                    // dead transport selected. Re-picking obfs4 while it's the
+                    // switch on OK, so picking bridges with no lines can't leave a
+                    // dead transport selected. Re-picking bridges while it's the
                     // current mode reopens the editor (prefilled) for edits.
-                    showObfs4BridgesDialog();
+                    showBridgesDialog();
                 } else {
                     SharedConfig.setMgTorTransportMode(mode);
                     refreshList();
@@ -473,7 +473,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
         showDialog(dialog);
     }
 
-    private void showObfs4BridgesDialog() {
+    private void showBridgesDialog() {
         Context context = getParentActivity();
         if (context == null) return;
         EditText editText = new EditText(context);
@@ -482,10 +482,15 @@ public class MgTorSettingsActivity extends UniversalFragment {
         // hint colors like Telegram's own themed inputs do.
         editText.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
         editText.setHintTextColor(Theme.getColor(Theme.key_dialogTextHint));
-        editText.setHint(LocaleController.getString(R.string.MercurygramTorObfs4BridgesHint));
+        editText.setHint(LocaleController.getString(R.string.MercurygramTorBridgesHint));
         editText.setText(SharedConfig.mg_torBridgeLines);
+        // Bridge addresses must stay unknown to a censor, so keep the keyboard
+        // from suggesting or learning them (a cloud-synced IME dictionary would
+        // otherwise leak them off the device).
         editText.setInputType(android.text.InputType.TYPE_CLASS_TEXT
-                | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+                | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                | android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        editText.setImeOptions(EditorInfoCompat.IME_FLAG_NO_PERSONALIZED_LEARNING);
         editText.setMinLines(3);
         editText.setGravity(android.view.Gravity.TOP | android.view.Gravity.START);
         int pad = AndroidUtilities.dp(4);
@@ -497,7 +502,7 @@ public class MgTorSettingsActivity extends UniversalFragment {
         container.addView(editText, LayoutHelper.createLinear(
                 LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         AlertDialog dialog = new AlertDialog.Builder(context)
-                .setTitle(LocaleController.getString(R.string.MercurygramTorTransportObfs4))
+                .setTitle(LocaleController.getString(R.string.MercurygramTorTransportBridges))
                 .setView(container)
                 .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
                 .setPositiveButton(LocaleController.getString(R.string.Save), null)
@@ -508,15 +513,15 @@ public class MgTorSettingsActivity extends UniversalFragment {
             View btn = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
             if (btn == null) return;
             btn.setOnClickListener(v -> {
-                String lines = normalizeObfs4Bridges(editText.getText().toString());
+                String lines = normalizeBridges(editText.getText().toString());
                 if (lines.isEmpty()) {
                     Toast.makeText(context,
-                            LocaleController.getString(R.string.MercurygramTorObfs4BridgesInvalid),
+                            LocaleController.getString(R.string.MercurygramTorBridgesInvalid),
                             Toast.LENGTH_LONG).show();
                     return;
                 }
                 SharedConfig.setMgTorBridgeLines(lines);
-                SharedConfig.setMgTorTransportMode(SharedConfig.MG_TOR_TRANSPORT_OBFS4);
+                SharedConfig.setMgTorTransportMode(SharedConfig.MG_TOR_TRANSPORT_BRIDGES);
                 refreshList();
                 dialog.dismiss();
             });
@@ -524,32 +529,51 @@ public class MgTorSettingsActivity extends UniversalFragment {
         showDialog(dialog);
     }
 
-    // Keep only well-formed obfs4 bridge lines (tolerating a leading "Bridge "
-    // keyword some sources prepend), one per line. Mirrors the plugin-side
-    // MgTorController.parseObfs4Bridges so what the user sees saved is what the
-    // daemon will actually use. Returns "" when nothing valid remains.
-    private static String normalizeObfs4Bridges(String raw) {
+    // Keep only well-formed obfs4/webtunnel bridge lines (tolerating a leading
+    // "Bridge" keyword some sources prepend), one per line. Tokens are split on
+    // any whitespace, as Tor's own bridge-line parser does, and rejoined with
+    // single spaces. A webtunnel line must carry its url= argument (a wrapped
+    // paste otherwise saves a bridge that can never connect); obfs4 cert/iat-mode
+    // are left to lyrebird. Mirrors the plugin-side MgTorController.parseBridges
+    // so what the user sees saved is what the daemon will actually use. Returns
+    // "" when nothing valid remains.
+    private static String normalizeBridges(String raw) {
         if (raw == null) return "";
         StringBuilder sb = new StringBuilder();
         for (String line : raw.split("\\r?\\n")) {
-            String s = line.trim();
-            if (s.isEmpty()) continue;
-            if (s.regionMatches(true, 0, "Bridge ", 0, 7)) {
-                s = s.substring(7).trim();
+            String[] t = line.trim().split("\\s+");
+            int i = t[0].equalsIgnoreCase("Bridge") ? 1 : 0;
+            // Need a transport name plus at least the bridge address.
+            if (t.length - i < 2) continue;
+            // Tor matches the transport name against the ClientTransportPlugin
+            // names case-sensitively, so store it lowercase: an "OBFS4" or
+            // "WebTunnel" line would otherwise be saved but never used.
+            String transport = t[i].toLowerCase(Locale.ROOT);
+            if (transport.equals("webtunnel")) {
+                if (!hasUrlArg(t, i + 1)) continue;
+            } else if (!transport.equals("obfs4")) {
+                continue;
             }
-            if (!s.regionMatches(true, 0, "obfs4 ", 0, 6)) continue;
+            t[i] = transport;
             if (sb.length() > 0) sb.append('\n');
-            sb.append(s);
+            sb.append(String.join(" ", Arrays.copyOfRange(t, i, t.length)));
         }
         return sb.toString();
+    }
+
+    private static boolean hasUrlArg(String[] t, int from) {
+        for (int k = from; k < t.length; k++) {
+            if (t[k].startsWith("url=")) return true;
+        }
+        return false;
     }
 
     private static String transportLabel(int mode) {
         switch (mode) {
             case SharedConfig.MG_TOR_TRANSPORT_SNOWFLAKE:
                 return LocaleController.getString(R.string.MercurygramTorTransportSnowflake);
-            case SharedConfig.MG_TOR_TRANSPORT_OBFS4:
-                return LocaleController.getString(R.string.MercurygramTorTransportObfs4);
+            case SharedConfig.MG_TOR_TRANSPORT_BRIDGES:
+                return LocaleController.getString(R.string.MercurygramTorTransportBridges);
             case SharedConfig.MG_TOR_TRANSPORT_DIRECT:
             default:
                 return LocaleController.getString(R.string.MercurygramTorTransportDirect);
