@@ -26,8 +26,6 @@ public class FirebasePhoneNumberVerificationHelper {
     public static class SimInfo {
         public int slot;
         public String carrierName;
-        public String countryName;
-        public String mccMnc;
         public String phoneNumber;
     }
 
