@@ -161,6 +161,11 @@ android {
         cruncherEnabled = false
     }
 
+    // IWidgetEngine: the widget engine's isolated process (WidgetEngineService).
+    buildFeatures {
+        aidl true
+    }
+
     lintOptions {
         disable 'MissingTranslation'
         disable 'ExtraTranslation'
@@ -193,7 +198,7 @@ android {
                     cmakeArgs += '-DQUIET_BUILD=ON'
                 }
                 arguments(*cmakeArgs)
-                targets 'tmessages.49'
+                targets 'tmessages.49', 'twidget'
             }
         }
 
