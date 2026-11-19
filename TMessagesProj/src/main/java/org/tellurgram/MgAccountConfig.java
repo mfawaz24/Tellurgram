@@ -36,6 +36,7 @@ public class MgAccountConfig {
     public boolean preferSecretChats = true;
     /** The one-time "new chats start as secret" hint was shown on the new-chat screen. */
     public boolean preferSecretChatsHintShown = false;
+    public boolean secretChatAccessibility = false;
     public boolean deleteForAllByDefault = false;
     public boolean stripTrackingParams = true;
     public boolean disableCloudDrafts = false;
@@ -97,6 +98,7 @@ public class MgAccountConfig {
         editor.putBoolean("disableLinkPreviews", disableLinkPreviews);
         editor.putBoolean("preferSecretChats", preferSecretChats);
         editor.putBoolean("preferSecretChatsHintShown", preferSecretChatsHintShown);
+        editor.putBoolean("secretChatAccessibility", secretChatAccessibility);
         editor.putBoolean("deleteForAllByDefault", deleteForAllByDefault);
         editor.putBoolean("stripTrackingParams", stripTrackingParams);
         editor.putBoolean("disableCloudDrafts", disableCloudDrafts);
@@ -128,6 +130,7 @@ public class MgAccountConfig {
         disableLinkPreviews = preferences.getBoolean("disableLinkPreviews", false);
         preferSecretChats = preferences.getBoolean("preferSecretChats", true);
         preferSecretChatsHintShown = preferences.getBoolean("preferSecretChatsHintShown", false);
+        secretChatAccessibility = preferences.getBoolean("secretChatAccessibility", false);
         deleteForAllByDefault = preferences.getBoolean("deleteForAllByDefault", false);
         stripTrackingParams = preferences.getBoolean("stripTrackingParams", true);
         disableCloudDrafts = preferences.getBoolean("disableCloudDrafts", false);
@@ -175,6 +178,7 @@ public class MgAccountConfig {
         disableLinkPreviews = false;
         preferSecretChats = true;
         preferSecretChatsHintShown = false;
+        secretChatAccessibility = false;
         deleteForAllByDefault = false;
         stripTrackingParams = true;
         disableCloudDrafts = false;

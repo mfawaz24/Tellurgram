@@ -6,6 +6,9 @@ name: Sync Mercurygram upstream
 # conflict, merge mg-upstream into staging locally, resolve it there and promote
 # staging; GitHub then marks the mg-upstream pull request as merged.
 # mg-upstream is force-updated, so a history rewrite upstream just moves it.
+# Mercurygram rebases onto every Telegram release, so after a rewrite the
+# workflow applies only the real difference onto staging and opens a pull
+# request into staging (or an issue, if that still conflicts) instead.
 #
 # GITHUB_TOKEN cannot push commits that change .github/workflows, which
 # upstream commits often do, and pull requests opened with GITHUB_TOKEN don't
@@ -26,6 +29,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      issues: write
       pull-requests: write
 
     steps:
@@ -55,6 +59,7 @@ jobs:
       # Runs even when mg-upstream was already current, so a pull request closed
       # without merging is opened again.
       - name: Open a pull request into prod
+        id: prod
         env:
           GH_TOKEN: ${{ secrets.SYNC_TOKEN || github.token }}
         run: |
@@ -62,6 +67,20 @@ jobs:
           upstream=$(git rev-parse --short mg-upstream)
           if git merge-base --is-ancestor mg-upstream origin/prod; then
             echo "prod already contains Mercurygram ${upstream}" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # Mercurygram rebases its patch stack onto each Telegram release. If
+          # the mirror merged last is no longer an ancestor of mg-upstream, a
+          # merge into prod would conflict almost everywhere, so apply only the
+          # real difference onto staging instead (see scripts/mg-rewrite-merge.sh).
+          old=$(git log --merges --format='%P %s' origin/staging origin/prod |
+            grep -m1 -E '^[0-9a-f]+ [0-9a-f]+ ((Merge|Record) Mercurygram [0-9a-f]{7,}|Merge pull request .* from [^ ]+/mg-upstream$)' |
+            cut -d' ' -f2 || true)
+          if [ -n "$old" ] && ! git merge-base --is-ancestor "$old" mg-upstream; then
+            echo "rewrite=true" >> "$GITHUB_OUTPUT"
+            echo "old=$old" >> "$GITHUB_OUTPUT"
+            echo "Mercurygram rewrote its history since $(git rev-parse --short "$old")" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           existing=$(gh pr list --base prod --head mg-upstream --state open --json url --jq '.[0].url')
@@ -78,3 +97,46 @@ jobs:
           url=$(gh pr create --base prod --head mg-upstream \
             --title "Merge Mercurygram ${upstream} into prod" --body "$note")
           echo "Opened ${url}" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # After a history rewrite: apply the old..new mirror difference onto a
+      # branch made from staging and open a pull request into staging. If
+      # something still conflicts, open an issue with the files and the local
+      # command instead. Either way, promote staging to prod as usual.
+      - name: Merge a rewritten Mercurygram into staging
+        if: steps.prod.outputs.rewrite == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN || github.token }}
+          OLD: ${{ steps.prod.outputs.old }}
+        run: |
+          set -euo pipefail
+          upstream=$(git rev-parse --short mg-upstream)
+          branch="sync/mercurygram-${upstream}"
+          title="Merge rewritten Mercurygram ${upstream} into staging"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            echo "${branch} already exists" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [ -n "$(gh issue list --state open --search "in:title \"${title}\"" --json number --jq '.[0].number')" ]; then
+            echo "Issue for ${upstream} already open" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          git checkout -q -B "$branch" origin/staging
+          status=0
+          scripts/mg-rewrite-merge.sh "$OLD" mg-upstream > merge.out || status=$?
+          cat merge.out
+          old_short=$(git rev-parse --short "$OLD")
+          case $status in
+            0)
+              git push origin "$branch"
+              url=$(gh pr create --base staging --head "$branch" --title "$title" --body "$(printf \
+                'Mercurygram rewrote its history, so this applies only the difference between the old mirror %s and %s onto staging, with mg-upstream recorded as merged.\n\nAfter merging, promote staging to prod.' \
+                "$old_short" "$upstream")")
+              echo "Opened ${url}" | tee -a "$GITHUB_STEP_SUMMARY" ;;
+            2)
+              url=$(gh issue create --title "$title" --body "$(printf \
+                'Mercurygram rewrote its history. Applying only %s..%s onto staging still conflicts:\n\n%s\n\nResolve locally:\n\n```sh\ngit fetch origin\ngit switch -c %s origin/staging\nscripts/mg-rewrite-merge.sh %s %s\n# fix the files above, then\ngit add -A && git commit\n```\n\nOpen a pull request into staging, then promote staging to prod.' \
+                "$old_short" "$upstream" "$(grep '^- ' merge.out)" "$branch" "$old_short" "$(git rev-parse mg-upstream)")")
+              echo "Conflicts, opened ${url}" | tee -a "$GITHUB_STEP_SUMMARY" ;;
+            *) exit "$status" ;;
+          esac
